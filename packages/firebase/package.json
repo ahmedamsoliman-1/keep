@@ -7,6 +7,8 @@
     ".": "./src/index.ts",
     "./admin": "./src/admin.ts",
     "./client": "./src/client.ts",
+    "./repositories/environment": "./src/repositories/environment-repository.ts",
+    "./repositories/project": "./src/repositories/project-repository.ts",
     "./repositories/vault": "./src/repositories/vault-repository.ts"
   },
   "scripts": {

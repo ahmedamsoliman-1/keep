@@ -10,7 +10,10 @@ export default function LoginPage() {
       footer={
         <>
           New to Envault?{" "}
-          <Link className="text-[var(--foreground)] underline" href="/register">
+          <Link
+            className="font-medium text-indigo-600 hover:text-indigo-500"
+            href="/register"
+          >
             Create an account
           </Link>
         </>
@@ -19,7 +22,7 @@ export default function LoginPage() {
     >
       <AuthForm mode="login" />
       <Link
-        className="mt-4 block text-right text-sm underline"
+        className="mt-4 block text-right text-xs font-medium text-indigo-600 hover:text-indigo-500"
         href="/forgot-password"
       >
         Forgot password?

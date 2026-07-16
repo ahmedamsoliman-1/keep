@@ -8,7 +8,10 @@ export default function ForgotPasswordPage() {
     <AuthShell
       description="Resetting your account password does not reset your future vault passphrase."
       footer={
-        <Link className="text-[var(--foreground)] underline" href="/login">
+        <Link
+          className="font-medium text-indigo-600 hover:text-indigo-500"
+          href="/login"
+        >
           Return to sign in
         </Link>
       }

@@ -1,30 +1,35 @@
 import { redirect } from "next/navigation";
 
 import { AppShell } from "@/components/layout/app-shell";
-import { VaultManager } from "@/components/vault/vault-manager";
+import { EnvironmentWorkspace } from "@/components/environments/environment-workspace";
 import { getSessionUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
-export default async function VaultPage() {
+export default async function ProjectPage({
+  params,
+}: {
+  params: Promise<{ projectId: string }>;
+}) {
   const user = await getSessionUser();
   if (!user) redirect("/login");
+  const { projectId } = await params;
 
   return (
     <AppShell
-      eyebrow="Security"
-      title="Vault"
+      eyebrow="Project"
+      title="Environments"
       userEmail={user.email}
       userName={user.displayName}
     >
       <section className="mx-auto max-w-7xl">
         <h2 className="text-3xl font-semibold tracking-[-0.035em]">
-          Vault security
+          Environments
         </h2>
-        <p className="mb-10 mt-3 max-w-2xl text-[var(--muted)]">
-          Encryption and key wrapping happen locally in this browser.
+        <p className="mb-8 mt-3 text-[var(--muted)]">
+          Separate configuration across local, staging, and production targets.
         </p>
-        <VaultManager />
+        <EnvironmentWorkspace projectId={projectId} />
       </section>
     </AppShell>
   );

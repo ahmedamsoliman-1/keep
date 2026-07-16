@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { getAuthErrorMessage } from "@/lib/auth-errors";
 import { getClientAuth } from "@/lib/firebase-client";
 import { clearActiveVaultKey } from "@/lib/vault-key-store";
 
@@ -40,6 +41,8 @@ export function VerificationPanel() {
       await apiClient.auth.session.create(await user.getIdToken(true));
       router.push("/app/dashboard");
       router.refresh();
+    } catch (caughtError) {
+      setMessage(getAuthErrorMessage(caughtError, "session"));
     } finally {
       setPending(false);
     }
@@ -51,6 +54,8 @@ export function VerificationPanel() {
     try {
       await sendEmailVerification(user);
       setMessage("A new verification email has been sent.");
+    } catch (caughtError) {
+      setMessage(getAuthErrorMessage(caughtError, "email-verification"));
     } finally {
       setPending(false);
     }

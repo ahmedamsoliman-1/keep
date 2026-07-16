@@ -1,0 +1,91 @@
+import { base64UrlToBytes, bytesToBase64Url } from "./base64";
+import type { CryptoProvider } from "./crypto-provider";
+import type { EncryptedPayloadV1 } from "./types";
+
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
+
+export interface VariableAdditionalData {
+  vaultId: string;
+  projectId: string;
+  environmentId: string;
+  variableId: string;
+  encryptionVersion: number;
+}
+
+function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  return Uint8Array.from(bytes).buffer;
+}
+
+function encodeAdditionalData(data: VariableAdditionalData) {
+  return encoder.encode(
+    [
+      "envault",
+      "variable",
+      "v1",
+      data.vaultId,
+      data.projectId,
+      data.environmentId,
+      data.variableId,
+      String(data.encryptionVersion),
+    ].join(":"),
+  );
+}
+
+async function importVaultKey(provider: CryptoProvider, vaultKey: Uint8Array) {
+  return provider.subtle.importKey(
+    "raw",
+    toArrayBuffer(vaultKey),
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"],
+  );
+}
+
+export async function encryptVariableValue(
+  provider: CryptoProvider,
+  vaultKey: Uint8Array,
+  plaintext: string,
+  additionalData: VariableAdditionalData,
+): Promise<EncryptedPayloadV1> {
+  const key = await importVaultKey(provider, vaultKey);
+  const iv = provider.getRandomValues(new Uint8Array(12));
+  const ciphertext = await provider.subtle.encrypt(
+    {
+      name: "AES-GCM",
+      iv: toArrayBuffer(iv),
+      additionalData: toArrayBuffer(encodeAdditionalData(additionalData)),
+      tagLength: 128,
+    },
+    key,
+    toArrayBuffer(encoder.encode(plaintext)),
+  );
+
+  return {
+    version: 1,
+    algorithm: "AES-GCM",
+    ciphertext: bytesToBase64Url(new Uint8Array(ciphertext)),
+    iv: bytesToBase64Url(iv),
+    additionalDataVersion: 1,
+  };
+}
+
+export async function decryptVariableValue(
+  provider: CryptoProvider,
+  vaultKey: Uint8Array,
+  payload: EncryptedPayloadV1,
+  additionalData: VariableAdditionalData,
+): Promise<string> {
+  const key = await importVaultKey(provider, vaultKey);
+  const plaintext = await provider.subtle.decrypt(
+    {
+      name: "AES-GCM",
+      iv: toArrayBuffer(base64UrlToBytes(payload.iv)),
+      additionalData: toArrayBuffer(encodeAdditionalData(additionalData)),
+      tagLength: 128,
+    },
+    key,
+    toArrayBuffer(base64UrlToBytes(payload.ciphertext)),
+  );
+  return decoder.decode(plaintext);
+}

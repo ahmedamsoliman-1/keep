@@ -4,6 +4,8 @@ import { EnvaultClient } from "@envault/api-client";
 import type { VaultDto } from "@envault/api-contract";
 import { useEffect, useState } from "react";
 
+import { getUserFacingError } from "@/lib/user-errors";
+
 import { VaultSetup } from "./vault-setup";
 import { VaultUnlock } from "./vault-unlock";
 
@@ -19,9 +21,10 @@ export function VaultManager() {
       .then((status) => setVault(status.vault))
       .catch((caughtError: unknown) => {
         setError(
-          caughtError instanceof Error
-            ? caughtError.message
-            : "Unable to load vault.",
+          getUserFacingError(
+            caughtError,
+            "Vault metadata could not be loaded.",
+          ),
         );
       });
   }, []);

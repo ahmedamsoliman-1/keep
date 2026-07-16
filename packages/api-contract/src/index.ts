@@ -43,8 +43,13 @@ export const sessionExchangeRequestSchema = z.object({
 export const sessionUserSchema = z.object({
   id: z.string().min(1),
   email: z.email().nullable(),
+  displayName: z.string().nullable(),
   emailVerified: z.boolean(),
   mfaEnabled: z.boolean(),
+});
+
+export const updateProfileRequestSchema = z.object({
+  displayName: z.string().trim().min(1).max(80),
 });
 
 export const sessionResponseSchema = z.object({
@@ -102,6 +107,15 @@ export const projectDtoSchema = z.object({
   updatedAt: z.iso.datetime(),
 });
 
+export const createProjectRequestSchema = z.object({
+  name: z.string().trim().min(1).max(100),
+  description: z.string().trim().max(500).nullable().default(null),
+});
+
+export const projectListSchema = z.object({
+  projects: z.array(projectDtoSchema),
+});
+
 export const environmentKindSchema = z.enum([
   "local",
   "development",
@@ -124,6 +138,11 @@ export const environmentDtoSchema = z.object({
   updatedAt: z.iso.datetime(),
 });
 
+export const createEnvironmentRequestSchema = z.object({
+  name: z.string().trim().min(1).max(100),
+  kind: environmentKindSchema,
+});
+
 export const variableDtoSchema = z.object({
   id: z.string().min(1),
   vaultId: z.string().min(1),
@@ -138,6 +157,22 @@ export const variableDtoSchema = z.object({
   description: z.string().max(1_000).nullable(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
+});
+
+export const createVariableRequestSchema = z.object({
+  id: z.string().uuid(),
+  projectId: z.string().min(1),
+  key: z
+    .string()
+    .regex(/^[A-Za-z_][A-Za-z0-9_]*$/u)
+    .max(256),
+  encryptedValue: z.string().min(1).max(1_000_000),
+  encryptionIv: z.string().min(1).max(256),
+  encryptionVersion: z.literal(1),
+  visibility: z.enum(["secret", "protected", "plain"]),
+  tags: z.array(z.string().min(1).max(50)).max(30).default([]),
+  description: z.string().max(1_000).nullable().default(null),
+  expectedVersion: z.number().int().nonnegative(),
 });
 
 export function createSuccessResponse<T>(data: T, requestId: string) {
@@ -157,10 +192,16 @@ export type SessionExchangeRequest = z.infer<
 >;
 export type SessionResponse = z.infer<typeof sessionResponseSchema>;
 export type SessionUser = z.infer<typeof sessionUserSchema>;
+export type UpdateProfileRequest = z.infer<typeof updateProfileRequestSchema>;
 export type CreateVaultRequest = z.infer<typeof createVaultRequestSchema>;
 export type VaultDto = z.infer<typeof vaultDtoSchema>;
 export type VaultStatus = z.infer<typeof vaultStatusSchema>;
 export type VaultSettings = z.infer<typeof vaultSettingsSchema>;
 export type ProjectDto = z.infer<typeof projectDtoSchema>;
+export type CreateProjectRequest = z.infer<typeof createProjectRequestSchema>;
 export type EnvironmentDto = z.infer<typeof environmentDtoSchema>;
+export type CreateEnvironmentRequest = z.infer<
+  typeof createEnvironmentRequestSchema
+>;
 export type VariableDto = z.infer<typeof variableDtoSchema>;
+export type CreateVariableRequest = z.infer<typeof createVariableRequestSchema>;

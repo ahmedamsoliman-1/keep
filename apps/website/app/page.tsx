@@ -1,14 +1,13 @@
-import { LockKeyhole } from "lucide-react";
 import Link from "next/link";
+
+import { EnvaultLogo, EnvaultMark } from "@/components/brand/envault-logo";
 
 export default function HomePage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-5xl items-center px-6 py-24">
       <section className="max-w-2xl">
-        <div className="mb-8 inline-flex size-10 items-center justify-center rounded-lg border">
-          <LockKeyhole aria-hidden="true" className="size-5" />
-        </div>
-        <p className="mb-3 font-mono text-sm text-[var(--accent)]">ENVAULT</p>
+        <EnvaultLogo className="mb-14" />
+        <EnvaultMark className="mb-8 size-11 text-indigo-600" />
         <h1 className="m-0 text-5xl font-semibold tracking-tight">
           Your environments, organized and protected.
         </h1>

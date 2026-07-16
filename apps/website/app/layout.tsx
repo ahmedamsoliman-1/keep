@@ -6,7 +6,10 @@ import { VaultLifecycle } from "@/components/vault/vault-lifecycle";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Envault",
+  title: {
+    default: "Envault",
+    template: "%s · Envault",
+  },
   description: "Your environments, organized and protected.",
 };
 

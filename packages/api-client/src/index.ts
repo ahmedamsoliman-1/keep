@@ -1,7 +1,15 @@
 import type {
   ApiError,
   CreateVaultRequest,
+  CreateProjectRequest,
+  CreateEnvironmentRequest,
+  CreateVariableRequest,
+  EnvironmentDto,
+  ProjectDto,
   SessionResponse,
+  SessionUser,
+  UpdateProfileRequest,
+  VariableDto,
   VaultDto,
   VaultSettings,
   VaultStatus,
@@ -68,6 +76,51 @@ export class EnvaultClient {
         method: "POST",
         body: JSON.stringify(input),
       }),
+  };
+
+  public readonly projects = {
+    list: () => this.request<{ projects: ProjectDto[] }>("/api/v1/projects"),
+    create: (input: CreateProjectRequest) =>
+      this.request<ProjectDto>("/api/v1/projects", {
+        method: "POST",
+        body: JSON.stringify(input),
+      }),
+  };
+
+  public readonly profile = {
+    get: () => this.request<SessionUser>("/api/v1/profile"),
+    update: (input: UpdateProfileRequest) =>
+      this.request<SessionUser>("/api/v1/profile", {
+        method: "PATCH",
+        body: JSON.stringify(input),
+      }),
+  };
+
+  public readonly environments = {
+    list: (projectId: string) =>
+      this.request<{ environments: EnvironmentDto[] }>(
+        `/api/v1/projects/${projectId}/environments`,
+      ),
+    create: (projectId: string, input: CreateEnvironmentRequest) =>
+      this.request<EnvironmentDto>(
+        `/api/v1/projects/${projectId}/environments`,
+        {
+          method: "POST",
+          body: JSON.stringify(input),
+        },
+      ),
+  };
+
+  public readonly variables = {
+    list: (environmentId: string) =>
+      this.request<{ variables: VariableDto[]; version: number }>(
+        `/api/v1/environments/${environmentId}/variables`,
+      ),
+    create: (environmentId: string, input: CreateVariableRequest) =>
+      this.request<{ variable: VariableDto; version: number }>(
+        `/api/v1/environments/${environmentId}/variables`,
+        { method: "POST", body: JSON.stringify(input) },
+      ),
   };
 
   public async request<T>(path: string, init: RequestInit = {}): Promise<T> {

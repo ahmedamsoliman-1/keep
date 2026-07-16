@@ -70,6 +70,8 @@ export async function POST(request: NextRequest) {
         user: {
           id: decodedToken.uid,
           email: decodedToken.email ?? null,
+          displayName:
+            typeof decodedToken.name === "string" ? decodedToken.name : null,
           emailVerified: decodedToken.email_verified ?? false,
           mfaEnabled: Boolean(decodedToken.firebase.sign_in_second_factor),
         },

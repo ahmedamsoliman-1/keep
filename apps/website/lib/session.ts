@@ -22,6 +22,7 @@ export async function getSessionUser(checkRevoked = true) {
     return {
       id: user.uid,
       email: user.email ?? null,
+      displayName: user.displayName ?? null,
       emailVerified: user.emailVerified,
       mfaEnabled: (user.multiFactor?.enrolledFactors.length ?? 0) > 0,
     };

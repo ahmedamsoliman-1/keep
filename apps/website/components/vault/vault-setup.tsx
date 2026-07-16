@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
 import { setActiveVaultKey } from "@/lib/vault-key-store";
+import { getUserFacingError } from "@/lib/user-errors";
 
 const client = new EnvaultClient({ baseUrl: "" });
 
@@ -52,9 +53,7 @@ export function VaultSetup() {
       setConfirmation("");
     } catch (caughtError) {
       setError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : "Vault setup failed.",
+        getUserFacingError(caughtError, "Vault setup could not be prepared."),
       );
     } finally {
       setPending(false);
@@ -78,9 +77,10 @@ export function VaultSetup() {
       router.refresh();
     } catch (caughtError) {
       setError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : "Vault setup failed.",
+        getUserFacingError(
+          caughtError,
+          "The encrypted vault could not be created.",
+        ),
       );
     } finally {
       setPending(false);

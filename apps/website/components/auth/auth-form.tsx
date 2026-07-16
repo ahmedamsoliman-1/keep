@@ -3,27 +3,26 @@
 import { EnvaultClient } from "@envault/api-client";
 import {
   createUserWithEmailAndPassword,
+  getMultiFactorResolver,
   sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
+  TotpMultiFactorGenerator,
+  type MultiFactorError,
+  type MultiFactorResolver,
 } from "firebase/auth";
+import { FirebaseError } from "firebase/app";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
+import { getAuthErrorMessage } from "@/lib/auth-errors";
 import { getClientAuth } from "@/lib/firebase-client";
 import { isEmailVerificationRequired } from "@/lib/features";
 
 type AuthMode = "login" | "register" | "forgot-password";
 
 const apiClient = new EnvaultClient({ baseUrl: "" });
-
-function getMessage(error: unknown) {
-  if (error instanceof Error) {
-    return error.message.replace(/^Firebase:\s*/u, "");
-  }
-  return "Something went wrong. Please try again.";
-}
 
 export function AuthForm({ mode }: { mode: AuthMode }) {
   const router = useRouter();
@@ -32,6 +31,10 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [mfaResolver, setMfaResolver] = useState<MultiFactorResolver | null>(
+    null,
+  );
+  const [mfaCode, setMfaCode] = useState("");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -41,6 +44,29 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
     try {
       const firebaseAuth = getClientAuth();
+      if (mfaResolver) {
+        const hint = mfaResolver.hints.find(
+          (factor) => factor.factorId === TotpMultiFactorGenerator.FACTOR_ID,
+        );
+        if (!hint) {
+          setError("No supported authenticator-app factor is available.");
+          return;
+        }
+        const assertion = TotpMultiFactorGenerator.assertionForSignIn(
+          hint.uid,
+          mfaCode,
+        );
+        const credential = await mfaResolver.resolveSignIn(assertion);
+        await apiClient.auth.session.create(
+          await credential.user.getIdToken(true),
+        );
+        setMfaResolver(null);
+        setMfaCode("");
+        router.push("/app/dashboard");
+        router.refresh();
+        return;
+      }
+
       if (mode === "forgot-password") {
         await sendPasswordResetEmail(firebaseAuth, email);
         setNotice(
@@ -70,8 +96,27 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       router.push("/app/dashboard");
       router.refresh();
     } catch (caughtError) {
+      if (
+        mode === "login" &&
+        caughtError instanceof FirebaseError &&
+        caughtError.code === "auth/multi-factor-auth-required"
+      ) {
+        setMfaResolver(
+          getMultiFactorResolver(
+            getClientAuth(),
+            caughtError as MultiFactorError,
+          ),
+        );
+        setError(null);
+        return;
+      }
       await signOut(getClientAuth()).catch(() => undefined);
-      setError(getMessage(caughtError));
+      setError(
+        getAuthErrorMessage(
+          caughtError,
+          mode === "forgot-password" ? "password-reset" : mode,
+        ),
+      );
     } finally {
       setPending(false);
     }
@@ -84,11 +129,11 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         void handleSubmit(event);
       }}
     >
-      <label className="block text-sm font-medium">
+      <label className="block text-[13px] font-medium">
         Email
         <input
           autoComplete="email"
-          className="mt-2 w-full rounded-lg border bg-transparent px-3 py-2.5 outline-none focus:ring-2 focus:ring-[var(--accent)]"
+          className="focus:ring-3 mt-2 w-full rounded-xl border bg-[var(--surface)] px-3.5 py-3 text-sm outline-none focus:border-[var(--accent)] focus:ring-indigo-500/10"
           onChange={(event) => setEmail(event.target.value)}
           required
           type="email"
@@ -96,20 +141,38 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         />
       </label>
       {mode !== "forgot-password" ? (
-        <label className="block text-sm font-medium">
-          Password
-          <input
-            autoComplete={
-              mode === "register" ? "new-password" : "current-password"
-            }
-            className="mt-2 w-full rounded-lg border bg-transparent px-3 py-2.5 outline-none focus:ring-2 focus:ring-[var(--accent)]"
-            minLength={8}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-            type="password"
-            value={password}
-          />
-        </label>
+        mfaResolver ? (
+          <label className="block text-[13px] font-medium">
+            Authenticator code
+            <input
+              autoComplete="one-time-code"
+              autoFocus
+              className="focus:ring-3 mt-2 w-full rounded-xl border bg-[var(--surface)] px-3.5 py-3 font-mono text-sm tracking-[0.25em] outline-none focus:border-[var(--accent)] focus:ring-indigo-500/10"
+              inputMode="numeric"
+              maxLength={6}
+              onChange={(event) =>
+                setMfaCode(event.target.value.replace(/\D/gu, ""))
+              }
+              required
+              value={mfaCode}
+            />
+          </label>
+        ) : (
+          <label className="block text-[13px] font-medium">
+            Password
+            <input
+              autoComplete={
+                mode === "register" ? "new-password" : "current-password"
+              }
+              className="focus:ring-3 mt-2 w-full rounded-xl border bg-[var(--surface)] px-3.5 py-3 text-sm outline-none focus:border-[var(--accent)] focus:ring-indigo-500/10"
+              minLength={8}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+              type="password"
+              value={password}
+            />
+          </label>
+        )
       ) : null}
       {error ? (
         <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-600">
@@ -122,17 +185,19 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         </p>
       ) : null}
       <button
-        className="w-full rounded-lg bg-[var(--foreground)] px-4 py-2.5 text-sm font-medium text-[var(--background)] disabled:opacity-50"
+        className="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-medium text-white shadow-sm shadow-indigo-600/15 hover:bg-indigo-500 disabled:opacity-50"
         disabled={pending}
         type="submit"
       >
         {pending
           ? "Please wait…"
-          : mode === "login"
-            ? "Sign in"
-            : mode === "register"
-              ? "Create account"
-              : "Send reset email"}
+          : mfaResolver
+            ? "Verify and sign in"
+            : mode === "login"
+              ? "Sign in"
+              : mode === "register"
+                ? "Create account"
+                : "Send reset email"}
       </button>
     </form>
   );
