@@ -4,7 +4,7 @@
   "private": true,
   "packageManager": "pnpm@11.9.0",
   "engines": {
-    "node": ">=20.20.0"
+    "node": ">=22.13.0"
   },
   "scripts": {
     "dev": "turbo dev",
@@ -21,7 +21,7 @@
   "devDependencies": {
     "@eslint/js": "^9.31.0",
     "@playwright/test": "^1.54.1",
-    "@types/node": "^20.19.8",
+    "@types/node": "^24.0.0",
     "eslint": "^9.31.0",
     "firebase-tools": "^14.11.2",
     "prettier": "^3.6.2",

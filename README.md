@@ -4,7 +4,7 @@ Envault is an API-first, client-side encrypted environment variable management p
 
 ## Prerequisites
 
-- Node.js 20.20 or newer
+- Node.js 22.13 or newer; Node.js 24 LTS is recommended
 - pnpm 11
 - Java 21 for the Firebase Emulator Suite
 
