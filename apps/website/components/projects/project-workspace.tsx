@@ -172,7 +172,7 @@ export function ProjectWorkspace() {
           </div>
           <Link
             className="text-sm font-medium text-amber-700 hover:underline"
-            href="/app/vault"
+            href="/app/settings"
           >
             Unlock
           </Link>

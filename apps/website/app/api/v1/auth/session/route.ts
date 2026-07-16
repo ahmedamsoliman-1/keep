@@ -71,6 +71,16 @@ export async function POST(request: NextRequest) {
       result.data.idToken,
       true,
     );
+    let passkeyAuthenticated = false;
+    if (result.data.passkeyProof) {
+      const proofKey = envaultRedisKey(
+        "passkey-proof",
+        result.data.passkeyProof,
+      );
+      const proof = await getAdminFirestore().get<{ userId: string }>(proofKey);
+      await getAdminFirestore().del(proofKey);
+      passkeyAuthenticated = proof?.userId === decodedToken.uid;
+    }
     let customMfaEnabled = false;
     let mfaTrustVersion: string | null = null;
     let trustedDeviceCookieName = "envault_mfa_trust";
@@ -116,8 +126,9 @@ export async function POST(request: NextRequest) {
           )
         : null;
       const deviceIsTrusted =
-        trustedDevice?.userId === decodedToken.uid &&
-        trustedDevice.trustVersion === mfaTrustVersion;
+        passkeyAuthenticated ||
+        (trustedDevice?.userId === decodedToken.uid &&
+          trustedDevice.trustVersion === mfaTrustVersion);
 
       if (customMfaEnabled && !deviceIsTrusted && !result.data.mfaCode) {
         return errorResponse(

@@ -64,14 +64,14 @@ export function VaultStatusCard() {
       ) : exists ? (
         <Link
           className="mt-5 inline-flex rounded-lg bg-[var(--foreground)] px-4 py-2.5 text-sm font-medium text-[var(--background)]"
-          href="/app/vault"
+          href="/app/settings"
         >
           Unlock vault
         </Link>
       ) : exists !== null ? (
         <Link
           className="mt-5 inline-flex rounded-lg bg-[var(--foreground)] px-4 py-2.5 text-sm font-medium text-[var(--background)]"
-          href="/app/vault"
+          href="/app/settings"
         >
           Set up vault
         </Link>

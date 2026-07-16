@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { AppShell } from "@/components/layout/app-shell";
 import { SecuritySettings } from "@/components/settings/security-settings";
+import { VaultManager } from "@/components/vault/vault-manager";
 import { getSessionUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -25,6 +26,16 @@ export default async function SettingsPage() {
           Manage account verification, multi-factor authentication, and vault
           security.
         </p>
+        <div className="mb-8 rounded-2xl border bg-[var(--surface)] p-6">
+          <h3 className="text-xl font-semibold tracking-[-0.02em]">
+            Vault security
+          </h3>
+          <p className="mb-6 mt-2 text-sm leading-6 text-[var(--muted)]">
+            Create, unlock, and manage the locally encrypted vault protecting
+            your environment secrets.
+          </p>
+          <VaultManager />
+        </div>
         <SecuritySettings />
       </section>
     </AppShell>

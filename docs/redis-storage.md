@@ -23,6 +23,15 @@ Every key is isolated below the versioned `envault:v1:` namespace:
 - `envault:v1:mfa:{userId}` stores the server-encrypted TOTP configuration.
 - `envault:v1:mfa-trusted-device:{deviceId}` stores a revocable browser trust
   record with a 30-day TTL.
+- `envault:v1:passkey:{credentialId}` stores a public WebAuthn credential.
+  When biometric vault unlock is enabled, this record also holds the
+  client-encrypted vault-key wrapper and PRF salt; it never holds the plaintext
+  vault key or biometric data.
+- `envault:v1:user:{userId}:passkeys` indexes a user's passkeys.
+- `envault:v1:passkey-challenge:{ceremony}:{flowId}` stores a five-minute
+  WebAuthn challenge.
+- `envault:v1:passkey-proof:{proofId}` stores a two-minute, one-use bridge from
+  verified WebAuthn authentication to Firebase session creation.
 
 Vault mutations use a Lua compare-and-set operation. A mutation reads the
 aggregate, applies domain changes, then replaces it only when the stored value

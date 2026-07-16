@@ -1,11 +1,13 @@
 "use client";
 
 import { EnvaultApiError, EnvaultClient } from "@envault/api-client";
+import { startAuthentication } from "@simplewebauthn/browser";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
+  signInWithCustomToken,
   signOut,
 } from "firebase/auth";
 import { useRouter } from "next/navigation";
@@ -15,6 +17,7 @@ import { toast } from "sonner";
 import { getAuthErrorMessage } from "@/lib/auth-errors";
 import { getClientAuth } from "@/lib/firebase-client";
 import { isEmailVerificationRequired } from "@/lib/features";
+import { passkeyClient } from "@/lib/passkey-client";
 
 type AuthMode = "login" | "register" | "forgot-password";
 
@@ -94,6 +97,42 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           caughtError,
           mode === "forgot-password" ? "password-reset" : mode,
         ),
+      );
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function signInWithPasskey() {
+    setPending(true);
+    try {
+      const authentication = await passkeyClient.authenticationOptions();
+      const response = await startAuthentication({
+        optionsJSON: authentication.options,
+      });
+      const verified = await passkeyClient.verifyAuthentication(
+        authentication.flowId,
+        response,
+      );
+      const credential = await signInWithCustomToken(
+        getClientAuth(),
+        verified.customToken,
+      );
+      const idToken = await credential.user.getIdToken(true);
+      await apiClient.auth.session.create(
+        idToken,
+        undefined,
+        false,
+        verified.passkeyProof,
+      );
+      router.push("/app/dashboard");
+      router.refresh();
+    } catch (error) {
+      await signOut(getClientAuth()).catch(() => undefined);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Passkey sign-in could not be completed.",
       );
     } finally {
       setPending(false);
@@ -183,6 +222,23 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
                 ? "Create account"
                 : "Send reset email"}
       </button>
+      {mode === "login" && !pendingIdToken ? (
+        <>
+          <div className="flex items-center gap-3 text-xs text-[var(--muted)]">
+            <span className="h-px flex-1 bg-[var(--border)]" />
+            or
+            <span className="h-px flex-1 bg-[var(--border)]" />
+          </div>
+          <button
+            className="w-full rounded-xl border bg-[var(--surface)] px-4 py-3 text-sm font-medium hover:bg-[var(--surface-hover)] disabled:opacity-50"
+            disabled={pending}
+            onClick={() => void signInWithPasskey()}
+            type="button"
+          >
+            Sign in with passkey
+          </button>
+        </>
+      ) : null}
     </form>
   );
 }

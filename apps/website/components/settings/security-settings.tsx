@@ -23,6 +23,8 @@ import { getAuthErrorMessage } from "@/lib/auth-errors";
 import { getClientAuth } from "@/lib/firebase-client";
 import { getUserFacingError } from "@/lib/user-errors";
 
+import { PasskeySettings } from "./passkey-settings";
+
 const client = new EnvaultClient({ baseUrl: "" });
 
 export function SecuritySettings() {
@@ -168,33 +170,51 @@ export function SecuritySettings() {
 
         {mfaEnabled ? (
           <div className="mt-6 rounded-xl border p-4">
-            <div className="flex items-center gap-3">
-              <CheckCircle2 className="size-5 text-emerald-600" />
-              <div>
-                <p className="text-sm font-medium">Authenticator app enabled</p>
-                <p className="text-xs text-[var(--muted)]">
-                  Enter a current code to remove this factor.
-                </p>
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="size-5 text-emerald-600" />
+                <div>
+                  <p className="text-sm font-medium">
+                    Authenticator app enabled
+                  </p>
+                  <p className="text-xs text-[var(--muted)]">
+                    Your authenticator has been verified.
+                  </p>
+                </div>
               </div>
+              <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-600">
+                Verified
+              </span>
             </div>
-            <input
-              className="mt-4 w-full rounded-xl border bg-transparent px-3.5 py-3 font-mono tracking-[0.25em]"
-              inputMode="numeric"
-              maxLength={6}
-              onChange={(event) =>
-                setVerificationCode(event.target.value.replace(/\D/gu, ""))
-              }
-              placeholder="000000"
-              value={verificationCode}
-            />
-            <button
-              className="mt-3 text-sm font-medium text-red-600"
-              disabled={pending || verificationCode.length !== 6}
-              onClick={() => void removeMfa()}
-              type="button"
-            >
-              Remove authenticator MFA
-            </button>
+            <div className="mt-5 border-t pt-5">
+              <label className="block text-sm font-medium">
+                Remove authenticator verification
+                <span className="mt-1 block text-xs font-normal text-[var(--muted)]">
+                  Enter a current six-digit code before removing this security
+                  method.
+                </span>
+                <input
+                  className="mt-3 w-full rounded-xl border bg-transparent px-3.5 py-3 font-mono tracking-[0.25em]"
+                  inputMode="numeric"
+                  maxLength={6}
+                  onChange={(event) =>
+                    setVerificationCode(event.target.value.replace(/\D/gu, ""))
+                  }
+                  placeholder="000000"
+                  value={verificationCode}
+                />
+              </label>
+              <button
+                className="mt-3 rounded-xl border border-red-500/30 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={pending || verificationCode.length !== 6}
+                onClick={() => void removeMfa()}
+                type="button"
+              >
+                {pending
+                  ? "Verifying code…"
+                  : "Remove authenticator verification"}
+              </button>
+            </div>
           </div>
         ) : secret && qrCode ? (
           <div className="mt-7 grid gap-6 md:grid-cols-[224px_1fr]">
@@ -265,6 +285,8 @@ export function SecuritySettings() {
           </div>
         )}
       </section>
+
+      <PasskeySettings />
     </div>
   );
 }

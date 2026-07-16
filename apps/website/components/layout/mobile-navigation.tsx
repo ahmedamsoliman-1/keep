@@ -5,7 +5,6 @@ import {
   LayoutDashboard,
   Menu,
   Settings,
-  ShieldCheck,
   UserRound,
   X,
 } from "lucide-react";
@@ -21,7 +20,6 @@ import { VaultQuickControl } from "@/components/vault/vault-quick-control";
 const links = [
   { href: "/app/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/app/projects", label: "Projects", icon: FolderKanban },
-  { href: "/app/vault", label: "Vault security", icon: ShieldCheck },
   { href: "/app/profile", label: "Profile", icon: UserRound },
   { href: "/app/settings", label: "Settings", icon: Settings },
 ];

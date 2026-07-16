@@ -20,6 +20,8 @@
     "@hookform/resolvers": "^5.1.1",
     "@next/env": "^15.4.2",
     "@radix-ui/react-dialog": "^1.1.14",
+    "@simplewebauthn/browser": "^13.3.0",
+    "@simplewebauthn/server": "^13.3.2",
     "@tanstack/react-table": "^8.21.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -38,9 +40,9 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.11",
+    "@types/qrcode": "^1.5.5",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
-    "@types/qrcode": "^1.5.5",
     "tailwindcss": "^4.1.11"
   }
 }

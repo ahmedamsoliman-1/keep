@@ -18,7 +18,7 @@ function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
 
 function wrappingAdditionalData(
   vaultId: string,
-  purpose: "passphrase" | "recovery",
+  purpose: "passphrase" | "recovery" | "biometric",
 ) {
   return textEncoder.encode(`envault:v1:vault-key:${vaultId}:${purpose}`);
 }
@@ -55,7 +55,7 @@ async function wrapVaultKey(
   vaultKey: Uint8Array,
   wrappingKey: CryptoKey,
   vaultId: string,
-  purpose: "passphrase" | "recovery",
+  purpose: "passphrase" | "recovery" | "biometric",
 ): Promise<WrappedVaultKeyV1> {
   const iv = provider.getRandomValues(new Uint8Array(IV_BYTES));
   const ciphertext = await provider.subtle.encrypt(
@@ -83,7 +83,7 @@ async function unwrapVaultKey(
   wrappedKey: WrappedVaultKeyV1,
   wrappingKey: CryptoKey,
   vaultId: string,
-  purpose: "passphrase" | "recovery",
+  purpose: "passphrase" | "recovery" | "biometric",
 ) {
   const plaintext = await provider.subtle.decrypt(
     {
@@ -202,5 +202,47 @@ export async function unlockVaultWithRecoveryKey(
     wrappingKey,
     vaultId,
     "recovery",
+  );
+}
+
+async function importBiometricWrappingKey(
+  provider: CryptoProvider,
+  prfOutput: Uint8Array,
+) {
+  if (prfOutput.length !== 32) {
+    throw new Error("INVALID_BIOMETRIC_KEY_MATERIAL");
+  }
+  return provider.subtle.importKey(
+    "raw",
+    toArrayBuffer(prfOutput),
+    { name: "AES-GCM" },
+    false,
+    ["encrypt", "decrypt"],
+  );
+}
+
+export async function wrapVaultKeyWithBiometricSecret(
+  provider: CryptoProvider,
+  vaultId: string,
+  vaultKey: Uint8Array,
+  prfOutput: Uint8Array,
+) {
+  const wrappingKey = await importBiometricWrappingKey(provider, prfOutput);
+  return wrapVaultKey(provider, vaultKey, wrappingKey, vaultId, "biometric");
+}
+
+export async function unlockVaultWithBiometricSecret(
+  provider: CryptoProvider,
+  vaultId: string,
+  wrappedKey: WrappedVaultKeyV1,
+  prfOutput: Uint8Array,
+) {
+  const wrappingKey = await importBiometricWrappingKey(provider, prfOutput);
+  return unwrapVaultKey(
+    provider,
+    wrappedKey,
+    wrappingKey,
+    vaultId,
+    "biometric",
   );
 }

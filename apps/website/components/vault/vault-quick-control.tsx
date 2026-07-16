@@ -138,7 +138,7 @@ export function VaultQuickControl({ mobile = false }: { mobile?: boolean }) {
             ? "flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-indigo-600 hover:bg-indigo-500/10"
             : "inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-medium hover:bg-[var(--surface-hover)]"
         }
-        href="/app/vault"
+        href="/app/settings"
       >
         <LockKeyhole className="size-4" />
         Set up vault

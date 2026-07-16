@@ -2,23 +2,37 @@
 
 import type { VaultDto } from "@envault/api-contract";
 import {
+  unlockVaultWithBiometricSecret,
   unlockVaultWithPassphrase,
   unlockVaultWithRecoveryKey,
   type VaultKeyMaterialV1,
 } from "@envault/crypto";
 import { getBrowserCryptoProvider } from "@envault/crypto/browser";
-import { KeyRound } from "lucide-react";
+import { startAuthentication } from "@simplewebauthn/browser";
+import { Fingerprint, KeyRound } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import { toast } from "sonner";
 
 import { setActiveVaultKey } from "@/lib/vault-key-store";
+import {
+  getPasskeyPrfOutput,
+  passkeyClient,
+  preparePasskeyPrfOptions,
+} from "@/lib/passkey-client";
 
 export function VaultUnlock({ vault }: { vault: VaultDto }) {
   const router = useRouter();
   const [method, setMethod] = useState<"passphrase" | "recovery">("passphrase");
   const [secret, setSecret] = useState("");
   const [pending, setPending] = useState(false);
+  const autoPromptStarted = useRef(false);
 
   async function unlock(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -63,6 +77,58 @@ export function VaultUnlock({ vault }: { vault: VaultDto }) {
       setPending(false);
     }
   }
+
+  const unlockWithBiometrics = useCallback(async () => {
+    setPending(true);
+    try {
+      const ceremony = await passkeyClient.vaultOptions(
+        vault.vaultId,
+        "unlock",
+      );
+      const response = await startAuthentication({
+        optionsJSON: preparePasskeyPrfOptions(ceremony.options),
+      });
+      const prfOutput = getPasskeyPrfOutput(response);
+      const verified = await passkeyClient.verifyVault(
+        ceremony.flowId,
+        response,
+      );
+      if (!("wrappedKey" in verified)) {
+        throw new Error("Biometric vault unlock is not enabled.");
+      }
+      const key = await unlockVaultWithBiometricSecret(
+        getBrowserCryptoProvider(),
+        vault.vaultId,
+        verified.wrappedKey,
+        prfOutput,
+      );
+      setActiveVaultKey(vault.vaultId, key, vault.autoLockMinutes);
+      key.fill(0);
+      prfOutput.fill(0);
+      toast.success("Vault unlocked with biometrics.");
+      router.push("/app/dashboard");
+      router.refresh();
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Biometric vault unlock could not be completed.",
+      );
+    } finally {
+      setPending(false);
+    }
+  }, [router, vault]);
+
+  useEffect(() => {
+    if (autoPromptStarted.current) return;
+    autoPromptStarted.current = true;
+    void passkeyClient
+      .vaultStatus(vault.vaultId)
+      .then(({ enabled }) => {
+        if (enabled) return unlockWithBiometrics();
+      })
+      .catch(() => undefined);
+  }, [unlockWithBiometrics, vault.vaultId]);
 
   return (
     <form
@@ -124,6 +190,20 @@ export function VaultUnlock({ vault }: { vault: VaultDto }) {
         type="submit"
       >
         {pending ? "Unlocking…" : "Unlock vault"}
+      </button>
+      <div className="my-5 flex items-center gap-3 text-xs text-[var(--muted)]">
+        <span className="h-px flex-1 bg-[var(--border)]" />
+        or
+        <span className="h-px flex-1 bg-[var(--border)]" />
+      </div>
+      <button
+        className="flex w-full items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium hover:bg-[var(--surface-hover)] disabled:opacity-50"
+        disabled={pending}
+        onClick={() => void unlockWithBiometrics()}
+        type="button"
+      >
+        <Fingerprint className="size-4" />
+        Unlock with biometrics
       </button>
     </form>
   );

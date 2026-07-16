@@ -63,10 +63,20 @@ export class EnvaultClient {
   public readonly auth = {
     session: {
       get: () => this.request<SessionResponse>("/api/v1/auth/session"),
-      create: (idToken: string, mfaCode?: string, rememberDevice = false) =>
+      create: (
+        idToken: string,
+        mfaCode?: string,
+        rememberDevice = false,
+        passkeyProof?: string,
+      ) =>
         this.request<SessionResponse>("/api/v1/auth/session", {
           method: "POST",
-          body: JSON.stringify({ idToken, mfaCode, rememberDevice }),
+          body: JSON.stringify({
+            idToken,
+            mfaCode,
+            rememberDevice,
+            passkeyProof,
+          }),
         }),
       delete: () =>
         this.request<{ signedOut: true }>("/api/v1/auth/session", {
