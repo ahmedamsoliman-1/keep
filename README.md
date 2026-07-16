@@ -2,6 +2,10 @@
 
 Envault is an API-first, client-side encrypted environment variable management platform.
 
+## Documentation
+
+- [Firebase free-tier constraints](docs/firebase-free-tier.md)
+
 ## Prerequisites
 
 - Node.js 22.13 or newer; Node.js 24 LTS is recommended

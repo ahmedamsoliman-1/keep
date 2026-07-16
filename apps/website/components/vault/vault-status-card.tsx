@@ -1,6 +1,5 @@
 "use client";
 
-import { EnvaultClient } from "@envault/api-client";
 import { LockKeyhole, LockOpen } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore } from "react";
@@ -12,8 +11,7 @@ import {
   lockedVaultKeyState,
   subscribeToVaultKey,
 } from "@/lib/vault-key-store";
-
-const client = new EnvaultClient({ baseUrl: "" });
+import { getVaultMetadata } from "@/lib/vault-metadata-store";
 
 export function VaultStatusCard() {
   const [exists, setExists] = useState<boolean | null>(null);
@@ -24,8 +22,7 @@ export function VaultStatusCard() {
   );
 
   useEffect(() => {
-    void client.vault
-      .get()
+    void getVaultMetadata()
       .then((status) => setExists(status.exists))
       .catch(() => {
         setExists(null);

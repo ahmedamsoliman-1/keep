@@ -1,16 +1,14 @@
 "use client";
 
-import { EnvaultClient } from "@envault/api-client";
 import type { VaultDto } from "@envault/api-contract";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { getUserFacingError } from "@/lib/user-errors";
+import { getVaultMetadata } from "@/lib/vault-metadata-store";
 
 import { VaultSetup } from "./vault-setup";
 import { VaultUnlock } from "./vault-unlock";
-
-const client = new EnvaultClient({ baseUrl: "" });
 
 export function VaultManager() {
   const [vault, setVault] = useState<VaultDto | null | undefined>(undefined);
@@ -19,8 +17,7 @@ export function VaultManager() {
   const loadVault = useCallback(() => {
     setLoadFailed(false);
     setVault(undefined);
-    void client.vault
-      .get()
+    void getVaultMetadata()
       .then((status) => setVault(status.vault))
       .catch((caughtError: unknown) => {
         setLoadFailed(true);

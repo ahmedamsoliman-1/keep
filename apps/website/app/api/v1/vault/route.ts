@@ -35,9 +35,20 @@ export async function GET() {
     );
   }
 
-  const repository = new FirestoreVaultRepository(getAdminFirestore());
-  const vault = await repository.findByOwnerId(user.id);
-  return successResponse({ exists: vault !== null, vault }, requestId);
+  try {
+    const repository = new FirestoreVaultRepository(getAdminFirestore());
+    const vault = await repository.findByOwnerId(user.id);
+    return successResponse({ exists: vault !== null, vault }, requestId);
+  } catch {
+    return errorResponse(
+      {
+        code: "FIRESTORE_UNAVAILABLE",
+        message: "Vault status could not be loaded.",
+      },
+      requestId,
+      503,
+    );
+  }
 }
 
 export async function POST(request: NextRequest) {

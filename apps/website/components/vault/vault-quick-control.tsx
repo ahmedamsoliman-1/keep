@@ -1,6 +1,5 @@
 "use client";
 
-import { EnvaultClient } from "@envault/api-client";
 import type { VaultDto } from "@envault/api-contract";
 import {
   unlockVaultWithPassphrase,
@@ -28,8 +27,7 @@ import {
   subscribeToVaultKey,
 } from "@/lib/vault-key-store";
 import { getUserFacingError } from "@/lib/user-errors";
-
-const client = new EnvaultClient({ baseUrl: "" });
+import { getVaultMetadata } from "@/lib/vault-metadata-store";
 
 export function VaultQuickControl({ mobile = false }: { mobile?: boolean }) {
   const [vault, setVault] = useState<VaultDto | null | undefined>(undefined);
@@ -44,11 +42,10 @@ export function VaultQuickControl({ mobile = false }: { mobile?: boolean }) {
     () => lockedVaultKeyState,
   );
 
-  const loadVault = useCallback(() => {
+  const loadVault = useCallback((force = false) => {
     setLoadFailed(false);
     setVault(undefined);
-    void client.vault
-      .get()
+    void getVaultMetadata(force)
       .then((result) => setVault(result.vault))
       .catch((error) => {
         setLoadFailed(true);
@@ -59,7 +56,7 @@ export function VaultQuickControl({ mobile = false }: { mobile?: boolean }) {
   }, []);
 
   useEffect(() => {
-    loadVault();
+    loadVault(false);
   }, [loadVault]);
 
   if (loadFailed) {
@@ -70,7 +67,7 @@ export function VaultQuickControl({ mobile = false }: { mobile?: boolean }) {
             ? "flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-[var(--muted)] hover:bg-[var(--surface-hover)]"
             : "inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-medium text-[var(--muted)]"
         }
-        onClick={loadVault}
+        onClick={() => loadVault(true)}
         type="button"
       >
         <LockKeyhole className="size-4" />

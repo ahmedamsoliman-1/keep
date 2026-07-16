@@ -39,4 +39,15 @@ describe("authentication error messages", () => {
       "Your secure session could not be established. Sign in again.",
     );
   });
+
+  it("explains when TOTP MFA is disabled for the Firebase project", () => {
+    const error = new FirebaseError(
+      "auth/operation-not-allowed",
+      "Raw provider configuration error",
+    );
+
+    expect(getAuthErrorMessage(error, "mfa")).toBe(
+      "Authenticator-app MFA is not enabled for this Firebase project. Enable TOTP in Identity Platform and try again.",
+    );
+  });
 });

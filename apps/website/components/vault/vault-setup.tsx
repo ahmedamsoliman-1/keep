@@ -11,6 +11,7 @@ import { toast } from "sonner";
 
 import { setActiveVaultKey } from "@/lib/vault-key-store";
 import { getUserFacingError } from "@/lib/user-errors";
+import { setVaultMetadata } from "@/lib/vault-metadata-store";
 
 const client = new EnvaultClient({ baseUrl: "" });
 
@@ -63,11 +64,12 @@ export function VaultSetup() {
     if (!pendingVault || !saved) return;
     setPending(true);
     try {
-      await client.vault.create({
+      const createdVault = await client.vault.create({
         vaultId: pendingVault.vaultId,
         ...pendingVault.material,
         autoLockMinutes: 15,
       });
+      setVaultMetadata({ exists: true, vault: createdVault });
       setActiveVaultKey(pendingVault.vaultId, pendingVault.vaultKey, 15);
       pendingVault.vaultKey.fill(0);
       setPendingVault(null);

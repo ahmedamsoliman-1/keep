@@ -61,6 +61,9 @@ export function getAuthErrorMessage(
   }
 
   if (error instanceof FirebaseError) {
+    if (error.code === "auth/operation-not-allowed" && operation === "mfa") {
+      return "Authenticator-app MFA is not enabled for this Firebase project. Enable TOTP in Identity Platform and try again.";
+    }
     const safeMessage = commonFirebaseMessages[error.code];
     if (safeMessage) return safeMessage;
 
