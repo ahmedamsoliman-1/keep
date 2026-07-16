@@ -2,14 +2,7 @@
 
 import { EnvaultClient } from "@envault/api-client";
 import type { ProjectDto } from "@envault/api-contract";
-import {
-  Folder,
-  LockKeyhole,
-  Pencil,
-  Plus,
-  Search,
-  Trash2,
-} from "lucide-react";
+import { Folder, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import Link from "next/link";
 import {
   useEffect,
@@ -158,26 +151,6 @@ export function ProjectWorkspace() {
           New project
         </button>
       </div>
-
-      {!vaultState.unlocked ? (
-        <div className="mt-6 flex items-center justify-between gap-4 rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-4">
-          <div className="flex items-center gap-3">
-            <LockKeyhole className="size-5 text-amber-600" />
-            <div>
-              <p className="text-sm font-medium">Vault locked</p>
-              <p className="mt-0.5 text-xs text-[var(--muted)]">
-                Unlock the vault before creating or modifying projects.
-              </p>
-            </div>
-          </div>
-          <Link
-            className="text-sm font-medium text-amber-700 hover:underline"
-            href="/app/settings"
-          >
-            Unlock
-          </Link>
-        </div>
-      ) : null}
 
       {creating ? (
         <form

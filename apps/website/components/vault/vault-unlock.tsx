@@ -11,13 +11,7 @@ import { getBrowserCryptoProvider } from "@envault/crypto/browser";
 import { startAuthentication } from "@simplewebauthn/browser";
 import { Fingerprint, KeyRound } from "lucide-react";
 import { useRouter } from "next/navigation";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type FormEvent,
-} from "react";
+import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 
 import { setActiveVaultKey } from "@/lib/vault-key-store";
@@ -32,7 +26,6 @@ export function VaultUnlock({ vault }: { vault: VaultDto }) {
   const [method, setMethod] = useState<"passphrase" | "recovery">("passphrase");
   const [secret, setSecret] = useState("");
   const [pending, setPending] = useState(false);
-  const autoPromptStarted = useRef(false);
 
   async function unlock(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -78,7 +71,7 @@ export function VaultUnlock({ vault }: { vault: VaultDto }) {
     }
   }
 
-  const unlockWithBiometrics = useCallback(async () => {
+  async function unlockWithBiometrics() {
     setPending(true);
     try {
       const ceremony = await passkeyClient.vaultOptions(
@@ -117,18 +110,7 @@ export function VaultUnlock({ vault }: { vault: VaultDto }) {
     } finally {
       setPending(false);
     }
-  }, [router, vault]);
-
-  useEffect(() => {
-    if (autoPromptStarted.current) return;
-    autoPromptStarted.current = true;
-    void passkeyClient
-      .vaultStatus(vault.vaultId)
-      .then(({ enabled }) => {
-        if (enabled) return unlockWithBiometrics();
-      })
-      .catch(() => undefined);
-  }, [unlockWithBiometrics, vault.vaultId]);
+  }
 
   return (
     <form

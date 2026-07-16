@@ -2,12 +2,14 @@
 
 import type { VaultDto } from "@envault/api-contract";
 import {
+  unlockVaultWithBiometricSecret,
   unlockVaultWithPassphrase,
   unlockVaultWithRecoveryKey,
   type VaultKeyMaterialV1,
 } from "@envault/crypto";
 import { getBrowserCryptoProvider } from "@envault/crypto/browser";
-import { LockKeyhole, LockOpen } from "lucide-react";
+import { startAuthentication } from "@simplewebauthn/browser";
+import { Fingerprint, LockKeyhole, LockOpen } from "lucide-react";
 import Link from "next/link";
 import {
   useCallback,
@@ -19,6 +21,11 @@ import {
 import { toast } from "sonner";
 
 import { ActionDialog } from "@/components/ui/action-dialog";
+import {
+  getPasskeyPrfOutput,
+  passkeyClient,
+  preparePasskeyPrfOptions,
+} from "@/lib/passkey-client";
 import {
   clearActiveVaultKey,
   getVaultKeyState,
@@ -121,6 +128,64 @@ export function VaultQuickControl({ mobile = false }: { mobile?: boolean }) {
     }
   }
 
+  async function unlockWithBiometrics() {
+    if (!vault) return false;
+    setPending(true);
+    try {
+      const ceremony = await passkeyClient.vaultOptions(
+        vault.vaultId,
+        "unlock",
+      );
+      const response = await startAuthentication({
+        optionsJSON: preparePasskeyPrfOptions(ceremony.options),
+      });
+      const prfOutput = getPasskeyPrfOutput(response);
+      const verified = await passkeyClient.verifyVault(
+        ceremony.flowId,
+        response,
+      );
+      if (!("wrappedKey" in verified)) {
+        throw new Error("Biometric vault unlock is not enabled.");
+      }
+      const key = await unlockVaultWithBiometricSecret(
+        getBrowserCryptoProvider(),
+        vault.vaultId,
+        verified.wrappedKey,
+        prfOutput,
+      );
+      setActiveVaultKey(vault.vaultId, key, vault.autoLockMinutes);
+      key.fill(0);
+      prfOutput.fill(0);
+      setOpen(false);
+      toast.success("Vault unlocked with biometrics.");
+      return true;
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Biometric vault unlock could not be completed.",
+      );
+      return false;
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function openUnlock() {
+    if (!vault) return;
+    try {
+      const { enabled } = await passkeyClient.vaultStatus(vault.vaultId);
+      if (enabled) {
+        const unlocked = await unlockWithBiometrics();
+        if (!unlocked) setOpen(true);
+        return;
+      }
+    } catch {
+      // The passphrase and recovery dialog remains available as fallback.
+    }
+    setOpen(true);
+  }
+
   if (vault === undefined) {
     return (
       <span className="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs text-[var(--muted)]">
@@ -174,7 +239,7 @@ export function VaultQuickControl({ mobile = false }: { mobile?: boolean }) {
             ? "flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-amber-700 hover:bg-amber-500/10"
             : "inline-flex items-center gap-2 rounded-xl border border-amber-500/25 bg-amber-500/[0.06] px-3 py-2 text-xs font-medium text-amber-800"
         }
-        onClick={() => setOpen(true)}
+        onClick={() => void openUnlock()}
         type="button"
       >
         <LockKeyhole className="size-4" />
@@ -241,6 +306,20 @@ export function VaultQuickControl({ mobile = false }: { mobile?: boolean }) {
               value={secret}
             />
           </label>
+          <div className="flex items-center gap-3 text-xs text-[var(--muted)]">
+            <span className="h-px flex-1 bg-[var(--border)]" />
+            or
+            <span className="h-px flex-1 bg-[var(--border)]" />
+          </div>
+          <button
+            className="flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium hover:bg-[var(--surface-hover)] disabled:opacity-50"
+            disabled={pending}
+            onClick={() => void unlockWithBiometrics()}
+            type="button"
+          >
+            <Fingerprint className="size-4" />
+            Unlock with biometrics
+          </button>
         </form>
       </ActionDialog>
     </>
