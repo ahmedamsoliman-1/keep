@@ -5,6 +5,7 @@ Envault is an API-first, client-side encrypted environment variable management p
 ## Documentation
 
 - [Firebase free-tier constraints](docs/firebase-free-tier.md)
+- [Envault-managed authenticator MFA](docs/custom-totp-mfa.md)
 
 ## Prerequisites
 
@@ -15,7 +16,7 @@ Envault is an API-first, client-side encrypted environment variable management p
 ## Start locally
 
 ```bash
-cp apps/website/.env.example apps/website/.env.local
+cp .env.example .env
 pnpm install
 pnpm dev
 ```
@@ -23,8 +24,9 @@ pnpm dev
 The website runs at `http://localhost:3000`. The initial health endpoint is available at
 `http://localhost:3000/api/v1/health`.
 
-Next.js loads the real Firebase configuration from `apps/website/.env.local`. Keep service
-account JSON and private keys out of comments and rotate any key that has been exposed.
+Next.js and the server packages load the real Firebase configuration from the repository
+root `.env`. Keep service account JSON and private keys out of comments and rotate any key
+that has been exposed.
 
 ## Quality checks
 

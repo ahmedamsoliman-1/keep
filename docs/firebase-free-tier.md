@@ -31,24 +31,16 @@ Official reference:
 
 ## TOTP multi-factor authentication
 
-The Envault interface and Firebase client integration support authenticator-app
-TOTP enrollment and sign-in challenges. However, TOTP must also be enabled in
-the Firebase project's Identity Platform configuration.
+Envault now manages standard TOTP enrollment and verification itself. Firebase
+Identity Platform MFA is not required. Firebase Authentication remains the
+email/password first factor, while Envault verifies the authenticator code
+before issuing its application session.
 
-Until project-level TOTP is available:
+This still requires Firestore access to read the encrypted MFA configuration.
+When Firestore quota is exhausted, MFA verification fails closed until quota is
+available again.
 
-- Authenticator-app enrollment will return `auth/operation-not-allowed`.
-- Envault should explain that MFA is unavailable for the current Firebase
-  project rather than showing the raw Firebase error.
-- MFA remains an optional feature and must not block normal account usage.
-- The security settings page can remain implemented for future enablement.
-
-When project configuration becomes available, enable TOTP through the Firebase
-Admin SDK or Identity Platform REST API and ensure email/password authentication
-and email verification are enabled.
-
-Official reference:
-[Enable TOTP MFA for Identity Platform](https://docs.cloud.google.com/identity-platform/docs/admin/enabling-totp-mfa).
+See [Envault-managed authenticator MFA](custom-totp-mfa.md).
 
 ## Future options
 

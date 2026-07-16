@@ -22,6 +22,7 @@ const serverEnvironmentSchema = z.object({
     .positive()
     .default(2_592_000),
   VAULT_PBKDF2_ITERATIONS: z.coerce.number().int().min(600_000),
+  MFA_ENCRYPTION_KEY: z.string().optional(),
 });
 
 export type ServerEnvironment = z.infer<typeof serverEnvironmentSchema>;

@@ -38,7 +38,20 @@ export const apiErrorSchema = z.object({
 
 export const sessionExchangeRequestSchema = z.object({
   idToken: z.string().min(1),
+  mfaCode: z
+    .string()
+    .regex(/^\d{6}$/u)
+    .optional(),
 });
+
+export const mfaCodeRequestSchema = z.object({
+  code: z.string().regex(/^\d{6}$/u),
+});
+export const mfaEnrollmentResponseSchema = z.object({
+  secret: z.string().min(16),
+  uri: z.url(),
+});
+export const mfaStatusSchema = z.object({ enabled: z.boolean() });
 
 export const sessionUserSchema = z.object({
   id: z.string().min(1),

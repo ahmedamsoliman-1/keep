@@ -10,6 +10,9 @@ const apiMessages: Partial<Record<EnvaultApiError["error"]["code"], string>> = {
     "Some submitted information is invalid. Review it and try again.",
   ENVIRONMENT_VERSION_CONFLICT:
     "This environment changed in another session. Refresh before saving again.",
+  MFA_REQUIRED: "Enter the code from your authenticator app to continue.",
+  INVALID_MFA_CODE:
+    "The authenticator code is invalid or has already been used.",
   FIRESTORE_UNAVAILABLE:
     "Envault could not reach its data service. Try again in a moment.",
 };

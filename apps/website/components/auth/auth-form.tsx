@@ -1,18 +1,13 @@
 "use client";
 
-import { EnvaultClient } from "@envault/api-client";
+import { EnvaultApiError, EnvaultClient } from "@envault/api-client";
 import {
   createUserWithEmailAndPassword,
-  getMultiFactorResolver,
   sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
-  TotpMultiFactorGenerator,
-  type MultiFactorError,
-  type MultiFactorResolver,
 } from "firebase/auth";
-import { FirebaseError } from "firebase/app";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
@@ -30,9 +25,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
-  const [mfaResolver, setMfaResolver] = useState<MultiFactorResolver | null>(
-    null,
-  );
+  const [pendingIdToken, setPendingIdToken] = useState<string | null>(null);
   const [mfaCode, setMfaCode] = useState("");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -41,23 +34,9 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
     try {
       const firebaseAuth = getClientAuth();
-      if (mfaResolver) {
-        const hint = mfaResolver.hints.find(
-          (factor) => factor.factorId === TotpMultiFactorGenerator.FACTOR_ID,
-        );
-        if (!hint) {
-          toast.error("No supported authenticator-app factor is available.");
-          return;
-        }
-        const assertion = TotpMultiFactorGenerator.assertionForSignIn(
-          hint.uid,
-          mfaCode,
-        );
-        const credential = await mfaResolver.resolveSignIn(assertion);
-        await apiClient.auth.session.create(
-          await credential.user.getIdToken(true),
-        );
-        setMfaResolver(null);
+      if (pendingIdToken) {
+        await apiClient.auth.session.create(pendingIdToken, mfaCode);
+        setPendingIdToken(null);
         setMfaCode("");
         router.push("/app/dashboard");
         router.refresh();
@@ -95,15 +74,12 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
     } catch (caughtError) {
       if (
         mode === "login" &&
-        caughtError instanceof FirebaseError &&
-        caughtError.code === "auth/multi-factor-auth-required"
+        caughtError instanceof EnvaultApiError &&
+        caughtError.error.code === "MFA_REQUIRED"
       ) {
-        setMfaResolver(
-          getMultiFactorResolver(
-            getClientAuth(),
-            caughtError as MultiFactorError,
-          ),
-        );
+        const currentUser = getClientAuth().currentUser;
+        if (!currentUser) throw caughtError;
+        setPendingIdToken(await currentUser.getIdToken(true));
         toast.info("Enter the code from your authenticator app to continue.");
         return;
       }
@@ -138,7 +114,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         />
       </label>
       {mode !== "forgot-password" ? (
-        mfaResolver ? (
+        pendingIdToken ? (
           <label className="block text-[13px] font-medium">
             Authenticator code
             <input
@@ -178,7 +154,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       >
         {pending
           ? "Please wait…"
-          : mfaResolver
+          : pendingIdToken
             ? "Verify and sign in"
             : mode === "login"
               ? "Sign in"

@@ -63,16 +63,34 @@ export class EnvaultClient {
   public readonly auth = {
     session: {
       get: () => this.request<SessionResponse>("/api/v1/auth/session"),
-      create: (idToken: string) =>
+      create: (idToken: string, mfaCode?: string) =>
         this.request<SessionResponse>("/api/v1/auth/session", {
           method: "POST",
-          body: JSON.stringify({ idToken }),
+          body: JSON.stringify({ idToken, mfaCode }),
         }),
       delete: () =>
         this.request<{ signedOut: true }>("/api/v1/auth/session", {
           method: "DELETE",
         }),
     },
+  };
+
+  public readonly mfa = {
+    status: () => this.request<{ enabled: boolean }>("/api/v1/mfa"),
+    begin: () =>
+      this.request<{ secret: string; uri: string }>("/api/v1/mfa", {
+        method: "POST",
+      }),
+    confirm: (code: string) =>
+      this.request<{ enabled: true }>("/api/v1/mfa/confirm", {
+        method: "POST",
+        body: JSON.stringify({ code }),
+      }),
+    remove: (code: string) =>
+      this.request<{ enabled: false }>("/api/v1/mfa", {
+        method: "DELETE",
+        body: JSON.stringify({ code }),
+      }),
   };
 
   public readonly vault = {

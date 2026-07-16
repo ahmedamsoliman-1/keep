@@ -1,13 +1,11 @@
 "use client";
 
+import { EnvaultClient } from "@envault/api-client";
 import {
   EmailAuthProvider,
-  multiFactor,
   onAuthStateChanged,
   reauthenticateWithCredential,
   sendEmailVerification,
-  TotpMultiFactorGenerator,
-  type TotpSecret,
   type User,
 } from "firebase/auth";
 import {
@@ -23,16 +21,26 @@ import { toast } from "sonner";
 
 import { getAuthErrorMessage } from "@/lib/auth-errors";
 import { getClientAuth } from "@/lib/firebase-client";
+import { getUserFacingError } from "@/lib/user-errors";
+
+const client = new EnvaultClient({ baseUrl: "" });
 
 export function SecuritySettings() {
   const [user, setUser] = useState<User | null>(null);
   const [password, setPassword] = useState("");
-  const [secret, setSecret] = useState<TotpSecret | null>(null);
+  const [secret, setSecret] = useState<string | null>(null);
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [verificationCode, setVerificationCode] = useState("");
+  const [mfaEnabled, setMfaEnabled] = useState(false);
   const [pending, setPending] = useState(false);
 
   useEffect(() => onAuthStateChanged(getClientAuth(), setUser), []);
+  useEffect(() => {
+    void client.mfa
+      .status()
+      .then((status) => setMfaEnabled(status.enabled))
+      .catch(() => undefined);
+  }, []);
 
   async function resendVerification() {
     if (!user) return;
@@ -55,64 +63,56 @@ export function SecuritySettings() {
         user,
         EmailAuthProvider.credential(user.email, password),
       );
-      const session = await multiFactor(user).getSession();
-      const generatedSecret =
-        await TotpMultiFactorGenerator.generateSecret(session);
-      const uri = generatedSecret.generateQrCodeUrl(user.email, "Envault");
+      const enrollment = await client.mfa.begin();
+      setSecret(enrollment.secret);
       setQrCode(
-        await QRCode.toDataURL(uri, {
+        await QRCode.toDataURL(enrollment.uri, {
           width: 224,
           margin: 1,
           color: { dark: "#111318", light: "#ffffff" },
         }),
       );
-      setSecret(generatedSecret);
       setPassword("");
     } catch (error) {
-      toast.error(getAuthErrorMessage(error, "mfa"));
+      toast.error(getUserFacingError(error, getAuthErrorMessage(error, "mfa")));
     } finally {
       setPending(false);
     }
   }
 
   async function completeMfaEnrollment() {
-    if (!user || !secret) return;
     setPending(true);
     try {
-      const assertion = TotpMultiFactorGenerator.assertionForEnrollment(
-        secret,
-        verificationCode,
-      );
-      await multiFactor(user).enroll(assertion, "Authenticator app");
-      await user.reload();
-      setUser(getClientAuth().currentUser);
+      await client.mfa.confirm(verificationCode);
+      setMfaEnabled(true);
       setSecret(null);
       setQrCode(null);
       setVerificationCode("");
       toast.success("Authenticator-app verification is now enabled.");
     } catch (error) {
-      toast.error(getAuthErrorMessage(error, "mfa"));
+      toast.error(
+        getUserFacingError(error, "The verification code is invalid."),
+      );
     } finally {
       setPending(false);
     }
   }
 
-  async function removeMfa(enrollmentId: string) {
-    if (!user) return;
+  async function removeMfa() {
     setPending(true);
     try {
-      await multiFactor(user).unenroll(enrollmentId);
-      await user.reload();
-      setUser(getClientAuth().currentUser);
+      await client.mfa.remove(verificationCode);
+      setMfaEnabled(false);
+      setVerificationCode("");
       toast.success("Authenticator-app verification has been removed.");
     } catch (error) {
-      toast.error(getAuthErrorMessage(error, "mfa"));
+      toast.error(
+        getUserFacingError(error, "The verification code is invalid."),
+      );
     } finally {
       setPending(false);
     }
   }
-
-  const enrolledFactors = user ? multiFactor(user).enrolledFactors : [];
 
   return (
     <div className="space-y-6">
@@ -141,7 +141,7 @@ export function SecuritySettings() {
         </div>
         {!user?.emailVerified ? (
           <button
-            className="mt-6 rounded-xl border px-4 py-2.5 text-sm font-medium hover:bg-[var(--surface-hover)] disabled:opacity-50"
+            className="mt-6 rounded-xl border px-4 py-2.5 text-sm font-medium disabled:opacity-50"
             disabled={pending || !user}
             onClick={() => void resendVerification()}
             type="button"
@@ -159,44 +159,45 @@ export function SecuritySettings() {
           <div>
             <h3 className="font-semibold">Authenticator app</h3>
             <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
-              Add a time-based one-time password from Microsoft Authenticator,
-              Google Authenticator, Authy, or another compatible application.
+              Envault verifies standard TOTP codes independently of Firebase
+              MFA. Microsoft Authenticator, Google Authenticator and compatible
+              apps are supported.
             </p>
           </div>
         </div>
 
-        {enrolledFactors.length > 0 ? (
-          <div className="mt-6 space-y-3">
-            {enrolledFactors.map((factor) => (
-              <div
-                className="flex items-center justify-between rounded-xl border p-4"
-                key={factor.uid}
-              >
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="size-5 text-emerald-600" />
-                  <div>
-                    <p className="text-sm font-medium">
-                      {factor.displayName ?? "Authenticator app"}
-                    </p>
-                    <p className="mt-0.5 text-xs text-[var(--muted)]">
-                      TOTP enabled
-                    </p>
-                  </div>
-                </div>
-                <button
-                  className="text-sm font-medium text-red-600 hover:underline"
-                  disabled={pending}
-                  onClick={() => void removeMfa(factor.uid)}
-                  type="button"
-                >
-                  Remove
-                </button>
+        {mfaEnabled ? (
+          <div className="mt-6 rounded-xl border p-4">
+            <div className="flex items-center gap-3">
+              <CheckCircle2 className="size-5 text-emerald-600" />
+              <div>
+                <p className="text-sm font-medium">Authenticator app enabled</p>
+                <p className="text-xs text-[var(--muted)]">
+                  Enter a current code to remove this factor.
+                </p>
               </div>
-            ))}
+            </div>
+            <input
+              className="mt-4 w-full rounded-xl border bg-transparent px-3.5 py-3 font-mono tracking-[0.25em]"
+              inputMode="numeric"
+              maxLength={6}
+              onChange={(event) =>
+                setVerificationCode(event.target.value.replace(/\D/gu, ""))
+              }
+              placeholder="000000"
+              value={verificationCode}
+            />
+            <button
+              className="mt-3 text-sm font-medium text-red-600"
+              disabled={pending || verificationCode.length !== 6}
+              onClick={() => void removeMfa()}
+              type="button"
+            >
+              Remove authenticator MFA
+            </button>
           </div>
         ) : secret && qrCode ? (
           <div className="mt-7 grid gap-6 md:grid-cols-[224px_1fr]">
-            {/* QR is generated locally from the Firebase TOTP enrollment URI. */}
             <img
               alt="Authenticator app enrollment QR code"
               className="size-56 rounded-xl border bg-white p-2"
@@ -206,45 +207,33 @@ export function SecuritySettings() {
             />
             <div>
               <p className="text-sm font-medium">Scan the QR code</p>
-              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-                If scanning is unavailable, enter this setup key manually:
+              <p className="mt-2 text-sm text-[var(--muted)]">
+                Or enter this setup key manually:
               </p>
               <div className="mt-3 flex items-center gap-2 rounded-xl border p-3">
                 <code className="min-w-0 flex-1 break-all text-xs">
-                  {secret.secretKey}
+                  {secret}
                 </code>
                 <button
                   aria-label="Copy setup key"
-                  onClick={() => {
-                    void navigator.clipboard
-                      .writeText(secret.secretKey)
-                      .then(() => toast.success("Setup key copied."))
-                      .catch(() =>
-                        toast.error(
-                          "The setup key could not be copied. Copy it manually instead.",
-                        ),
-                      );
-                  }}
+                  onClick={() => void navigator.clipboard.writeText(secret)}
                   type="button"
                 >
                   <Copy className="size-4" />
                 </button>
               </div>
-              <label className="mt-5 block text-sm font-medium">
-                Six-digit verification code
-                <input
-                  autoComplete="one-time-code"
-                  className="focus:ring-3 mt-2 w-full rounded-xl border bg-transparent px-3.5 py-3 font-mono text-sm tracking-[0.25em] outline-none focus:border-[var(--accent)] focus:ring-indigo-500/10"
-                  inputMode="numeric"
-                  maxLength={6}
-                  onChange={(event) =>
-                    setVerificationCode(event.target.value.replace(/\D/gu, ""))
-                  }
-                  value={verificationCode}
-                />
-              </label>
+              <input
+                className="mt-5 w-full rounded-xl border bg-transparent px-3.5 py-3 font-mono tracking-[0.25em]"
+                inputMode="numeric"
+                maxLength={6}
+                onChange={(event) =>
+                  setVerificationCode(event.target.value.replace(/\D/gu, ""))
+                }
+                placeholder="Six-digit code"
+                value={verificationCode}
+              />
               <button
-                className="mt-5 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
+                className="mt-4 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
                 disabled={pending || verificationCode.length !== 6}
                 onClick={() => void completeMfaEnrollment()}
                 type="button"
@@ -258,15 +247,14 @@ export function SecuritySettings() {
             <label className="block text-sm font-medium">
               Confirm your account password
               <input
-                autoComplete="current-password"
-                className="focus:ring-3 mt-2 w-full rounded-xl border bg-transparent px-3.5 py-3 text-sm outline-none focus:border-[var(--accent)] focus:ring-indigo-500/10"
+                className="mt-2 w-full rounded-xl border bg-transparent px-3.5 py-3"
                 onChange={(event) => setPassword(event.target.value)}
                 type="password"
                 value={password}
               />
             </label>
             <button
-              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
+              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
               disabled={pending || !password || !user}
               onClick={() => void beginMfaEnrollment()}
               type="button"

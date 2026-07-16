@@ -33,6 +33,15 @@ export function getSessionConfiguration() {
   };
 }
 
+export function getMfaConfiguration() {
+  ensureLocalEnvironmentLoaded();
+  const environment = parseServerEnvironment(process.env);
+  if (!environment.MFA_ENCRYPTION_KEY) {
+    throw new Error("MFA_ENCRYPTION_KEY_NOT_CONFIGURED");
+  }
+  return { encryptionKey: environment.MFA_ENCRYPTION_KEY };
+}
+
 export function getAdminAuth() {
   ensureLocalEnvironmentLoaded();
   const environment = parseServerEnvironment(process.env);
