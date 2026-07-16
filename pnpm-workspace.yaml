@@ -12,4 +12,5 @@ onlyBuiltDependencies:
   - "@firebase/util"
   - esbuild
   - protobufjs
+  - re2
   - sharp

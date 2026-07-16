@@ -41,7 +41,6 @@ export function VariableWorkspace({
     useState<VariableDto["visibility"]>("secret");
   const [revealed, setRevealed] = useState<Record<string, string>>({});
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<"table" | "dotenv">("table");
   const [dotenvContent, setDotenvContent] = useState<string | null>(null);
   const [dotenvLoading, setDotenvLoading] = useState(false);
@@ -64,7 +63,9 @@ export function VariableWorkspace({
         setVersion(result.version);
       })
       .catch((caught) =>
-        setError(getUserFacingError(caught, "Variables could not be loaded.")),
+        toast.error(
+          getUserFacingError(caught, "Variables could not be loaded."),
+        ),
       );
   }, [environmentId]);
 
@@ -80,11 +81,10 @@ export function VariableWorkspace({
     const state = getVaultKeyState();
     const vaultKey = state.vaultId ? getActiveVaultKey(state.vaultId) : null;
     if (!state.vaultId || !vaultKey) {
-      setError("Unlock the vault before adding a variable.");
+      toast.warning("Unlock the vault before adding a variable.");
       return;
     }
     setPending(true);
-    setError(null);
     try {
       const id = crypto.randomUUID();
       const payload = await encryptVariableValue(
@@ -119,7 +119,7 @@ export function VariableWorkspace({
       setCreating(false);
       toast.success("Variable encrypted and saved");
     } catch (caught) {
-      setError(
+      toast.error(
         getUserFacingError(caught, "The variable could not be created."),
       );
     } finally {
@@ -138,7 +138,7 @@ export function VariableWorkspace({
     }
     const vaultKey = getActiveVaultKey(variable.vaultId);
     if (!vaultKey) {
-      setError("Unlock the vault before revealing secret values.");
+      toast.warning("Unlock the vault before revealing secret values.");
       return;
     }
     try {
@@ -169,7 +169,7 @@ export function VariableWorkspace({
         });
       }, 30_000);
     } catch {
-      setError("This value could not be decrypted.");
+      toast.error("This value could not be decrypted.");
     } finally {
       vaultKey.fill(0);
     }
@@ -180,7 +180,7 @@ export function VariableWorkspace({
     if (!editingVariable || !editKey.trim()) return;
     const vaultKey = getActiveVaultKey(editingVariable.vaultId);
     if (!vaultKey) {
-      setError("Unlock the vault before editing variables.");
+      toast.warning("Unlock the vault before editing variables.");
       return;
     }
     setActionPending(true);
@@ -259,12 +259,14 @@ export function VariableWorkspace({
     setDotenvLoading(true);
     setDotenvContent(null);
     setCopied(false);
-    setError(null);
 
     const vaultId = variables[0]?.vaultId ?? getVaultKeyState().vaultId;
     const vaultKey = vaultId ? getActiveVaultKey(vaultId) : null;
     if (!vaultId || !vaultKey) {
-      setError("Unlock the vault before generating a plaintext .env view.");
+      toast.warning(
+        "Unlock the vault before generating a plaintext .env view.",
+      );
+      setView("table");
       setDotenvLoading(false);
       return;
     }
@@ -295,7 +297,7 @@ export function VariableWorkspace({
       );
       setDotenvContent(serializeDotenv(entries));
     } catch {
-      setError("The .env view could not be decrypted.");
+      toast.error("The .env view could not be decrypted.");
       setView("table");
     } finally {
       vaultKey.fill(0);
@@ -387,7 +389,6 @@ export function VariableWorkspace({
           </button>
         </form>
       ) : null}
-      {error ? <p className="mt-5 text-sm text-red-600">{error}</p> : null}
       {view === "dotenv" ? (
         <section className="mt-8 overflow-hidden rounded-2xl border bg-[#101216] text-zinc-100">
           <header className="flex items-center justify-between border-b border-white/10 px-4 py-3">
