@@ -5,6 +5,7 @@ import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 
 import { getClientAuth } from "@/lib/firebase-client";
+import { clearActiveVaultKey } from "@/lib/vault-key-store";
 
 const apiClient = new EnvaultClient({ baseUrl: "" });
 
@@ -16,6 +17,7 @@ export function LogoutButton() {
       className="rounded-lg border px-3 py-2 text-sm"
       onClick={() => {
         void (async () => {
+          clearActiveVaultKey();
           await apiClient.auth.session.delete();
           await signOut(getClientAuth());
           router.push("/login");

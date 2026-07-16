@@ -71,7 +71,7 @@ export function VaultSetup() {
         ...pendingVault.material,
         autoLockMinutes: 15,
       });
-      setActiveVaultKey(pendingVault.vaultKey);
+      setActiveVaultKey(pendingVault.vaultId, pendingVault.vaultKey, 15);
       pendingVault.vaultKey.fill(0);
       setPendingVault(null);
       router.push("/app/dashboard");

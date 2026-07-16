@@ -3,12 +3,24 @@
 import { EnvaultClient } from "@envault/api-client";
 import { LockKeyhole, LockOpen } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+
+import {
+  clearActiveVaultKey,
+  getVaultKeyState,
+  lockedVaultKeyState,
+  subscribeToVaultKey,
+} from "@/lib/vault-key-store";
 
 const client = new EnvaultClient({ baseUrl: "" });
 
 export function VaultStatusCard() {
   const [exists, setExists] = useState<boolean | null>(null);
+  const keyState = useSyncExternalStore(
+    subscribeToVaultKey,
+    getVaultKeyState,
+    () => lockedVaultKeyState,
+  );
 
   useEffect(() => {
     void client.vault
@@ -19,7 +31,7 @@ export function VaultStatusCard() {
 
   return (
     <article className="mt-10 max-w-xl rounded-xl border p-6">
-      {exists ? (
+      {exists && keyState.unlocked ? (
         <LockOpen className="size-5 text-[var(--accent)]" />
       ) : (
         <LockKeyhole className="size-5 text-[var(--accent)]" />
@@ -28,15 +40,34 @@ export function VaultStatusCard() {
         {exists === null
           ? "Checking vault status…"
           : exists
-            ? "Vault created"
+            ? keyState.unlocked
+              ? "Vault unlocked"
+              : "Vault locked"
             : "Create your encrypted vault"}
       </h3>
       <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
         {exists
-          ? "Your wrapped vault keys are stored. Unlocking will be added in the next step."
+          ? keyState.unlocked
+            ? "The active vault key is held in memory only and will clear automatically."
+            : "Unlock locally with your vault passphrase or recovery key."
           : "Generate your client-side vault key, passphrase wrapping, and recovery key."}
       </p>
-      {!exists && exists !== null ? (
+      {exists && keyState.unlocked ? (
+        <button
+          className="mt-5 rounded-lg border px-4 py-2.5 text-sm font-medium"
+          onClick={clearActiveVaultKey}
+          type="button"
+        >
+          Lock vault
+        </button>
+      ) : exists ? (
+        <Link
+          className="mt-5 inline-flex rounded-lg bg-[var(--foreground)] px-4 py-2.5 text-sm font-medium text-[var(--background)]"
+          href="/app/vault"
+        >
+          Unlock vault
+        </Link>
+      ) : exists !== null ? (
         <Link
           className="mt-5 inline-flex rounded-lg bg-[var(--foreground)] px-4 py-2.5 text-sm font-medium text-[var(--background)]"
           href="/app/vault"

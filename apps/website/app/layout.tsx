@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
+import { VaultLifecycle } from "@/components/vault/vault-lifecycle";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,7 +15,10 @@ export default function RootLayout({
 }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <VaultLifecycle />
+      </body>
     </html>
   );
 }

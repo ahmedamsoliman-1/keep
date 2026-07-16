@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { VaultSetup } from "@/components/vault/vault-setup";
+import { VaultManager } from "@/components/vault/vault-manager";
 import { getSessionUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +20,7 @@ export default async function VaultPage() {
       <p className="mb-10 mt-3 max-w-2xl text-[var(--muted)]">
         Encryption and key wrapping happen locally in this browser.
       </p>
-      <VaultSetup />
+      <VaultManager />
     </main>
   );
 }

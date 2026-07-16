@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { getClientAuth } from "@/lib/firebase-client";
+import { clearActiveVaultKey } from "@/lib/vault-key-store";
 
 const apiClient = new EnvaultClient({ baseUrl: "" });
 
@@ -56,6 +57,7 @@ export function VerificationPanel() {
   }
 
   async function logout() {
+    clearActiveVaultKey();
     await apiClient.auth.session.delete().catch(() => undefined);
     await signOut(getClientAuth());
     router.push("/login");
