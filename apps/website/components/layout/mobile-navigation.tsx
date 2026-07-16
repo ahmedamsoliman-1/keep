@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 
 import { LogoutButton } from "@/components/auth/logout-button";
 import { EnvaultLogo } from "@/components/brand/envault-logo";
+import { VaultQuickControl } from "@/components/vault/vault-quick-control";
 
 const links = [
   { href: "/app/dashboard", label: "Overview", icon: LayoutDashboard },
@@ -95,6 +96,9 @@ export function MobileNavigation({
                 );
               })}
             </nav>
+            <div className="mt-4 border-t pt-4">
+              <VaultQuickControl mobile />
+            </div>
             <div className="mt-auto rounded-2xl border bg-[var(--surface)] p-3">
               <Link
                 className="flex items-center gap-3 rounded-xl p-2"

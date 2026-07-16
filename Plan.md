@@ -1704,13 +1704,13 @@ after every stage.
 
 ### Stage B — Secure import workflow
 
-- [ ] Accept uploaded dotenv files and pasted dotenv content.
-- [ ] Show an import preview classifying variables as new, updated, unchanged,
+- [x] Accept uploaded dotenv files and pasted dotenv content.
+- [x] Show an import preview classifying variables as new, updated, unchanged,
       invalid or conflicting.
-- [ ] Support overwrite, skip-existing, import-new-only and individual conflict review.
-- [ ] Encrypt every imported plaintext value locally before sending mutations to the API.
-- [ ] Ensure plaintext import content is never persisted or logged.
-- [ ] Commit imports with expected environment versions.
+- [x] Support overwrite, skip-existing, import-new-only and individual conflict review.
+- [x] Encrypt every imported plaintext value locally before sending mutations to the API.
+- [x] Ensure plaintext import content is never persisted or logged.
+- [x] Commit imports with expected environment versions.
 - [ ] Protect import retries with idempotency keys and operation records.
 - [ ] Chunk large imports and report progress safely.
 

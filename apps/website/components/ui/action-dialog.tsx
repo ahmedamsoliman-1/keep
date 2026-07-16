@@ -11,6 +11,7 @@ export function ActionDialog({
   description,
   children,
   footer,
+  size = "md",
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -18,12 +19,17 @@ export function ActionDialog({
   description?: string;
   children?: ReactNode;
   footer?: ReactNode;
+  size?: "md" | "xl";
 }) {
   return (
     <Dialog.Root onOpenChange={onOpenChange} open={open}>
       <Dialog.Portal>
         <Dialog.Overlay className="data-[state=closed]:animate-out data-[state=open]:animate-in fixed inset-0 z-50 bg-black/45 backdrop-blur-[2px]" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl border bg-[var(--surface)] p-6 shadow-2xl outline-none">
+        <Dialog.Content
+          className={`fixed left-1/2 top-1/2 z-50 max-h-[calc(100vh-2rem)] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border bg-[var(--surface)] p-6 shadow-2xl outline-none ${
+            size === "xl" ? "max-w-3xl" : "max-w-md"
+          }`}
+        >
           <div className="pr-10">
             <Dialog.Title className="text-lg font-semibold tracking-[-0.02em]">
               {title}

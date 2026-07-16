@@ -12,6 +12,7 @@ import type { ReactNode } from "react";
 import { EnvaultLogo } from "@/components/brand/envault-logo";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { MobileNavigation } from "@/components/layout/mobile-navigation";
+import { VaultQuickControl } from "@/components/vault/vault-quick-control";
 
 const navigation = [
   { href: "/app/dashboard", label: "Overview", icon: LayoutDashboard },
@@ -108,7 +109,10 @@ export function AppShell({
             ) : null}
             <h1 className="text-base font-semibold">{title}</h1>
           </div>
-          <div className="flex items-center gap-2">{actions}</div>
+          <div className="hidden items-center gap-2 lg:flex">
+            <VaultQuickControl />
+            {actions}
+          </div>
         </header>
         <main className="px-5 py-8 lg:px-8 lg:py-10">{children}</main>
       </div>

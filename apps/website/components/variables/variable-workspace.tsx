@@ -20,6 +20,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 
 import { ActionDialog, ConfirmDialog } from "@/components/ui/action-dialog";
+import { VariableImportDialog } from "@/components/variables/variable-import-dialog";
 import { getUserFacingError } from "@/lib/user-errors";
 import { getActiveVaultKey, getVaultKeyState } from "@/lib/vault-key-store";
 
@@ -340,14 +341,27 @@ export function VariableWorkspace({
             .env
           </button>
         </div>
-        <button
-          className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-500"
-          onClick={() => setCreating(true)}
-          type="button"
-        >
-          <Plus className="size-4" />
-          Add variable
-        </button>
+        <div className="flex items-center gap-2">
+          <VariableImportDialog
+            environmentId={environmentId}
+            onImported={(nextVariables, nextVersion) => {
+              setVariables(nextVariables);
+              setVersion(nextVersion);
+              setRevealed({});
+            }}
+            projectId={projectId}
+            variables={variables}
+            version={version}
+          />
+          <button
+            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-500"
+            onClick={() => setCreating(true)}
+            type="button"
+          >
+            <Plus className="size-4" />
+            Add variable
+          </button>
+        </div>
       </div>
       {creating ? (
         <form
