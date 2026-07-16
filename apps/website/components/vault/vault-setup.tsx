@@ -7,6 +7,7 @@ import { getBrowserCryptoProvider } from "@envault/crypto/browser";
 import { Check, Copy, KeyRound, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { toast } from "sonner";
 
 import { setActiveVaultKey } from "@/lib/vault-key-store";
 import { getUserFacingError } from "@/lib/user-errors";
@@ -28,13 +29,11 @@ export function VaultSetup() {
   const [saved, setSaved] = useState(false);
   const [copied, setCopied] = useState(false);
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   async function prepareVault(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError(null);
     if (passphrase !== confirmation) {
-      setError("The passphrases do not match.");
+      toast.error("The passphrases do not match.");
       return;
     }
 
@@ -52,7 +51,7 @@ export function VaultSetup() {
       setPassphrase("");
       setConfirmation("");
     } catch (caughtError) {
-      setError(
+      toast.error(
         getUserFacingError(caughtError, "Vault setup could not be prepared."),
       );
     } finally {
@@ -63,7 +62,6 @@ export function VaultSetup() {
   async function createVault() {
     if (!pendingVault || !saved) return;
     setPending(true);
-    setError(null);
     try {
       await client.vault.create({
         vaultId: pendingVault.vaultId,
@@ -76,7 +74,7 @@ export function VaultSetup() {
       router.push("/app/dashboard");
       router.refresh();
     } catch (caughtError) {
-      setError(
+      toast.error(
         getUserFacingError(
           caughtError,
           "The encrypted vault could not be created.",
@@ -104,8 +102,17 @@ export function VaultSetup() {
             aria-label="Copy recovery key"
             className="rounded-md border p-2"
             onClick={() => {
-              void navigator.clipboard.writeText(pendingVault.recoveryKey);
-              setCopied(true);
+              void navigator.clipboard
+                .writeText(pendingVault.recoveryKey)
+                .then(() => {
+                  setCopied(true);
+                  toast.success("Recovery key copied.");
+                })
+                .catch(() =>
+                  toast.error(
+                    "The recovery key could not be copied. Copy it manually instead.",
+                  ),
+                );
             }}
             type="button"
           >
@@ -126,7 +133,6 @@ export function VaultSetup() {
           I saved the recovery key in a secure location and understand it cannot
           be shown again.
         </label>
-        {error ? <p className="mt-4 text-sm text-red-600">{error}</p> : null}
         <button
           className="mt-6 w-full rounded-lg bg-[var(--foreground)] px-4 py-2.5 text-sm font-medium text-[var(--background)] disabled:opacity-50"
           disabled={!saved || pending}
@@ -178,7 +184,6 @@ export function VaultSetup() {
           value={confirmation}
         />
       </label>
-      {error ? <p className="mt-4 text-sm text-red-600">{error}</p> : null}
       <button
         className="mt-6 w-full rounded-lg bg-[var(--foreground)] px-4 py-2.5 text-sm font-medium text-[var(--background)] disabled:opacity-50"
         disabled={pending}

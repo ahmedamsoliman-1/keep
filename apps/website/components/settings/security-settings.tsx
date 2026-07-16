@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { getAuthErrorMessage } from "@/lib/auth-errors";
 import { getClientAuth } from "@/lib/firebase-client";
@@ -29,7 +30,6 @@ export function SecuritySettings() {
   const [secret, setSecret] = useState<TotpSecret | null>(null);
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [verificationCode, setVerificationCode] = useState("");
-  const [message, setMessage] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
   useEffect(() => onAuthStateChanged(getClientAuth(), setUser), []);
@@ -37,12 +37,11 @@ export function SecuritySettings() {
   async function resendVerification() {
     if (!user) return;
     setPending(true);
-    setMessage(null);
     try {
       await sendEmailVerification(user);
-      setMessage("A fresh verification email has been sent.");
+      toast.success("A fresh verification email has been sent.");
     } catch (error) {
-      setMessage(getAuthErrorMessage(error, "email-verification"));
+      toast.error(getAuthErrorMessage(error, "email-verification"));
     } finally {
       setPending(false);
     }
@@ -51,7 +50,6 @@ export function SecuritySettings() {
   async function beginMfaEnrollment() {
     if (!user?.email) return;
     setPending(true);
-    setMessage(null);
     try {
       await reauthenticateWithCredential(
         user,
@@ -71,7 +69,7 @@ export function SecuritySettings() {
       setSecret(generatedSecret);
       setPassword("");
     } catch (error) {
-      setMessage(getAuthErrorMessage(error, "mfa"));
+      toast.error(getAuthErrorMessage(error, "mfa"));
     } finally {
       setPending(false);
     }
@@ -80,7 +78,6 @@ export function SecuritySettings() {
   async function completeMfaEnrollment() {
     if (!user || !secret) return;
     setPending(true);
-    setMessage(null);
     try {
       const assertion = TotpMultiFactorGenerator.assertionForEnrollment(
         secret,
@@ -92,9 +89,9 @@ export function SecuritySettings() {
       setSecret(null);
       setQrCode(null);
       setVerificationCode("");
-      setMessage("Authenticator-app verification is now enabled.");
+      toast.success("Authenticator-app verification is now enabled.");
     } catch (error) {
-      setMessage(getAuthErrorMessage(error, "mfa"));
+      toast.error(getAuthErrorMessage(error, "mfa"));
     } finally {
       setPending(false);
     }
@@ -103,14 +100,13 @@ export function SecuritySettings() {
   async function removeMfa(enrollmentId: string) {
     if (!user) return;
     setPending(true);
-    setMessage(null);
     try {
       await multiFactor(user).unenroll(enrollmentId);
       await user.reload();
       setUser(getClientAuth().currentUser);
-      setMessage("Authenticator-app verification has been removed.");
+      toast.success("Authenticator-app verification has been removed.");
     } catch (error) {
-      setMessage(getAuthErrorMessage(error, "mfa"));
+      toast.error(getAuthErrorMessage(error, "mfa"));
     } finally {
       setPending(false);
     }
@@ -219,9 +215,16 @@ export function SecuritySettings() {
                 </code>
                 <button
                   aria-label="Copy setup key"
-                  onClick={() =>
-                    void navigator.clipboard.writeText(secret.secretKey)
-                  }
+                  onClick={() => {
+                    void navigator.clipboard
+                      .writeText(secret.secretKey)
+                      .then(() => toast.success("Setup key copied."))
+                      .catch(() =>
+                        toast.error(
+                          "The setup key could not be copied. Copy it manually instead.",
+                        ),
+                      );
+                  }}
                   type="button"
                 >
                   <Copy className="size-4" />
@@ -273,10 +276,6 @@ export function SecuritySettings() {
             </button>
           </div>
         )}
-
-        {message ? (
-          <p className="mt-5 text-sm text-[var(--muted)]">{message}</p>
-        ) : null}
       </section>
     </div>
   );

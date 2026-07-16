@@ -4,6 +4,7 @@ import { EnvaultClient } from "@envault/api-client";
 import { LockKeyhole, LockOpen } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore } from "react";
+import { toast } from "sonner";
 
 import {
   clearActiveVaultKey,
@@ -26,7 +27,10 @@ export function VaultStatusCard() {
     void client.vault
       .get()
       .then((status) => setExists(status.exists))
-      .catch(() => setExists(false));
+      .catch(() => {
+        setExists(null);
+        toast.error("Vault status could not be loaded.");
+      });
   }, []);
 
   return (

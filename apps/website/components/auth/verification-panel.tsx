@@ -9,6 +9,7 @@ import {
 } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { getAuthErrorMessage } from "@/lib/auth-errors";
 import { getClientAuth } from "@/lib/firebase-client";
@@ -19,7 +20,6 @@ const apiClient = new EnvaultClient({ baseUrl: "" });
 export function VerificationPanel() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
   useEffect(() => onAuthStateChanged(getClientAuth(), setUser), []);
@@ -31,18 +31,17 @@ export function VerificationPanel() {
     }
 
     setPending(true);
-    setMessage(null);
     try {
       await user.reload();
       if (!user.emailVerified) {
-        setMessage("Your email is not verified yet.");
+        toast.warning("Your email is not verified yet.");
         return;
       }
       await apiClient.auth.session.create(await user.getIdToken(true));
       router.push("/app/dashboard");
       router.refresh();
     } catch (caughtError) {
-      setMessage(getAuthErrorMessage(caughtError, "session"));
+      toast.error(getAuthErrorMessage(caughtError, "session"));
     } finally {
       setPending(false);
     }
@@ -53,9 +52,9 @@ export function VerificationPanel() {
     setPending(true);
     try {
       await sendEmailVerification(user);
-      setMessage("A new verification email has been sent.");
+      toast.success("A new verification email has been sent.");
     } catch (caughtError) {
-      setMessage(getAuthErrorMessage(caughtError, "email-verification"));
+      toast.error(getAuthErrorMessage(caughtError, "email-verification"));
     } finally {
       setPending(false);
     }
@@ -74,9 +73,6 @@ export function VerificationPanel() {
       <p className="rounded-lg border px-3 py-3 text-sm">
         Signed in as <strong>{user?.email ?? "your account"}</strong>
       </p>
-      {message ? (
-        <p className="text-sm text-[var(--muted)]">{message}</p>
-      ) : null}
       <button
         className="w-full rounded-lg bg-[var(--foreground)] px-4 py-2.5 text-sm font-medium text-[var(--background)] disabled:opacity-50"
         disabled={pending}

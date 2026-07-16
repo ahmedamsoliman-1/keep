@@ -1685,6 +1685,86 @@ Keep the project runnable after every implementation phase.
 * Revision restoration.
 * Activity screen.
 
+## Next milestone — Productivity, synchronization and usable history
+
+This milestone combines the first production-ready portions of Phases 6, 7 and 8.
+Track implementation against the following checklist and keep the application runnable
+after every stage.
+
+### Stage A — Shared import foundation
+
+- [x] Build the shared dotenv parser.
+- [x] Support comments, empty values, quoting and escaped characters.
+- [x] Support safely parseable multiline values.
+- [x] Support shell-style `export KEY=value` entries.
+- [x] Preserve variable references without evaluating them.
+- [x] Detect duplicate keys and report their source locations.
+- [x] Reject invalid keys and warn about suspicious shell content without executing it.
+- [x] Add comprehensive parser and serializer tests.
+
+### Stage B — Secure import workflow
+
+- [ ] Accept uploaded dotenv files and pasted dotenv content.
+- [ ] Show an import preview classifying variables as new, updated, unchanged,
+      invalid or conflicting.
+- [ ] Support overwrite, skip-existing, import-new-only and individual conflict review.
+- [ ] Encrypt every imported plaintext value locally before sending mutations to the API.
+- [ ] Ensure plaintext import content is never persisted or logged.
+- [ ] Commit imports with expected environment versions.
+- [ ] Protect import retries with idempotency keys and operation records.
+- [ ] Chunk large imports and report progress safely.
+
+### Stage C — Local export workflow
+
+- [ ] Export decrypted values locally as `.env`.
+- [ ] Export decrypted values locally as JSON.
+- [ ] Export decrypted values locally as shell `export` statements.
+- [ ] Export decrypted values locally as a Docker Compose environment snippet.
+- [ ] Export decrypted values locally as Kubernetes Secret YAML.
+- [ ] Explain that Kubernetes base64 values are encoded rather than encrypted.
+- [ ] Support copying and downloading exports without sending plaintext to the server.
+
+### Stage D — Variable selection and bulk operations
+
+- [ ] Add variable row selection and select-all behavior.
+- [ ] Bulk delete selected variables.
+- [ ] Bulk change visibility.
+- [ ] Bulk add and remove tags.
+- [ ] Bulk add and remove key prefixes.
+- [ ] Bulk convert variable keys to uppercase.
+- [ ] Detect key collisions before applying transformations.
+- [ ] Apply bulk mutations with expected-version and idempotency protection.
+
+### Stage E — Revision history and restoration
+
+- [ ] Add revision-history API contracts, client methods and route handlers.
+- [ ] Add paginated environment and variable revision lists.
+- [ ] Keep revision-list metadata non-sensitive.
+- [ ] Decrypt only one explicitly selected revision value at a time.
+- [ ] Restore a selected revision as a new encrypted revision.
+- [ ] Require expected-version checking when restoring.
+- [ ] Present version conflicts through the shared notification and resolution UI.
+
+### Stage F — Activity records
+
+- [ ] Create non-sensitive activity records for imports, exports, bulk changes,
+      variable mutations and revision restoration.
+- [ ] Never include plaintext values, ciphertext, wrapped keys or sensitive metadata
+      in activity records.
+- [ ] Add activity API contracts, client methods and route handlers.
+- [ ] Add a paginated activity page with useful filters.
+
+### Milestone acceptance criteria
+
+- [ ] Import parsing, preview and execution tests pass.
+- [ ] Imported plaintext is encrypted before any API request.
+- [ ] All export formats are generated locally.
+- [ ] Retried imports and bulk mutations do not duplicate changes.
+- [ ] Stale import, bulk and restoration writes return HTTP 409.
+- [ ] Revision history does not decrypt values while listing.
+- [ ] Activity records contain no secret material.
+- [ ] Lint, typecheck, unit tests and production build pass.
+
 ## Phase 9 — Device architecture
 
 * Device authorization model.

@@ -10,6 +10,7 @@ import { getBrowserCryptoProvider } from "@envault/crypto/browser";
 import { KeyRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { toast } from "sonner";
 
 import { setActiveVaultKey } from "@/lib/vault-key-store";
 
@@ -18,12 +19,10 @@ export function VaultUnlock({ vault }: { vault: VaultDto }) {
   const [method, setMethod] = useState<"passphrase" | "recovery">("passphrase");
   const [secret, setSecret] = useState("");
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   async function unlock(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending(true);
-    setError(null);
 
     const material: VaultKeyMaterialV1 = {
       protocolVersion: vault.protocolVersion,
@@ -55,7 +54,7 @@ export function VaultUnlock({ vault }: { vault: VaultDto }) {
       router.push("/app/dashboard");
       router.refresh();
     } catch {
-      setError(
+      toast.error(
         method === "passphrase"
           ? "The vault passphrase is incorrect."
           : "The recovery key is invalid.",
@@ -88,7 +87,6 @@ export function VaultUnlock({ vault }: { vault: VaultDto }) {
           onClick={() => {
             setMethod("passphrase");
             setSecret("");
-            setError(null);
           }}
           type="button"
         >
@@ -103,7 +101,6 @@ export function VaultUnlock({ vault }: { vault: VaultDto }) {
           onClick={() => {
             setMethod("recovery");
             setSecret("");
-            setError(null);
           }}
           type="button"
         >
@@ -121,7 +118,6 @@ export function VaultUnlock({ vault }: { vault: VaultDto }) {
           value={secret}
         />
       </label>
-      {error ? <p className="mt-4 text-sm text-red-600">{error}</p> : null}
       <button
         className="mt-6 w-full rounded-lg bg-[var(--foreground)] px-4 py-2.5 text-sm font-medium text-[var(--background)] disabled:opacity-50"
         disabled={pending}

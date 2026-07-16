@@ -15,6 +15,7 @@ import {
 import { FirebaseError } from "firebase/app";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { toast } from "sonner";
 
 import { getAuthErrorMessage } from "@/lib/auth-errors";
 import { getClientAuth } from "@/lib/firebase-client";
@@ -28,8 +29,6 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [mfaResolver, setMfaResolver] = useState<MultiFactorResolver | null>(
     null,
@@ -38,8 +37,6 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError(null);
-    setNotice(null);
     setPending(true);
 
     try {
@@ -49,7 +46,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           (factor) => factor.factorId === TotpMultiFactorGenerator.FACTOR_ID,
         );
         if (!hint) {
-          setError("No supported authenticator-app factor is available.");
+          toast.error("No supported authenticator-app factor is available.");
           return;
         }
         const assertion = TotpMultiFactorGenerator.assertionForSignIn(
@@ -69,7 +66,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
       if (mode === "forgot-password") {
         await sendPasswordResetEmail(firebaseAuth, email);
-        setNotice(
+        toast.success(
           "If an account is eligible, password-reset instructions have been sent.",
         );
         return;
@@ -107,11 +104,11 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
             caughtError as MultiFactorError,
           ),
         );
-        setError(null);
+        toast.info("Enter the code from your authenticator app to continue.");
         return;
       }
       await signOut(getClientAuth()).catch(() => undefined);
-      setError(
+      toast.error(
         getAuthErrorMessage(
           caughtError,
           mode === "forgot-password" ? "password-reset" : mode,
@@ -173,16 +170,6 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
             />
           </label>
         )
-      ) : null}
-      {error ? (
-        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-600">
-          {error}
-        </p>
-      ) : null}
-      {notice ? (
-        <p className="rounded-lg border px-3 py-2 text-sm text-[var(--muted)]">
-          {notice}
-        </p>
       ) : null}
       <button
         className="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-medium text-white shadow-sm shadow-indigo-600/15 hover:bg-indigo-500 disabled:opacity-50"

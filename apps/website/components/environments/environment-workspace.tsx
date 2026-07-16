@@ -18,7 +18,6 @@ export function EnvironmentWorkspace({ projectId }: { projectId: string }) {
   const [kind, setKind] = useState<EnvironmentDto["kind"]>("development");
   const [creating, setCreating] = useState(false);
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [editingEnvironment, setEditingEnvironment] =
     useState<EnvironmentDto | null>(null);
   const [deletingEnvironment, setDeletingEnvironment] =
@@ -31,7 +30,7 @@ export function EnvironmentWorkspace({ projectId }: { projectId: string }) {
       .list(projectId)
       .then((result) => setEnvironments(result.environments))
       .catch((caught) =>
-        setError(
+        toast.error(
           getUserFacingError(caught, "Environments could not be loaded."),
         ),
       );
@@ -40,7 +39,6 @@ export function EnvironmentWorkspace({ projectId }: { projectId: string }) {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending(true);
-    setError(null);
     try {
       const environment = await client.environments.create(projectId, {
         name,
@@ -51,7 +49,7 @@ export function EnvironmentWorkspace({ projectId }: { projectId: string }) {
       setCreating(false);
       toast.success("Environment created");
     } catch (caught) {
-      setError(
+      toast.error(
         getUserFacingError(caught, "The environment could not be created."),
       );
     } finally {
@@ -159,7 +157,6 @@ export function EnvironmentWorkspace({ projectId }: { projectId: string }) {
           </button>
         </form>
       ) : null}
-      {error ? <p className="mt-5 text-sm text-red-600">{error}</p> : null}
       <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {environments.map((environment) => (
           <article

@@ -37,7 +37,6 @@ export function ProjectWorkspace() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [editingProject, setEditingProject] = useState<ProjectDto | null>(null);
   const [deletingProject, setDeletingProject] = useState<ProjectDto | null>(
@@ -56,7 +55,7 @@ export function ProjectWorkspace() {
       .list()
       .then((result) => setProjects(result.projects))
       .catch((caughtError: unknown) =>
-        setError(
+        toast.error(
           getUserFacingError(caughtError, "Projects could not be loaded."),
         ),
       )
@@ -76,7 +75,6 @@ export function ProjectWorkspace() {
   async function createProject(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending(true);
-    setError(null);
     try {
       const project = await client.projects.create({
         name,
@@ -88,7 +86,7 @@ export function ProjectWorkspace() {
       setCreating(false);
       toast.success("Project created");
     } catch (caughtError) {
-      setError(
+      toast.error(
         getUserFacingError(caughtError, "The project could not be created."),
       );
     } finally {
@@ -179,12 +177,6 @@ export function ProjectWorkspace() {
             Unlock
           </Link>
         </div>
-      ) : null}
-
-      {error ? (
-        <p className="mt-6 rounded-xl border border-red-500/20 bg-red-500/[0.06] p-4 text-sm text-red-600">
-          {error}
-        </p>
       ) : null}
 
       {creating ? (

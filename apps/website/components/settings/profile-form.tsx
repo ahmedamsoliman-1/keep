@@ -3,6 +3,7 @@
 import { EnvaultClient } from "@envault/api-client";
 import { UserRound } from "lucide-react";
 import { useState, type FormEvent } from "react";
+import { toast } from "sonner";
 
 import { getUserFacingError } from "@/lib/user-errors";
 
@@ -17,17 +18,15 @@ export function ProfileForm({
 }) {
   const [displayName, setDisplayName] = useState(initialDisplayName ?? "");
   const [pending, setPending] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending(true);
-    setMessage(null);
     try {
       await client.profile.update({ displayName });
-      setMessage("Profile updated.");
+      toast.success("Profile updated.");
     } catch (error) {
-      setMessage(
+      toast.error(
         getUserFacingError(error, "Your profile could not be updated."),
       );
     } finally {
@@ -71,8 +70,7 @@ export function ProfileForm({
           />
         </label>
       </div>
-      <div className="mt-6 flex items-center justify-between">
-        <p className="text-sm text-[var(--muted)]">{message}</p>
+      <div className="mt-6 flex justify-end">
         <button
           className="rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
           disabled={pending}
