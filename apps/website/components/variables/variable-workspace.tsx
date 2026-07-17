@@ -1,14 +1,14 @@
 "use client";
 
-import { EnvaultApiError, EnvaultClient } from "@envault/api-client";
-import type { VariableDto } from "@envault/api-contract";
-import { decryptVariableValue, encryptVariableValue } from "@envault/crypto";
-import { getBrowserCryptoProvider } from "@envault/crypto/browser";
+import { KeepApiError, KeepClient } from "@keephq/api-client";
+import type { VariableDto } from "@keephq/api-contract";
+import { decryptVariableValue, encryptVariableValue } from "@keephq/crypto";
+import { getBrowserCryptoProvider } from "@keephq/crypto/browser";
 import {
   serializeEnvironment,
   type DotenvEntry,
   type EnvironmentExportFormat,
-} from "@envault/dotenv";
+} from "@keephq/dotenv";
 import {
   Check,
   Command,
@@ -40,7 +40,7 @@ import { getEnvironmentConflict, getUserFacingError } from "@/lib/user-errors";
 import { filterVariables, type ModifiedFilter } from "@/lib/variable-filters";
 import { getActiveVaultKey, getVaultKeyState } from "@/lib/vault-key-store";
 
-const client = new EnvaultClient({ baseUrl: "" });
+const client = new KeepClient({ baseUrl: "" });
 type BulkAction =
   | "delete"
   | "visibility"
@@ -455,7 +455,7 @@ export function VariableWorkspace({
             break;
           } catch (error) {
             const retryable =
-              !(error instanceof EnvaultApiError) || error.status >= 500;
+              !(error instanceof KeepApiError) || error.status >= 500;
             if (!retryable || attempt === 1) throw error;
           }
         }
@@ -729,7 +729,7 @@ export function VariableWorkspace({
                   setExportFormat(format);
                   setDotenvContent(
                     serializeEnvironment(exportEntries, format, {
-                      kubernetesSecretName: `envault-${environmentId}`,
+                      kubernetesSecretName: `keep-${environmentId}`,
                     }),
                   );
                   setCopied(false);
@@ -795,7 +795,7 @@ export function VariableWorkspace({
                   const url = URL.createObjectURL(blob);
                   const anchor = document.createElement("a");
                   anchor.href = url;
-                  anchor.download = `envault-${environmentId}${extensions[exportFormat]}`;
+                  anchor.download = `keep-${environmentId}${extensions[exportFormat]}`;
                   anchor.click();
                   URL.revokeObjectURL(url);
                   toast.success("Export downloaded.");

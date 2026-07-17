@@ -1,6 +1,6 @@
 # Firebase free-tier constraints
 
-Envault currently runs against the Firebase free tier. The following limitations
+Keep currently runs against the Firebase free tier. The following limitations
 must remain visible in planning and deployment decisions.
 
 ## Firestore quota exhaustion
@@ -17,12 +17,12 @@ in Firebase Console under **Firestore Database → Usage**.
 
 When quota is exhausted:
 
-- Envault API routes should return a professional `503` response.
+- Keep API routes should return a professional `503` response.
 - Users should be told that the data service is temporarily unavailable.
 - The application must not repeatedly retry requests in a tight loop.
 - Development must wait for the daily reset when billing cannot be enabled.
 
-Envault deduplicates vault-metadata requests in the browser so the desktop
+Keep deduplicates vault-metadata requests in the browser so the desktop
 navigation, mobile navigation, dashboard and vault page share one request. This
 reduces unnecessary reads but cannot bypass an already exhausted Firebase quota.
 
@@ -31,16 +31,16 @@ Official reference:
 
 ## TOTP multi-factor authentication
 
-Envault now manages standard TOTP enrollment and verification itself. Firebase
+Keep now manages standard TOTP enrollment and verification itself. Firebase
 Identity Platform MFA is not required. Firebase Authentication remains the
-email/password first factor, while Envault verifies the authenticator code
+email/password first factor, while Keep verifies the authenticator code
 before issuing its application session.
 
 This still requires Firestore access to read the encrypted MFA configuration.
 When Firestore quota is exhausted, MFA verification fails closed until quota is
 available again.
 
-See [Envault-managed authenticator MFA](custom-totp-mfa.md).
+See [Keep-managed authenticator MFA](custom-totp-mfa.md).
 
 ## Future options
 

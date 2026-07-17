@@ -30,7 +30,7 @@ export default async function EnvironmentPage({
           Variables
         </h2>
         <p className="mb-8 mt-3 text-[var(--muted)]">
-          Values are encrypted locally before they reach the Envault API.
+          Values are encrypted locally before they reach the Keep API.
         </p>
         <VariableWorkspace
           environmentId={environmentId}

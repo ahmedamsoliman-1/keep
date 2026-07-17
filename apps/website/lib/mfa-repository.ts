@@ -1,6 +1,6 @@
 import "server-only";
 
-import { envaultRedisKey, type EnvaultRedis } from "@envault/redis";
+import { keepRedisKey, type KeepRedis } from "@keephq/redis";
 
 import { decryptMfaSecret, encryptMfaSecret, verifyTotp } from "./custom-totp";
 
@@ -12,11 +12,11 @@ interface MfaDocument {
   updatedAt: string;
 }
 
-const keyFor = (userId: string) => envaultRedisKey("mfa", userId);
+const keyFor = (userId: string) => keepRedisKey("mfa", userId);
 
 export class MfaRepository {
   public constructor(
-    private readonly redis: EnvaultRedis,
+    private readonly redis: KeepRedis,
     private readonly encryptionKey: string,
   ) {}
 

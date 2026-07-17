@@ -1,4 +1,4 @@
-import { EnvaultApiError } from "@envault/api-client";
+import { KeepApiError } from "@keephq/api-client";
 import { FirebaseError } from "firebase/app";
 import { describe, expect, it } from "vitest";
 
@@ -29,7 +29,7 @@ describe("authentication error messages", () => {
   });
 
   it("does not expose API implementation details", () => {
-    const error = new EnvaultApiError(
+    const error = new KeepApiError(
       401,
       { code: "UNAUTHENTICATED", message: "Internal authentication detail" },
       "request-id",

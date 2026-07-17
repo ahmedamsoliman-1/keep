@@ -1,5 +1,5 @@
 import { generateRegistrationOptions } from "@simplewebauthn/server";
-import { envaultRedisKey } from "@envault/redis";
+import { keepRedisKey } from "@keephq/redis";
 import type { NextRequest } from "next/server";
 
 import { errorResponse, successResponse } from "@/lib/api-response";
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     rpID: configuration.rpId,
     userID: new TextEncoder().encode(user.id),
     userName: user.email ?? user.id,
-    userDisplayName: user.displayName ?? user.email ?? "Envault user",
+    userDisplayName: user.displayName ?? user.email ?? "Keep user",
     attestationType: "none",
     authenticatorSelection: {
       residentKey: "required",
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
   });
   const flowId = crypto.randomUUID();
   await redis.set(
-    envaultRedisKey("passkey-challenge", "registration", flowId),
+    keepRedisKey("passkey-challenge", "registration", flowId),
     {
       userId: user.id,
       challenge: options.challenge,

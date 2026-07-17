@@ -51,7 +51,7 @@ export async function resolveTargetFolder(): Promise<
   const folders = vscode.workspace.workspaceFolders ?? [];
   if (folders.length === 0) {
     void vscode.window.showWarningMessage(
-      "Open a folder before selecting an Envault environment.",
+      "Open a folder before selecting an Keep environment.",
     );
     return undefined;
   }
@@ -125,7 +125,7 @@ export async function selectEnvironment(
     const { projects } = await client.projects.list();
     if (projects.length === 0) {
       void vscode.window.showInformationMessage(
-        "No Envault projects yet. Create one from the web app first.",
+        "No Keep projects yet. Create one from the web app first.",
       );
       return undefined;
     }
@@ -135,7 +135,7 @@ export async function selectEnvironment(
         description: item.description ?? undefined,
         project: item,
       })),
-      { placeHolder: "Select an Envault project" },
+      { placeHolder: "Select an Keep project" },
     );
     if (!project) return undefined;
 
@@ -152,7 +152,7 @@ export async function selectEnvironment(
         description: `${item.kind} · version ${item.version}`,
         environment: item,
       })),
-      { placeHolder: "Select an Envault environment" },
+      { placeHolder: "Select an Keep environment" },
     );
     if (!environment) return undefined;
 
@@ -166,14 +166,14 @@ export async function selectEnvironment(
     };
     await setBinding(context, folder, binding);
     void vscode.window.showInformationMessage(
-      `Envault: ${folder.name} → ${binding.projectName} / ${binding.environmentName}`,
+      `Keep: ${folder.name} → ${binding.projectName} / ${binding.environmentName}`,
     );
     return binding;
   } catch (error) {
     void vscode.window.showErrorMessage(
       error instanceof Error
         ? error.message
-        : "The Envault environment could not be selected.",
+        : "The Keep environment could not be selected.",
     );
     return undefined;
   }

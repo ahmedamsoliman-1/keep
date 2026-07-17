@@ -1,6 +1,6 @@
 "use client";
 
-import { EnvaultClient } from "@envault/api-client";
+import { KeepClient } from "@keephq/api-client";
 import { signOut } from "firebase/auth";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { getClientAuth } from "@/lib/firebase-client";
 import { clearActiveVaultKey } from "@/lib/vault-key-store";
 
-const apiClient = new EnvaultClient({ baseUrl: "" });
+const apiClient = new KeepClient({ baseUrl: "" });
 
 export function LogoutButton({
   variant = "default",

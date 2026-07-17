@@ -19,7 +19,7 @@ export default async function LoginPage({
       description="Sign in to unlock access to your encrypted environments."
       footer={
         <>
-          New to Envault?{" "}
+          New to Keep?{" "}
           <Link
             className="font-medium text-indigo-600 hover:text-indigo-500"
             href="/register"

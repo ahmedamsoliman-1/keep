@@ -1,4 +1,4 @@
-import { EnvaultClient } from "@envault/api-client";
+import { KeepClient } from "@keephq/api-client";
 import * as vscode from "vscode";
 
 import { serverUrl, TOKEN_KEY } from "./config";
@@ -9,8 +9,8 @@ export async function getAccessToken(
   return (await context.secrets.get(TOKEN_KEY)) ?? null;
 }
 
-export function createClient(token: string | null): EnvaultClient {
-  return new EnvaultClient({
+export function createClient(token: string | null): KeepClient {
+  return new KeepClient({
     baseUrl: serverUrl(),
     getAccessToken: () => Promise.resolve(token),
   });
@@ -22,11 +22,11 @@ export function createClient(token: string | null): EnvaultClient {
  */
 export async function requireClient(
   context: vscode.ExtensionContext,
-): Promise<EnvaultClient | null> {
+): Promise<KeepClient | null> {
   const token = await getAccessToken(context);
   if (!token) {
     void vscode.window.showWarningMessage(
-      "Sign in to Envault first (Envault: Sign in).",
+      "Sign in to Keep first (Keep: Sign in).",
     );
     return null;
   }

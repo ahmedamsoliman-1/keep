@@ -2,6 +2,10 @@ import type {
   ApiError,
   BulkEnvironmentRequest,
   BulkEnvironmentResponse,
+  ClipboardItemContentDto,
+  ClipboardItemDto,
+  ClipboardList,
+  CreateClipboardItemRequest,
   CreateVaultRequest,
   CreateProjectRequest,
   CreateEnvironmentRequest,
@@ -25,9 +29,9 @@ import type {
   VaultDto,
   VaultSettings,
   VaultStatus,
-} from "@envault/api-contract";
+} from "@keephq/api-contract";
 
-export interface EnvaultClientOptions {
+export interface KeepClientOptions {
   baseUrl: string;
   getAccessToken?: () => Promise<string | null>;
   fetch?: typeof globalThis.fetch;
@@ -43,23 +47,23 @@ interface ErrorEnvelope {
   meta: { requestId: string };
 }
 
-export class EnvaultApiError extends Error {
+export class KeepApiError extends Error {
   public constructor(
     public readonly status: number,
     public readonly error: ApiError,
     public readonly requestId: string,
   ) {
     super(error.message);
-    this.name = "EnvaultApiError";
+    this.name = "KeepApiError";
   }
 }
 
-export class EnvaultClient {
+export class KeepClient {
   readonly #baseUrl: string;
   readonly #getAccessToken?: () => Promise<string | null>;
   readonly #fetch: typeof globalThis.fetch;
 
-  public constructor(options: EnvaultClientOptions) {
+  public constructor(options: KeepClientOptions) {
     this.#baseUrl = options.baseUrl.replace(/\/$/, "");
     this.#getAccessToken = options.getAccessToken;
     this.#fetch = options.fetch ?? globalThis.fetch.bind(globalThis);
@@ -253,6 +257,37 @@ export class EnvaultClient {
       }),
   };
 
+  public readonly clipboard = {
+    list: () => this.request<ClipboardList>("/api/v1/clipboard/items"),
+    create: (input: CreateClipboardItemRequest) =>
+      this.request<ClipboardItemDto>("/api/v1/clipboard/items", {
+        method: "POST",
+        body: JSON.stringify(input),
+      }),
+    get: (itemId: string) =>
+      this.request<ClipboardItemContentDto>(
+        `/api/v1/clipboard/items/${itemId}`,
+      ),
+    delete: (itemId: string) =>
+      this.request<{ deleted: true }>(`/api/v1/clipboard/items/${itemId}`, {
+        method: "DELETE",
+      }),
+    pin: (itemId: string) =>
+      this.request<ClipboardItemDto>(`/api/v1/clipboard/items/${itemId}/pin`, {
+        method: "POST",
+      }),
+    unpin: (itemId: string) =>
+      this.request<ClipboardItemDto>(
+        `/api/v1/clipboard/items/${itemId}/unpin`,
+        { method: "POST" },
+      ),
+    consume: (itemId: string) =>
+      this.request<ClipboardItemContentDto>(
+        `/api/v1/clipboard/items/${itemId}/consume`,
+        { method: "POST" },
+      ),
+  };
+
   public async request<T>(path: string, init: RequestInit = {}): Promise<T> {
     const headers = new Headers(init.headers);
     headers.set("Accept", "application/json");
@@ -275,7 +310,7 @@ export class EnvaultClient {
 
     if (!response.ok || "error" in body) {
       const errorBody = body as ErrorEnvelope;
-      throw new EnvaultApiError(
+      throw new KeepApiError(
         response.status,
         errorBody.error,
         errorBody.meta.requestId,

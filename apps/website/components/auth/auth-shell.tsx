@@ -2,7 +2,7 @@ import { CheckCircle2, KeyRound, ShieldCheck, Sparkles } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { EnvaultLogo, EnvaultMark } from "@/components/brand/envault-logo";
+import { KeepLogo, KeepMark } from "@/components/brand/keep-logo";
 
 export function AuthShell({
   title,
@@ -23,7 +23,7 @@ export function AuthShell({
         <div className="absolute bottom-[-10rem] right-[-12rem] size-[30rem] rounded-full bg-violet-500/10 blur-3xl" />
 
         <Link className="relative z-10" href="/">
-          <EnvaultLogo className="[--foreground:white] [--logo-cutout:#111318]" />
+          <KeepLogo className="[--foreground:white] [--logo-cutout:#111318]" />
         </Link>
 
         <div className="relative z-10 my-auto max-w-xl py-16">
@@ -62,18 +62,18 @@ export function AuthShell({
         </div>
 
         <p className="relative z-10 text-xs text-white/35">
-          Envault security architecture · Protocol v1
+          Keep security architecture · Protocol v1
         </p>
       </section>
 
       <section className="flex min-h-screen items-center justify-center px-6 py-12 sm:px-10">
         <div className="w-full max-w-[420px]">
           <Link className="mb-12 inline-flex lg:hidden" href="/">
-            <EnvaultLogo />
+            <KeepLogo />
           </Link>
 
           <div className="mb-8 hidden size-11 items-center justify-center rounded-xl border bg-[var(--surface)] lg:flex">
-            <EnvaultMark className="size-7 text-[var(--foreground)]" />
+            <KeepMark className="size-7 text-[var(--foreground)]" />
           </div>
           <h1 className="text-3xl font-semibold tracking-[-0.035em]">
             {title}

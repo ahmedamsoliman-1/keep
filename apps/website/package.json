@@ -1,5 +1,5 @@
 {
-  "name": "@envault/website",
+  "name": "@keephq/website",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,13 +10,14 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@envault/api-client": "workspace:*",
-    "@envault/api-contract": "workspace:*",
-    "@envault/config": "workspace:*",
-    "@envault/crypto": "workspace:*",
-    "@envault/dotenv": "workspace:*",
-    "@envault/firebase": "workspace:*",
-    "@envault/redis": "workspace:*",
+    "@keephq/api-client": "workspace:*",
+    "@keephq/api-contract": "workspace:*",
+    "@keephq/config": "workspace:*",
+    "@keephq/crypto": "workspace:*",
+    "@keephq/domain": "workspace:*",
+    "@keephq/dotenv": "workspace:*",
+    "@keephq/firebase": "workspace:*",
+    "@keephq/redis": "workspace:*",
     "@hookform/resolvers": "^5.1.1",
     "@next/env": "^15.4.2",
     "@radix-ui/react-dialog": "^1.1.14",

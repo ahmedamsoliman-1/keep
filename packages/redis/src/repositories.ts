@@ -12,10 +12,10 @@ import type {
   UpdateVariableRequest,
   VariableDto,
   VaultDto,
-} from "@envault/api-contract";
+} from "@keephq/api-contract";
 import { createHash } from "node:crypto";
 
-import { envaultRedisKey, type EnvaultRedis } from "./index";
+import { keepRedisKey, type KeepRedis } from "./index";
 
 interface Revision {
   id: string;
@@ -53,16 +53,15 @@ export interface WorkspaceOverview {
 }
 
 const userVaultKey = (ownerId: string) =>
-  envaultRedisKey("user", ownerId, "vault");
-const stateKey = (vaultId: string) =>
-  envaultRedisKey("vault", vaultId, "state");
+  keepRedisKey("user", ownerId, "vault");
+const stateKey = (vaultId: string) => keepRedisKey("vault", vaultId, "state");
 const overviewKey = (vaultId: string) =>
-  envaultRedisKey("vault", vaultId, "overview");
+  keepRedisKey("vault", vaultId, "overview");
 const now = () => new Date().toISOString();
 const fingerprint = (value: unknown) =>
   createHash("sha256").update(JSON.stringify(value)).digest("hex");
 
-async function stateFor(redis: EnvaultRedis, ownerId: string) {
+async function stateFor(redis: KeepRedis, ownerId: string) {
   const vaultId = await redis.get<string>(userVaultKey(ownerId));
   if (!vaultId) return null;
   const state = await redis.get<VaultState>(stateKey(vaultId));
@@ -70,7 +69,7 @@ async function stateFor(redis: EnvaultRedis, ownerId: string) {
 }
 
 async function mutate<T>(
-  redis: EnvaultRedis,
+  redis: KeepRedis,
   ownerId: string,
   change: (state: VaultState) => T,
 ): Promise<T | null> {
@@ -149,7 +148,7 @@ function workspaceOverview(state: VaultState): WorkspaceOverview {
 }
 
 export class RedisVaultRepository {
-  public constructor(private readonly redis: EnvaultRedis) {}
+  public constructor(private readonly redis: KeepRedis) {}
   public async findByOwnerId(ownerId: string) {
     return (await stateFor(this.redis, ownerId))?.state.vault ?? null;
   }
@@ -188,7 +187,7 @@ export class RedisVaultRepository {
 }
 
 export class RedisProjectRepository {
-  public constructor(private readonly redis: EnvaultRedis) {}
+  public constructor(private readonly redis: KeepRedis) {}
   public async overview(ownerId: string): Promise<WorkspaceOverview> {
     const vaultId = await this.redis.get<string>(userVaultKey(ownerId));
     if (!vaultId)
@@ -269,7 +268,7 @@ export class RedisProjectRepository {
 }
 
 export class RedisEnvironmentRepository {
-  public constructor(private readonly redis: EnvaultRedis) {}
+  public constructor(private readonly redis: KeepRedis) {}
   public async list(ownerId: string, projectId: string) {
     const result = await stateFor(this.redis, ownerId);
     return result ? environmentList(result.state, projectId) : [];

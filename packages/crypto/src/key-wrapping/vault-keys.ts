@@ -20,6 +20,8 @@ function wrappingAdditionalData(
   vaultId: string,
   purpose: "passphrase" | "recovery" | "biometric" | "device",
 ) {
+  // Legacy AAD label retained after the Envault->Keep rebrand.
+  // Do NOT change: it is bound into every existing wrapped vault key.
   return textEncoder.encode(`envault:v1:vault-key:${vaultId}:${purpose}`);
 }
 

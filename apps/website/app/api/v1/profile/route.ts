@@ -1,4 +1,4 @@
-import { updateProfileRequestSchema } from "@envault/api-contract";
+import { updateProfileRequestSchema } from "@keephq/api-contract";
 import type { NextRequest } from "next/server";
 
 import {

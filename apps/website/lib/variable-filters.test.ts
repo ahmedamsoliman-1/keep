@@ -1,4 +1,4 @@
-import type { VariableDto } from "@envault/api-contract";
+import type { VariableDto } from "@keephq/api-contract";
 import { describe, expect, it } from "vitest";
 
 import { filterVariables } from "./variable-filters";

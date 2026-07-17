@@ -1,4 +1,4 @@
-import { mfaCodeRequestSchema } from "@envault/api-contract";
+import { mfaCodeRequestSchema } from "@keephq/api-contract";
 import type { NextRequest } from "next/server";
 
 import {

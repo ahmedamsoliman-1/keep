@@ -1,6 +1,6 @@
 import type { AuthenticationResponseJSON } from "@simplewebauthn/server";
 import { verifyAuthenticationResponse } from "@simplewebauthn/server";
-import { envaultRedisKey } from "@envault/redis";
+import { keepRedisKey } from "@keephq/redis";
 import type { NextRequest } from "next/server";
 
 import {
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
   if (!body?.flowId || !body.response) return invalidRequestResponse(requestId);
 
   const redis = getAdminFirestore();
-  const challengeKey = envaultRedisKey(
+  const challengeKey = keepRedisKey(
     "passkey-challenge",
     "authentication",
     body.flowId,
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
   );
   const passkeyProof = crypto.randomUUID();
   await redis.set(
-    envaultRedisKey("passkey-proof", passkeyProof),
+    keepRedisKey("passkey-proof", passkeyProof),
     { userId: stored.userId },
     { ex: 120 },
   );

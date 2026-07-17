@@ -371,7 +371,7 @@ function kubernetesName(value: string): string {
     .replace(/[^a-z0-9.-]+/gu, "-")
     .replace(/^[^a-z0-9]+|[^a-z0-9]+$/gu, "")
     .slice(0, 253);
-  return normalized || "envault-environment";
+  return normalized || "keep-environment";
 }
 
 export function serializeEnvironment(

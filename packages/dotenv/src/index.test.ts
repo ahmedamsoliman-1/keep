@@ -149,8 +149,8 @@ describe("serializeDotenv", () => {
 
   it("quotes whitespace, newlines, quotes, and backslashes", () => {
     expect(
-      serializeDotenv([{ key: "MESSAGE", value: 'hello "team"\nC:\\envault' }]),
-    ).toBe('MESSAGE="hello \\"team\\"\\nC:\\\\envault"');
+      serializeDotenv([{ key: "MESSAGE", value: 'hello "team"\nC:\\keep' }]),
+    ).toBe('MESSAGE="hello \\"team\\"\\nC:\\\\keep"');
   });
 
   it("round-trips serialized entries through the parser", () => {
@@ -158,7 +158,7 @@ describe("serializeDotenv", () => {
       { key: "EMPTY", value: "" },
       { key: "REFERENCE", value: "${API_URL}/v1" },
       { key: "MESSAGE", value: 'hello "team"\nnext line' },
-      { key: "WINDOWS_PATH", value: "C:\\envault\\bin" },
+      { key: "WINDOWS_PATH", value: "C:\\keep\\bin" },
     ];
 
     const result = parseDotenv(serializeDotenv(entries));

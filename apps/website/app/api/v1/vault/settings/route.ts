@@ -2,7 +2,7 @@ import { successResponse } from "@/lib/api-response";
 import { getSessionConfiguration } from "@/lib/firebase-admin";
 import { getSessionUser } from "@/lib/session";
 import { errorResponse } from "@/lib/api-response";
-import { parseServerEnvironment } from "@envault/config/server";
+import { parseServerEnvironment } from "@keephq/config/server";
 
 export async function GET() {
   const requestId = crypto.randomUUID();

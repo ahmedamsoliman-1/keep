@@ -1,7 +1,7 @@
 "use client";
 
-import { wrapVaultKeyWithBiometricSecret } from "@envault/crypto";
-import { getBrowserCryptoProvider } from "@envault/crypto/browser";
+import { wrapVaultKeyWithBiometricSecret } from "@keephq/crypto";
+import { getBrowserCryptoProvider } from "@keephq/crypto/browser";
 import {
   startAuthentication,
   startRegistration,
@@ -132,7 +132,7 @@ export function PasskeySettings() {
             <h3 className="font-semibold">Passkeys and biometrics</h3>
             <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
               Sign in using Touch ID, Android biometrics, Windows Hello, or your
-              device security PIN. Envault never receives biometric data.
+              device security PIN. Keep never receives biometric data.
             </p>
           </div>
         </div>

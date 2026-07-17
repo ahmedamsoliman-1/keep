@@ -1,9 +1,9 @@
 "use client";
 
-import { EnvaultClient } from "@envault/api-client";
-import type { VaultStatus } from "@envault/api-contract";
+import { KeepClient } from "@keephq/api-client";
+import type { VaultStatus } from "@keephq/api-contract";
 
-const client = new EnvaultClient({ baseUrl: "" });
+const client = new KeepClient({ baseUrl: "" });
 
 let cachedStatus: VaultStatus | null = null;
 let pendingRequest: Promise<VaultStatus> | null = null;

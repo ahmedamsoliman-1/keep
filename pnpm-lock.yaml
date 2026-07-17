@@ -44,16 +44,16 @@ importers:
 
   apps/vscode-extension:
     dependencies:
-      '@envault/api-client':
+      '@keephq/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
-      '@envault/api-contract':
+      '@keephq/api-contract':
         specifier: workspace:*
         version: link:../../packages/api-contract
-      '@envault/crypto':
+      '@keephq/crypto':
         specifier: workspace:*
         version: link:../../packages/crypto
-      '@envault/dotenv':
+      '@keephq/dotenv':
         specifier: workspace:*
         version: link:../../packages/dotenv
     devDependencies:
@@ -69,30 +69,33 @@ importers:
 
   apps/website:
     dependencies:
-      '@envault/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api-client
-      '@envault/api-contract':
-        specifier: workspace:*
-        version: link:../../packages/api-contract
-      '@envault/config':
-        specifier: workspace:*
-        version: link:../../packages/config
-      '@envault/crypto':
-        specifier: workspace:*
-        version: link:../../packages/crypto
-      '@envault/dotenv':
-        specifier: workspace:*
-        version: link:../../packages/dotenv
-      '@envault/firebase':
-        specifier: workspace:*
-        version: link:../../packages/firebase
-      '@envault/redis':
-        specifier: workspace:*
-        version: link:../../packages/redis
       '@hookform/resolvers':
         specifier: ^5.1.1
         version: 5.4.0(react-hook-form@7.81.0(react@19.2.7))
+      '@keephq/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@keephq/api-contract':
+        specifier: workspace:*
+        version: link:../../packages/api-contract
+      '@keephq/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@keephq/crypto':
+        specifier: workspace:*
+        version: link:../../packages/crypto
+      '@keephq/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
+      '@keephq/dotenv':
+        specifier: workspace:*
+        version: link:../../packages/dotenv
+      '@keephq/firebase':
+        specifier: workspace:*
+        version: link:../../packages/firebase
+      '@keephq/redis':
+        specifier: workspace:*
+        version: link:../../packages/redis
       '@next/env':
         specifier: ^15.4.2
         version: 15.5.20
@@ -172,7 +175,7 @@ importers:
 
   packages/api-client:
     dependencies:
-      '@envault/api-contract':
+      '@keephq/api-contract':
         specifier: workspace:*
         version: link:../api-contract
 
@@ -184,7 +187,7 @@ importers:
 
   packages/application:
     dependencies:
-      '@envault/domain':
+      '@keephq/domain':
         specifier: workspace:*
         version: link:../domain
 
@@ -205,10 +208,10 @@ importers:
 
   packages/firebase:
     dependencies:
-      '@envault/api-contract':
+      '@keephq/api-contract':
         specifier: workspace:*
         version: link:../api-contract
-      '@envault/redis':
+      '@keephq/redis':
         specifier: workspace:*
         version: link:../redis
       firebase:
@@ -225,9 +228,12 @@ importers:
 
   packages/redis:
     dependencies:
-      '@envault/api-contract':
+      '@keephq/api-contract':
         specifier: workspace:*
         version: link:../api-contract
+      '@keephq/domain':
+        specifier: workspace:*
+        version: link:../domain
       redis:
         specifier: ^6.1.0
         version: 6.1.0(@opentelemetry/api@1.9.1)

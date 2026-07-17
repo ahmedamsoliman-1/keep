@@ -1,7 +1,7 @@
 "use client";
 
-import { EnvaultClient } from "@envault/api-client";
-import type { EnvironmentDto } from "@envault/api-contract";
+import { KeepClient } from "@keephq/api-client";
+import type { EnvironmentDto } from "@keephq/api-contract";
 import { Boxes, Pencil, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { ActionDialog, ConfirmDialog } from "@/components/ui/action-dialog";
 import { getEnvironmentConflict, getUserFacingError } from "@/lib/user-errors";
 
-const client = new EnvaultClient({ baseUrl: "" });
+const client = new KeepClient({ baseUrl: "" });
 
 export function EnvironmentWorkspace({ projectId }: { projectId: string }) {
   const [environments, setEnvironments] = useState<EnvironmentDto[]>([]);

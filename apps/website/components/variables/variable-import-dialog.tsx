@@ -1,14 +1,14 @@
 "use client";
 
-import { EnvaultApiError, EnvaultClient } from "@envault/api-client";
-import type { ImportVariableItem, VariableDto } from "@envault/api-contract";
-import { decryptVariableValue, encryptVariableValue } from "@envault/crypto";
-import { getBrowserCryptoProvider } from "@envault/crypto/browser";
+import { KeepApiError, KeepClient } from "@keephq/api-client";
+import type { ImportVariableItem, VariableDto } from "@keephq/api-contract";
+import { decryptVariableValue, encryptVariableValue } from "@keephq/crypto";
+import { getBrowserCryptoProvider } from "@keephq/crypto/browser";
 import {
   parseDotenv,
   type DotenvDiagnostic,
   type ParsedDotenvEntry,
-} from "@envault/dotenv";
+} from "@keephq/dotenv";
 import { FileUp, Upload } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -17,7 +17,7 @@ import { ActionDialog } from "@/components/ui/action-dialog";
 import { getActiveVaultKey, getVaultKeyState } from "@/lib/vault-key-store";
 import { getUserFacingError } from "@/lib/user-errors";
 
-const client = new EnvaultClient({ baseUrl: "" });
+const client = new KeepClient({ baseUrl: "" });
 const apiKeyPattern = /^[A-Za-z_][A-Za-z0-9_]*$/u;
 
 type ImportClassification =
@@ -295,7 +295,7 @@ export function VariableImportDialog({
             break;
           } catch (error) {
             const retryable =
-              !(error instanceof EnvaultApiError) || error.status >= 500;
+              !(error instanceof KeepApiError) || error.status >= 500;
             if (!retryable || attempt === 1) throw error;
           }
         }

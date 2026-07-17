@@ -1,11 +1,12 @@
 {
-  "name": "@envault/redis",
+  "name": "@keephq/redis",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./repositories": "./src/repositories.ts"
+    "./repositories": "./src/repositories.ts",
+    "./clipboard-repository": "./src/clipboard-repository.ts"
   },
   "scripts": {
     "build": "tsc --noEmit",
@@ -14,7 +15,8 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@envault/api-contract": "workspace:*",
+    "@keephq/api-contract": "workspace:*",
+    "@keephq/domain": "workspace:*",
     "redis": "^6.1.0"
   }
 }

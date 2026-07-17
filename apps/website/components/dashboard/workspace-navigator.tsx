@@ -1,4 +1,4 @@
-import type { WorkspaceOverview } from "@envault/redis/repositories";
+import type { WorkspaceOverview } from "@keephq/redis/repositories";
 import { Boxes, ChevronRight, Folder, KeyRound } from "lucide-react";
 import Link from "next/link";
 

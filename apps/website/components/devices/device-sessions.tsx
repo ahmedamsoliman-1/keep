@@ -1,14 +1,14 @@
 "use client";
 
-import { EnvaultClient } from "@envault/api-client";
-import type { DeviceSession } from "@envault/api-contract";
+import { KeepClient } from "@keephq/api-client";
+import type { DeviceSession } from "@keephq/api-contract";
 import { Laptop, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { ConfirmDialog } from "@/components/ui/action-dialog";
 
-const client = new EnvaultClient({ baseUrl: "" });
+const client = new KeepClient({ baseUrl: "" });
 
 export function DeviceSessions() {
   const [sessions, setSessions] = useState<DeviceSession[]>([]);

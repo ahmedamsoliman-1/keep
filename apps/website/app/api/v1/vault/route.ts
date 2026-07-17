@@ -1,5 +1,5 @@
-import { createVaultRequestSchema } from "@envault/api-contract";
-import { FirestoreVaultRepository } from "@envault/firebase/repositories/vault";
+import { createVaultRequestSchema } from "@keephq/api-contract";
+import { FirestoreVaultRepository } from "@keephq/firebase/repositories/vault";
 import type { NextRequest } from "next/server";
 
 import {

@@ -2,7 +2,7 @@ import {
   createErrorResponse,
   createSuccessResponse,
   type ApiError,
-} from "@envault/api-contract";
+} from "@keephq/api-contract";
 
 export function successResponse<T>(data: T, requestId: string, status = 200) {
   return Response.json(createSuccessResponse(data, requestId), { status });

@@ -1,6 +1,6 @@
 # Architecture
 
-Envault is an API-first system. The website is one client of the same versioned API that
+Keep is an API-first system. The website is one client of the same versioned API that
 future VS Code, CLI, and desktop clients will use.
 
 ```text

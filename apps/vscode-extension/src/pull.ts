@@ -1,5 +1,5 @@
-import type { EnvaultClient } from "@envault/api-client";
-import { serializeDotenv } from "@envault/dotenv";
+import type { KeepClient } from "@keephq/api-client";
+import { serializeDotenv } from "@keephq/dotenv";
 import * as vscode from "vscode";
 
 import { requireClient } from "./client";
@@ -59,7 +59,7 @@ async function confirmOverwrite(
 }
 
 async function decryptAll(
-  client: EnvaultClient,
+  client: KeepClient,
   key: Uint8Array,
   environmentId: string,
 ): Promise<{ key: string; value: string }[]> {

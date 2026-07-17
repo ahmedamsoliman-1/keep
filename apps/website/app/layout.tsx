@@ -8,8 +8,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Envault",
-    template: "%s · Envault",
+    default: "Keep",
+    template: "%s · Keep",
   },
   description: "Your environments, organized and protected.",
 };

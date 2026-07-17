@@ -1,9 +1,9 @@
 {
-  "name": "envault-vscode",
-  "displayName": "Envault",
+  "name": "keep-vscode",
+  "displayName": "Keep",
   "description": "Secure environment management from VS Code.",
   "version": "0.3.1",
-  "publisher": "envault",
+  "publisher": "keep",
   "license": "UNLICENSED",
   "repository": {
     "type": "git",
@@ -21,7 +21,7 @@
     "secrets",
     "security",
     "aamsdn",
-    "envault"
+    "keep"
   ],
   "engines": {
     "vscode": "^1.100.0"
@@ -30,162 +30,162 @@
     "Other"
   ],
   "activationEvents": [
-    "onView:envault.explorer"
+    "onView:keep.explorer"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "envault.signIn",
+        "command": "keep.signIn",
         "title": "Sign in",
-        "category": "Envault"
+        "category": "Keep"
       },
       {
-        "command": "envault.signOut",
+        "command": "keep.signOut",
         "title": "Sign out",
-        "category": "Envault"
+        "category": "Keep"
       },
       {
-        "command": "envault.status",
+        "command": "keep.status",
         "title": "Show connection status",
-        "category": "Envault"
+        "category": "Keep"
       },
       {
-        "command": "envault.selectEnvironment",
+        "command": "keep.selectEnvironment",
         "title": "Select environment",
-        "category": "Envault"
+        "category": "Keep"
       },
       {
-        "command": "envault.unlock",
+        "command": "keep.unlock",
         "title": "Unlock vault",
-        "category": "Envault",
+        "category": "Keep",
         "icon": "$(unlock)"
       },
       {
-        "command": "envault.lock",
+        "command": "keep.lock",
         "title": "Lock vault",
-        "category": "Envault",
+        "category": "Keep",
         "icon": "$(lock)"
       },
       {
-        "command": "envault.pull",
+        "command": "keep.pull",
         "title": "Pull environment → .env",
-        "category": "Envault",
+        "category": "Keep",
         "icon": "$(cloud-download)"
       },
       {
-        "command": "envault.push",
+        "command": "keep.push",
         "title": "Push .env → environment",
-        "category": "Envault",
+        "category": "Keep",
         "icon": "$(cloud-upload)"
       },
       {
-        "command": "envault.quickActions",
+        "command": "keep.quickActions",
         "title": "Quick actions",
-        "category": "Envault"
+        "category": "Keep"
       },
       {
-        "command": "envault.refresh",
+        "command": "keep.refresh",
         "title": "Refresh",
-        "category": "Envault",
+        "category": "Keep",
         "icon": "$(refresh)"
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "envault",
-          "title": "Envault",
+          "id": "keep",
+          "title": "Keep",
           "icon": "images/icon.png"
         }
       ]
     },
     "views": {
-      "envault": [
+      "keep": [
         {
-          "id": "envault.explorer",
+          "id": "keep.explorer",
           "name": "Environments"
         }
       ]
     },
     "viewsWelcome": [
       {
-        "view": "envault.explorer",
-        "contents": "Connect this device to Envault to browse your projects and environments.\n[Sign in to Envault](command:envault.signIn)"
+        "view": "keep.explorer",
+        "contents": "Connect this device to Keep to browse your projects and environments.\n[Sign in to Keep](command:keep.signIn)"
       }
     ],
     "menus": {
       "view/title": [
         {
-          "command": "envault.refresh",
-          "when": "view == envault.explorer",
+          "command": "keep.refresh",
+          "when": "view == keep.explorer",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
-          "command": "envault.pull",
-          "when": "view == envault.explorer && viewItem == envaultEnvironment",
+          "command": "keep.pull",
+          "when": "view == keep.explorer && viewItem == keepEnvironment",
           "group": "inline@1"
         },
         {
-          "command": "envault.push",
-          "when": "view == envault.explorer && viewItem == envaultEnvironment",
+          "command": "keep.push",
+          "when": "view == keep.explorer && viewItem == keepEnvironment",
           "group": "inline@2"
         }
       ]
     },
     "walkthroughs": [
       {
-        "id": "envault.getStarted",
-        "title": "Get started with Envault",
-        "description": "Connect VS Code to your encrypted Envault environments.",
+        "id": "keep.getStarted",
+        "title": "Get started with Keep",
+        "description": "Connect VS Code to your encrypted Keep environments.",
         "steps": [
           {
             "id": "signIn",
             "title": "Sign in",
-            "description": "Approve this device in your browser — no password is typed into VS Code.\n[Sign in](command:envault.signIn)",
+            "description": "Approve this device in your browser — no password is typed into VS Code.\n[Sign in](command:keep.signIn)",
             "media": {
               "markdown": "walkthrough/sign-in.md"
             },
             "completionEvents": [
-              "onCommand:envault.signIn"
+              "onCommand:keep.signIn"
             ]
           },
           {
             "id": "select",
             "title": "Select an environment",
-            "description": "Bind a workspace folder to a project environment.\n[Select environment](command:envault.selectEnvironment)",
+            "description": "Bind a workspace folder to a project environment.\n[Select environment](command:keep.selectEnvironment)",
             "media": {
               "markdown": "walkthrough/select.md"
             },
             "completionEvents": [
-              "onCommand:envault.selectEnvironment"
+              "onCommand:keep.selectEnvironment"
             ]
           },
           {
             "id": "pullPush",
             "title": "Pull and push",
-            "description": "Fetch secrets into .env and publish local changes back.\n[Pull environment](command:envault.pull)",
+            "description": "Fetch secrets into .env and publish local changes back.\n[Pull environment](command:keep.pull)",
             "media": {
               "markdown": "walkthrough/pull-push.md"
             },
             "completionEvents": [
-              "onCommand:envault.pull"
+              "onCommand:keep.pull"
             ]
           }
         ]
       }
     ],
     "configuration": {
-      "title": "Envault",
+      "title": "Keep",
       "properties": {
-        "envault.serverUrl": {
+        "keep.serverUrl": {
           "type": "string",
           "default": "https://env.aamsdn.space",
-          "description": "Envault server URL."
+          "description": "Keep server URL."
         },
-        "envault.autoLockMinutes": {
+        "keep.autoLockMinutes": {
           "type": "number",
           "default": 0,
           "minimum": 0,
@@ -207,10 +207,10 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@envault/api-client": "workspace:*",
-    "@envault/api-contract": "workspace:*",
-    "@envault/crypto": "workspace:*",
-    "@envault/dotenv": "workspace:*"
+    "@keephq/api-client": "workspace:*",
+    "@keephq/api-contract": "workspace:*",
+    "@keephq/crypto": "workspace:*",
+    "@keephq/dotenv": "workspace:*"
   },
   "devDependencies": {
     "@types/vscode": "^1.100.0",

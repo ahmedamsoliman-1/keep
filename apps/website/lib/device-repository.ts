@@ -4,8 +4,8 @@ import type {
   DeviceScope,
   DeviceSession,
   DeviceWrappedVaultKey,
-} from "@envault/api-contract";
-import { envaultRedisKey, type EnvaultRedis } from "@envault/redis";
+} from "@keephq/api-contract";
+import { keepRedisKey, type KeepRedis } from "@keephq/redis";
 import { createHash, randomBytes } from "node:crypto";
 
 interface DeviceAuthorization {
@@ -32,20 +32,20 @@ interface StoredDeviceVaultKey extends DeviceWrappedVaultKey {
 }
 
 const authorizationKey = (id: string) =>
-  envaultRedisKey("device-authorization", id);
-const userCodeKey = (code: string) => envaultRedisKey("device-user-code", code);
-const sessionKey = (id: string) => envaultRedisKey("device-session", id);
-const sessionTokenKey = (hash: string) => envaultRedisKey("device-token", hash);
+  keepRedisKey("device-authorization", id);
+const userCodeKey = (code: string) => keepRedisKey("device-user-code", code);
+const sessionKey = (id: string) => keepRedisKey("device-session", id);
+const sessionTokenKey = (hash: string) => keepRedisKey("device-token", hash);
 const sessionVaultKeyKey = (id: string) =>
-  envaultRedisKey("device-session-vault-key", id);
+  keepRedisKey("device-session-vault-key", id);
 const ownerSessionsKey = (ownerId: string) =>
-  envaultRedisKey("user", ownerId, "device-sessions");
+  keepRedisKey("user", ownerId, "device-sessions");
 
 const sha256 = (value: string) =>
   createHash("sha256").update(value).digest("base64url");
 
 export class DeviceRepository {
-  public constructor(private readonly redis: EnvaultRedis) {}
+  public constructor(private readonly redis: KeepRedis) {}
 
   public async createAuthorization(input: {
     deviceName: string;

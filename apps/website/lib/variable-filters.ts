@@ -1,4 +1,4 @@
-import type { VariableDto } from "@envault/api-contract";
+import type { VariableDto } from "@keephq/api-contract";
 
 export type ModifiedFilter = "all" | "today" | "week" | "month";
 

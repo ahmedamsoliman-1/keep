@@ -1,6 +1,6 @@
 # Threat model
 
-Envault is designed to limit damage from database disclosure, server compromise,
+Keep is designed to limit damage from database disclosure, server compromise,
 cross-account authorization bugs, stolen device credentials, request replay, stale
 concurrent writes, and accidental logging or persistence of plaintext secrets.
 
