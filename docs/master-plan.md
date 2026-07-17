@@ -4032,12 +4032,17 @@ sequence.
 
 ## Divergence now (Keep Clipboard)
 
-- **Step 0 — Rebrand Envault → Keep** (Part 0 checklist). One isolated commit.
-- **Phase 12 — Keep Clipboard Core** (= Part II §25 Phase 1). Clipboard domain
-  in `@keephq/domain` + `@keephq/api-contract`, Redis repository via
-  `keepRedisKey`, `/api/v1/clipboard/*` routes + policy + sensitivity
-  detection, web `/dashboard/clipboard` (tablet-responsive), retention/trim,
-  safe logging, `KEEP_CLIPBOARD_ENABLED` flag.
+- **[x] Step 0 — Rebrand Envault → Keep** (Part 0 checklist). Done; legacy
+  storage/crypto namespaces retained (0.6).
+- **[x] Phase 12 — Keep Clipboard Core** (= Part II §25 Phase 1). Clipboard
+  domain in `@keephq/domain` (sensitivity/preview/retention) + DTOs/scopes in
+  `@keephq/api-contract`; `RedisClipboardRepository` (per-user CAS store under
+  `envault:v1:clipboard:user:*`, dedupe/trim/pin limits); `/api/v1/clipboard/*`
+  routes (list/create/get/delete/pin/unpin/consume), feature-flagged and
+  auth-scoped; `client.clipboard.*`; tablet-responsive `/app/clipboard`
+  workspace + nav; `NEXT_PUBLIC_KEEP_CLIPBOARD_ENABLED` + `KEEP_CLIPBOARD_*`.
+  Unit-tested; `pnpm check` green; API smoke-tested. Real-time (Streams/SSE) and
+  client-side encryption remain deferred (Phases 14/18).
 - **Phase 13 — Keep Clipboard in VS Code** (= Part II §25 Phase 2). Add
   `clipboard:*` scopes to existing device authorization; add clipboard commands
   to `apps/keep-vscode`; secure reuse of `SecretStorage`; loop/dedupe
