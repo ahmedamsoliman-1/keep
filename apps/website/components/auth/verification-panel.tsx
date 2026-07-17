@@ -1,6 +1,6 @@
 "use client";
 
-import { EnvaultClient } from "@envault/api-client";
+import { KeepClient } from "@keephq/api-client";
 import {
   onAuthStateChanged,
   sendEmailVerification,
@@ -15,7 +15,7 @@ import { getAuthErrorMessage } from "@/lib/auth-errors";
 import { getClientAuth } from "@/lib/firebase-client";
 import { clearActiveVaultKey } from "@/lib/vault-key-store";
 
-const apiClient = new EnvaultClient({ baseUrl: "" });
+const apiClient = new KeepClient({ baseUrl: "" });
 
 export function VerificationPanel() {
   const router = useRouter();

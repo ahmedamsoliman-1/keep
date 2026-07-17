@@ -1,5 +1,5 @@
 import { generateAuthenticationOptions } from "@simplewebauthn/server";
-import { envaultRedisKey } from "@envault/redis";
+import { keepRedisKey } from "@keephq/redis";
 import type { NextRequest } from "next/server";
 
 import {
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
   });
   const flowId = crypto.randomUUID();
   await redis.set(
-    envaultRedisKey("passkey-challenge", "vault", flowId),
+    keepRedisKey("passkey-challenge", "vault", flowId),
     {
       userId: user.id,
       vaultId,

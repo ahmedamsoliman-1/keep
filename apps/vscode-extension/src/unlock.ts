@@ -1,12 +1,12 @@
-import type { EnvaultClient } from "@envault/api-client";
-import type { VaultDto } from "@envault/api-contract";
+import type { KeepClient } from "@keephq/api-client";
+import type { VaultDto } from "@keephq/api-contract";
 import {
   unlockVaultWithDeviceSecret,
   unlockVaultWithPassphrase,
   unlockVaultWithRecoveryKey,
   wrapVaultKeyWithDeviceSecret,
   type VaultKeyMaterialV1,
-} from "@envault/crypto";
+} from "@keephq/crypto";
 import { randomBytes } from "node:crypto";
 import * as vscode from "vscode";
 
@@ -47,7 +47,7 @@ async function readDeviceSecret(
  */
 async function establishDeviceKey(
   context: vscode.ExtensionContext,
-  client: EnvaultClient,
+  client: KeepClient,
   vaultId: string,
   key: Uint8Array,
 ): Promise<void> {
@@ -76,7 +76,7 @@ async function establishDeviceKey(
 /** Removes device-wrapped unlock material both locally and server-side. */
 export async function forgetDeviceKey(
   context: vscode.ExtensionContext,
-  client: EnvaultClient | null,
+  client: KeepClient | null,
 ): Promise<void> {
   await context.secrets.delete(DEVICE_SECRET_KEY);
   try {
@@ -88,7 +88,7 @@ export async function forgetDeviceKey(
 
 async function trySilentUnlock(
   context: vscode.ExtensionContext,
-  client: EnvaultClient,
+  client: KeepClient,
   session: VaultSession,
   vault: VaultDto,
 ): Promise<Uint8Array | null> {
@@ -120,7 +120,7 @@ async function trySilentUnlock(
 
 async function promptUnlock(
   context: vscode.ExtensionContext,
-  client: EnvaultClient,
+  client: KeepClient,
   session: VaultSession,
   vault: VaultDto,
 ): Promise<Uint8Array | null> {
@@ -129,7 +129,7 @@ async function promptUnlock(
       { label: "Passphrase", value: "passphrase" as const },
       { label: "Recovery key", value: "recovery" as const },
     ],
-    { placeHolder: "Unlock the Envault vault" },
+    { placeHolder: "Unlock the Keep vault" },
   );
   if (!method) return null;
 
@@ -197,13 +197,13 @@ export async function ensureUnlocked(
     void vscode.window.showErrorMessage(
       error instanceof Error
         ? error.message
-        : "The Envault vault could not be loaded.",
+        : "The Keep vault could not be loaded.",
     );
     return null;
   }
   if (!vault) {
     void vscode.window.showWarningMessage(
-      "No Envault vault exists yet. Create one from the Envault web app first.",
+      "No Keep vault exists yet. Create one from the Keep web app first.",
     );
     return null;
   }

@@ -20,7 +20,7 @@ function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
 function encodeAdditionalData(data: VariableAdditionalData) {
   return encoder.encode(
     [
-      "envault",
+      "keep",
       "variable",
       "v1",
       data.vaultId,

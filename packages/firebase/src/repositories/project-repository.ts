@@ -1,1 +1,1 @@
-export { RedisProjectRepository as FirestoreProjectRepository } from "@envault/redis/repositories";
+export { RedisProjectRepository as FirestoreProjectRepository } from "@keephq/redis/repositories";

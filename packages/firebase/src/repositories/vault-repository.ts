@@ -1,1 +1,1 @@
-export { RedisVaultRepository as FirestoreVaultRepository } from "@envault/redis/repositories";
+export { RedisVaultRepository as FirestoreVaultRepository } from "@keephq/redis/repositories";

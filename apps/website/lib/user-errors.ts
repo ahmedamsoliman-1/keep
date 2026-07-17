@@ -1,6 +1,6 @@
-import { EnvaultApiError } from "@envault/api-client";
+import { KeepApiError } from "@keephq/api-client";
 
-const apiMessages: Partial<Record<EnvaultApiError["error"]["code"], string>> = {
+const apiMessages: Partial<Record<KeepApiError["error"]["code"], string>> = {
   UNAUTHENTICATED: "Your session has expired. Sign in again to continue.",
   FORBIDDEN: "You do not have permission to perform this action.",
   EMAIL_NOT_VERIFIED: "Verify your email address before continuing.",
@@ -14,11 +14,11 @@ const apiMessages: Partial<Record<EnvaultApiError["error"]["code"], string>> = {
   INVALID_MFA_CODE:
     "The authenticator code is invalid or has already been used.",
   FIRESTORE_UNAVAILABLE:
-    "Envault could not reach its data service. Try again in a moment.",
+    "Keep could not reach its data service. Try again in a moment.",
 };
 
 export function getUserFacingError(error: unknown, fallback: string): string {
-  if (error instanceof EnvaultApiError) {
+  if (error instanceof KeepApiError) {
     return apiMessages[error.error.code] ?? fallback;
   }
   return fallback;
@@ -26,7 +26,7 @@ export function getUserFacingError(error: unknown, fallback: string): string {
 
 export function getEnvironmentConflict(error: unknown) {
   if (
-    !(error instanceof EnvaultApiError) ||
+    !(error instanceof KeepApiError) ||
     error.error.code !== "ENVIRONMENT_VERSION_CONFLICT"
   ) {
     return null;

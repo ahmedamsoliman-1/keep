@@ -1,9 +1,9 @@
 "use client";
 
-import { EnvaultClient } from "@envault/api-client";
-import type { VaultKeyMaterialV1 } from "@envault/crypto";
-import { createVaultKeyMaterial } from "@envault/crypto";
-import { getBrowserCryptoProvider } from "@envault/crypto/browser";
+import { KeepClient } from "@keephq/api-client";
+import type { VaultKeyMaterialV1 } from "@keephq/crypto";
+import { createVaultKeyMaterial } from "@keephq/crypto";
+import { getBrowserCryptoProvider } from "@keephq/crypto/browser";
 import { Check, Copy, KeyRound, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
@@ -13,7 +13,7 @@ import { setActiveVaultKey } from "@/lib/vault-key-store";
 import { getUserFacingError } from "@/lib/user-errors";
 import { setVaultMetadata } from "@/lib/vault-metadata-store";
 
-const client = new EnvaultClient({ baseUrl: "" });
+const client = new KeepClient({ baseUrl: "" });
 
 interface PendingVault {
   vaultId: string;
@@ -93,7 +93,7 @@ export function VaultSetup() {
         <ShieldCheck className="size-6 text-[var(--accent)]" />
         <h2 className="mt-5 text-2xl font-semibold">Save your recovery key</h2>
         <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-          This key is displayed once. Envault administrators cannot recover your
+          This key is displayed once. Keep administrators cannot recover your
           vault if you lose both this key and your vault passphrase.
         </p>
         <div className="mt-6 flex items-center gap-3 rounded-lg border bg-black/5 p-4 dark:bg-white/5">
@@ -159,8 +159,8 @@ export function VaultSetup() {
         Create your encrypted vault
       </h2>
       <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-        Choose a separate vault passphrase. It is never sent to Envault and
-        cannot be reset using your account password.
+        Choose a separate vault passphrase. It is never sent to Keep and cannot
+        be reset using your account password.
       </p>
       <label className="mt-6 block text-sm font-medium">
         Vault passphrase

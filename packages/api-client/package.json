@@ -1,5 +1,5 @@
 {
-  "name": "@envault/api-client",
+  "name": "@keephq/api-client",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -13,6 +13,6 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@envault/api-contract": "workspace:*"
+    "@keephq/api-contract": "workspace:*"
   }
 }

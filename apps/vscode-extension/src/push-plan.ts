@@ -1,5 +1,5 @@
-import type { ImportVariableItem, VariableDto } from "@envault/api-contract";
-import { parseDotenv } from "@envault/dotenv";
+import type { ImportVariableItem, VariableDto } from "@keephq/api-contract";
+import { parseDotenv } from "@keephq/dotenv";
 
 import { encryptVariable } from "./crypto";
 

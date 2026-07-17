@@ -1,6 +1,6 @@
 import type { SVGProps } from "react";
 
-export function EnvaultMark({ className, ...props }: SVGProps<SVGSVGElement>) {
+export function KeepMark({ className, ...props }: SVGProps<SVGSVGElement>) {
   return (
     <svg
       aria-hidden="true"
@@ -24,7 +24,7 @@ export function EnvaultMark({ className, ...props }: SVGProps<SVGSVGElement>) {
   );
 }
 
-export function EnvaultLogo({
+export function KeepLogo({
   compact = false,
   className = "",
 }: {
@@ -33,10 +33,10 @@ export function EnvaultLogo({
 }) {
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
-      <EnvaultMark className="size-8 shrink-0 text-[var(--foreground)]" />
+      <KeepMark className="size-8 shrink-0 text-[var(--foreground)]" />
       {!compact ? (
         <span className="text-[15px] font-semibold tracking-[-0.02em]">
-          Envault
+          Keep
         </span>
       ) : null}
     </span>

@@ -1,13 +1,13 @@
 "use client";
 
-import { EnvaultClient } from "@envault/api-client";
+import { KeepClient } from "@keephq/api-client";
 import { UserRound } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 
 import { getUserFacingError } from "@/lib/user-errors";
 
-const client = new EnvaultClient({ baseUrl: "" });
+const client = new KeepClient({ baseUrl: "" });
 
 export function ProfileForm({
   initialDisplayName,
@@ -46,7 +46,7 @@ export function ProfileForm({
         <div>
           <h3 className="font-semibold">Personal information</h3>
           <p className="mt-1 text-sm text-[var(--muted)]">
-            How you appear inside Envault.
+            How you appear inside Keep.
           </p>
         </div>
       </div>

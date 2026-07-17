@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Build, verify and publish the Envault VS Code extension.
+# Build, verify and publish the Keep VS Code extension.
 #
 # Usage:
 #   scripts/release.sh                 # verify + package a local .vsix (no publish)
@@ -13,7 +13,7 @@
 # Pre-release builds should use an ODD minor (0.3.x, 0.5.x); stable an EVEN minor.
 #
 # Auth (publish only): set a Marketplace token via `export VSCE_PAT=xxxx`,
-# or run `pnpm exec vsce login envault` once beforehand.
+# or run `pnpm exec vsce login keep` once beforehand.
 
 set -euo pipefail
 
@@ -58,12 +58,12 @@ CURRENT_VERSION="$(node -p "require('./package.json').version")"
 if [ "$VERB" = "package" ]; then
   echo "▶ Packaging local .vsix (v${CURRENT_VERSION}, pre-release layout)…"
   pnpm exec vsce package --pre-release "${ARGS[@]}"
-  echo "✔ Packaged. Install locally with: code --install-extension envault-vscode-${CURRENT_VERSION}.vsix"
+  echo "✔ Packaged. Install locally with: code --install-extension keep-vscode-${CURRENT_VERSION}.vsix"
   exit 0
 fi
 
 if [ -z "${VSCE_PAT:-}" ]; then
-  echo "ℹ VSCE_PAT is not set — vsce will use a saved 'vsce login envault' session if available."
+  echo "ℹ VSCE_PAT is not set — vsce will use a saved 'vsce login keep' session if available."
 fi
 
 echo "▶ Publishing to '${MODE}' channel…"

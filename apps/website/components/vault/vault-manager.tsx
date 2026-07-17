@@ -1,6 +1,6 @@
 "use client";
 
-import type { VaultDto } from "@envault/api-contract";
+import type { VaultDto } from "@keephq/api-contract";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 

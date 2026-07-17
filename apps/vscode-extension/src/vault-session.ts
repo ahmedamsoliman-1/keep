@@ -39,15 +39,12 @@ export class VaultSession implements vscode.Disposable {
     this.#vaultId = vaultId;
     const minutes = autoLockMinutesOverride() ?? autoLockMinutes;
     if (minutes > 0) {
-      this.#autoLockTimer = setTimeout(
-        () => {
-          void vscode.window.showInformationMessage(
-            "Envault vault locked automatically.",
-          );
-          this.lock();
-        },
-        minutes * 60_000,
-      );
+      this.#autoLockTimer = setTimeout(() => {
+        void vscode.window.showInformationMessage(
+          "Keep vault locked automatically.",
+        );
+        this.lock();
+      }, minutes * 60_000);
     }
     this.#onDidChange.fire();
   }

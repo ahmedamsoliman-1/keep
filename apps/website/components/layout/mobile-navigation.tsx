@@ -14,7 +14,7 @@ import { createPortal } from "react-dom";
 import { useEffect, useState } from "react";
 
 import { LogoutButton } from "@/components/auth/logout-button";
-import { EnvaultLogo } from "@/components/brand/envault-logo";
+import { KeepLogo } from "@/components/brand/keep-logo";
 import { VaultQuickControl } from "@/components/vault/vault-quick-control";
 
 const links = [
@@ -42,7 +42,7 @@ export function MobileNavigation({
     <>
       <div className="flex w-full items-center justify-between lg:hidden">
         <Link href="/app/dashboard">
-          <EnvaultLogo />
+          <KeepLogo />
         </Link>
         <button
           aria-expanded={open}
@@ -69,7 +69,7 @@ export function MobileNavigation({
                 style={{ backgroundColor: "#0e0f12", opacity: 1 }}
               >
                 <div className="flex items-center justify-between border-b border-zinc-200 bg-[#fbfbfc] px-2 pb-4 pt-2 dark:border-zinc-800 dark:bg-[#0e0f12]">
-                  <EnvaultLogo />
+                  <KeepLogo />
                   <button
                     aria-label="Close navigation"
                     className="flex size-10 items-center justify-center rounded-xl border border-zinc-300 bg-white text-zinc-900 shadow-sm hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800"
@@ -114,7 +114,7 @@ export function MobileNavigation({
                     </span>
                     <span className="min-w-0">
                       <span className="block truncate text-sm font-semibold">
-                        {userName ?? "Envault user"}
+                        {userName ?? "Keep user"}
                       </span>
                       <span className="mt-0.5 block truncate text-xs text-[var(--muted)]">
                         {userEmail ?? "Individual workspace"}

@@ -1,6 +1,6 @@
 "use client";
 
-import { getFirebaseClientAuth } from "@envault/firebase/client";
+import { getFirebaseClientAuth } from "@keephq/firebase/client";
 
 const firebaseOptions = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,

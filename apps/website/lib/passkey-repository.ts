@@ -4,8 +4,8 @@ import type {
   AuthenticatorTransportFuture,
   WebAuthnCredential,
 } from "@simplewebauthn/server";
-import type { WrappedVaultKeyV1 } from "@envault/crypto";
-import { envaultRedisKey, type EnvaultRedis } from "@envault/redis";
+import type { WrappedVaultKeyV1 } from "@keephq/crypto";
+import { keepRedisKey, type KeepRedis } from "@keephq/redis";
 
 export interface BiometricVaultBinding {
   salt: string;
@@ -27,12 +27,12 @@ export interface StoredPasskey {
   vaultBindings?: Record<string, BiometricVaultBinding>;
 }
 
-const credentialKey = (id: string) => envaultRedisKey("passkey", id);
+const credentialKey = (id: string) => keepRedisKey("passkey", id);
 const userIndexKey = (userId: string) =>
-  envaultRedisKey("user", userId, "passkeys");
+  keepRedisKey("user", userId, "passkeys");
 
 export class PasskeyRepository {
-  public constructor(private readonly redis: EnvaultRedis) {}
+  public constructor(private readonly redis: KeepRedis) {}
 
   public async list(userId: string) {
     const ids = (await this.redis.get<string[]>(userIndexKey(userId))) ?? [];

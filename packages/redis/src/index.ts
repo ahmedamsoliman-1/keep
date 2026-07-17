@@ -1,21 +1,21 @@
 import { createClient } from "redis";
 
-export const ENVAULT_REDIS_PREFIX = "envault:v1";
+export const KEEP_REDIS_PREFIX = "keep:v1";
 
-export function envaultRedisKey(...parts: string[]) {
-  return [ENVAULT_REDIS_PREFIX, ...parts].join(":");
+export function keepRedisKey(...parts: string[]) {
+  return [KEEP_REDIS_PREFIX, ...parts].join(":");
 }
 
-export interface EnvaultRedis {
+export interface KeepRedis {
   get<T>(key: string): Promise<T | null>;
   set(key: string, value: unknown, options?: { ex?: number }): Promise<unknown>;
   del(key: string): Promise<number>;
   eval(script: string, keys: string[], args: string[]): Promise<unknown>;
 }
 
-let client: EnvaultRedis | null = null;
+let client: KeepRedis | null = null;
 
-export function getEnvaultRedis(environment = process.env) {
+export function getKeepRedis(environment = process.env) {
   if (client) return client;
   const url = environment.REDIS_URL;
   if (!url) throw new Error("REDIS_CONFIGURATION_INCOMPLETE");

@@ -20,7 +20,7 @@ function wrappingAdditionalData(
   vaultId: string,
   purpose: "passphrase" | "recovery" | "biometric" | "device",
 ) {
-  return textEncoder.encode(`envault:v1:vault-key:${vaultId}:${purpose}`);
+  return textEncoder.encode(`keep:v1:vault-key:${vaultId}:${purpose}`);
 }
 
 async function deriveWrappingKey(

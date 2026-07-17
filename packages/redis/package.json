@@ -1,5 +1,5 @@
 {
-  "name": "@envault/redis",
+  "name": "@keephq/redis",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -14,7 +14,7 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@envault/api-contract": "workspace:*",
+    "@keephq/api-contract": "workspace:*",
     "redis": "^6.1.0"
   }
 }

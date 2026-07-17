@@ -89,7 +89,7 @@ export function GlobalCommandPalette() {
         <kbd className="rounded border px-1.5 py-0.5 text-[10px]">⌘K</kbd>
       </button>
       <ActionDialog
-        description="Navigate Envault and open common security workflows."
+        description="Navigate Keep and open common security workflows."
         onOpenChange={(next) => {
           setOpen(next);
           if (!next) setQuery("");

@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { DeviceScope } from "@envault/api-contract";
+import type { DeviceScope } from "@keephq/api-contract";
 import type { NextRequest } from "next/server";
 
 import { DeviceRepository } from "./device-repository";

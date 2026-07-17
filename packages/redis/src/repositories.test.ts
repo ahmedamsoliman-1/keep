@@ -1,14 +1,14 @@
-import type { ImportEnvironmentRequest } from "@envault/api-contract";
+import type { ImportEnvironmentRequest } from "@keephq/api-contract";
 import { describe, expect, it } from "vitest";
 
-import type { EnvaultRedis } from "./index";
+import type { KeepRedis } from "./index";
 import {
   RedisEnvironmentRepository,
   RedisProjectRepository,
   RedisVaultRepository,
 } from "./repositories";
 
-class MemoryRedis implements EnvaultRedis {
+class MemoryRedis implements KeepRedis {
   private readonly values = new Map<string, unknown>();
 
   public get<T>(key: string) {
@@ -80,7 +80,7 @@ async function setup() {
     autoLockMinutes: 15,
   });
   const project = await new RedisProjectRepository(redis).create(ownerId, {
-    name: "Envault",
+    name: "Keep",
     description: null,
   });
   const repository = new RedisEnvironmentRepository(redis);

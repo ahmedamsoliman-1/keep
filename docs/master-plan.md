@@ -7,7 +7,7 @@ developer carries between machines. It has two capabilities under one backend,
 one identity, and one device model:
 
 - **Keep Secrets** — encrypted environment-variable and secret management across
-  projects and environments (formerly *Envault*).
+  projects and environments (formerly _Envault_).
 - **Keep Clipboard** — secure cross-device clipboard synchronization.
 
 This document is the **single source of truth**. It supersedes and replaces the
@@ -18,13 +18,13 @@ clipboard feature spec), both now removed.
 
 - **Part 0 — Rebrand: Envault → Keep.** The naming decision, the exact rename
   map, the mechanical migration checklist, and the caveats. Do this first; all
-  later code is born as *Keep*.
+  later code is born as _Keep_.
 - **Part I — Keep Secrets (the platform).** The original Envault platform spec,
   folded in and rebranded verbatim, **including the real delivery-phase
   completion state** (`[x]`/`[ ]`). This is history + remaining roadmap; do not
   lose the checkbox state.
 - **Part II — Keep Clipboard.** The clipboard spec, reconciled to what the repo
-  *actually* has today (device authorization, Redis, crypto, shared packages),
+  _actually_ has today (device authorization, Redis, crypto, shared packages),
   then the full rebranded feature spec.
 - **Part III — Unified delivery roadmap.** What is done, what the current
   divergence is, and the order of return.
@@ -42,14 +42,14 @@ clipboard feature spec), both now removed.
 
 "Envault" is `env + vault` — the name is bound to environment variables. Adding
 cross-device clipboard sync makes the product broader than env vars: it is a
-client-side-encrypted store for *any* sensitive developer text that moves
+client-side-encrypted store for _any_ sensitive developer text that moves
 between environments and devices. The **`en-` (env) prefix is the limiting
 part**, not "vault". We keep the trust the product has earned and drop the
 env-specificity. The umbrella becomes **Keep**, expressed as two sub-brands:
 **Keep Secrets** and **Keep Clipboard**.
 
 This honors the original clipboard spec's rule ("one backend, one brand"): we
-are not creating a second product or backend — we are renaming the *umbrella*
+are not creating a second product or backend — we are renaming the _umbrella_
 and giving each capability a sub-brand under the same BFF, identity, Redis, and
 device model.
 
@@ -63,22 +63,22 @@ device model.
 
 ## 0.3 Rename map
 
-| Concept | Before | After |
-|---|---|---|
-| Product name (prose, UI) | Envault | Keep |
-| Sub-brands | — | Keep Secrets, Keep Clipboard |
-| npm workspace scope | `@envault/*` | `@keephq/*` |
-| VS Code app package | `envault-vscode` | `keep-vscode` |
-| VS Code command prefix | `Envault: …` | `Keep: …` |
-| Typed client class | `EnvaultClient` | `KeepClient` |
-| Redis client type / helpers | `EnvaultRedis`, `envaultRedisKey`, `getEnvaultRedis` | `KeepRedis`, `keepRedisKey`, `getKeepRedis` |
-| Redis key prefix | `envault:v1` | `keep:v1` |
-| Env-var prefix | `ENVAULT_*` | `KEEP_*` |
-| Session cookie | `envault_session` | `keep_session` |
-| MFA-trust cookie | `envault_mfa_trust` | `keep_mfa_trust` |
-| App name env | `NEXT_PUBLIC_APP_NAME=Envault` | `NEXT_PUBLIC_APP_NAME=Keep` |
-| Device type union (clipboard) | `EnvaultDevice` | `KeepDevice` |
-| Monorepo root dir | `envault/` | `keep/` |
+| Concept                       | Before                                               | After                                       |
+| ----------------------------- | ---------------------------------------------------- | ------------------------------------------- |
+| Product name (prose, UI)      | Envault                                              | Keep                                        |
+| Sub-brands                    | —                                                    | Keep Secrets, Keep Clipboard                |
+| npm workspace scope           | `@envault/*`                                         | `@keephq/*`                                 |
+| VS Code app package           | `envault-vscode`                                     | `keep-vscode`                               |
+| VS Code command prefix        | `Envault: …`                                         | `Keep: …`                                   |
+| Typed client class            | `EnvaultClient`                                      | `KeepClient`                                |
+| Redis client type / helpers   | `EnvaultRedis`, `envaultRedisKey`, `getEnvaultRedis` | `KeepRedis`, `keepRedisKey`, `getKeepRedis` |
+| Redis key prefix              | `envault:v1`                                         | `keep:v1`                                   |
+| Env-var prefix                | `ENVAULT_*`                                          | `KEEP_*`                                    |
+| Session cookie                | `envault_session`                                    | `keep_session`                              |
+| MFA-trust cookie              | `envault_mfa_trust`                                  | `keep_mfa_trust`                            |
+| App name env                  | `NEXT_PUBLIC_APP_NAME=Envault`                       | `NEXT_PUBLIC_APP_NAME=Keep`                 |
+| Device type union (clipboard) | `EnvaultDevice`                                      | `KeepDevice`                                |
+| Monorepo root dir             | `envault/`                                           | `keep/`                                     |
 
 ## 0.4 Migration checklist — Step 0 (one isolated commit, no behavior change)
 
@@ -139,10 +139,10 @@ Keep allows developers to securely manage environment variables and secrets acro
 
 The initial product is a modern Next.js web application. However, the architecture must support future clients such as:
 
-* A VS Code extension.
-* A command-line interface.
-* A desktop application.
-* Other approved integrations.
+- A VS Code extension.
+- A command-line interface.
+- A desktop application.
+- Other approved integrations.
 
 Do not create a superficial prototype. Build a maintainable, typed, testable and security-conscious application.
 
@@ -152,32 +152,32 @@ Do not create a superficial prototype. Build a maintainable, typed, testable and
 
 Users must be able to:
 
-* Register using email and password.
-* Verify their email address.
-* Log in and log out.
-* Reset their password.
-* Enable TOTP multi-factor authentication.
-* Use authenticator applications such as Microsoft Authenticator or Google Authenticator.
-* Complete an MFA challenge during login.
-* Create and unlock an encrypted vault.
-* Create multiple projects.
-* Create multiple environments under each project.
-* Add, edit, rename, copy and delete environment variables.
-* Hide sensitive values by default.
-* Reveal values temporarily.
-* Copy values to the clipboard.
-* Import `.env` files and pasted dotenv content.
-* Export environments in supported formats.
-* Search and filter variables.
-* Select multiple variables.
-* Perform bulk updates.
-* Copy variables between environments.
-* Compare two environments.
-* View revision history.
-* Restore previous revisions.
-* Review non-sensitive activity logs.
-* Configure automatic vault locking.
-* Use light and dark themes.
+- Register using email and password.
+- Verify their email address.
+- Log in and log out.
+- Reset their password.
+- Enable TOTP multi-factor authentication.
+- Use authenticator applications such as Microsoft Authenticator or Google Authenticator.
+- Complete an MFA challenge during login.
+- Create and unlock an encrypted vault.
+- Create multiple projects.
+- Create multiple environments under each project.
+- Add, edit, rename, copy and delete environment variables.
+- Hide sensitive values by default.
+- Reveal values temporarily.
+- Copy values to the clipboard.
+- Import `.env` files and pasted dotenv content.
+- Export environments in supported formats.
+- Search and filter variables.
+- Select multiple variables.
+- Perform bulk updates.
+- Copy variables between environments.
+- Compare two environments.
+- View revision history.
+- Restore previous revisions.
+- Review non-sensitive activity logs.
+- Configure automatic vault locking.
+- Use light and dark themes.
 
 The first release is for individual users.
 
@@ -189,29 +189,29 @@ Do not implement team collaboration yet, but structure the platform so organizat
 
 Use:
 
-* Next.js with the App Router.
-* React.
-* TypeScript with strict mode.
-* `pnpm`.
-* A `pnpm` workspace.
-* Turborepo where useful.
-* Tailwind CSS.
-* shadcn/ui.
-* Radix UI primitives.
-* Lucide icons.
-* Firebase Authentication.
-* Firebase Authentication with Identity Platform.
-* Cloud Firestore.
-* Firebase Admin SDK.
-* Firebase App Check integration points.
-* Firebase Emulator Suite.
-* Zod.
-* React Hook Form.
-* TanStack Table.
-* Sonner.
-* Vitest.
-* Playwright.
-* Firestore Rules Unit Testing.
+- Next.js with the App Router.
+- React.
+- TypeScript with strict mode.
+- `pnpm`.
+- A `pnpm` workspace.
+- Turborepo where useful.
+- Tailwind CSS.
+- shadcn/ui.
+- Radix UI primitives.
+- Lucide icons.
+- Firebase Authentication.
+- Firebase Authentication with Identity Platform.
+- Cloud Firestore.
+- Firebase Admin SDK.
+- Firebase App Check integration points.
+- Firebase Emulator Suite.
+- Zod.
+- React Hook Form.
+- TanStack Table.
+- Sonner.
+- Vitest.
+- Playwright.
+- Firestore Rules Unit Testing.
 
 Do not introduce another primary database.
 
@@ -227,11 +227,11 @@ The initial web application uses Next.js, but the platform must not be designed 
 
 Use Next.js Route Handlers as:
 
-* A Backend for Frontend for the website.
-* A versioned application API for future clients.
-* An authorization boundary.
-* A validation boundary.
-* A stable interface over Firestore.
+- A Backend for Frontend for the website.
+- A versioned application API for future clients.
+- An authorization boundary.
+- A validation boundary.
+- A stable interface over Firestore.
 
 The website must not directly access Firestore for core domain operations.
 
@@ -271,20 +271,20 @@ Keep /api/v1
 
 Do not place important business logic directly inside:
 
-* React components.
-* Route Handlers.
-* Server Actions.
-* Firestore repositories.
+- React components.
+- Route Handlers.
+- Server Actions.
+- Firestore repositories.
 
 Route Handlers should handle only:
 
-* Authentication.
-* Authorization context.
-* Request parsing.
-* Input validation.
-* Application-service invocation.
-* Error-to-HTTP mapping.
-* Typed responses.
+- Authentication.
+- Authorization context.
+- Request parsing.
+- Input validation.
+- Application-service invocation.
+- Error-to-HTTP mapping.
+- Typed responses.
 
 ---
 
@@ -497,12 +497,12 @@ export type VariableDto = z.infer<typeof variableDtoSchema>;
 
 The schemas must be consumed by:
 
-* Route Handlers.
-* The website.
-* The typed API client.
-* Future VS Code extension.
-* Future CLI.
-* Tests.
+- Route Handlers.
+- The website.
+- The typed API client.
+- Future VS Code extension.
+- Future CLI.
+- Tests.
 
 Do not manually duplicate request or response types.
 
@@ -615,13 +615,13 @@ interface EncryptedPayloadV1 {
 
 Use:
 
-* AES-256-GCM for payload encryption.
-* A cryptographically secure random IV for every encryption operation.
-* A separate random vault data-encryption key.
-* PBKDF2-SHA-256 for initial passphrase-based key derivation.
-* A unique random salt per user.
-* A configurable and documented iteration count.
-* Authenticated additional data.
+- AES-256-GCM for payload encryption.
+- A cryptographically secure random IV for every encryption operation.
+- A separate random vault data-encryption key.
+- PBKDF2-SHA-256 for initial passphrase-based key derivation.
+- A unique random salt per user.
+- A configurable and documented iteration count.
+- Authenticated additional data.
 
 Authenticated additional data should include stable identifiers:
 
@@ -654,23 +654,23 @@ During vault setup:
 5. Keep the unlocked vault key only in memory.
 6. Clear it when:
 
-   * The vault is manually locked.
-   * The user signs out.
-   * The auto-lock timer expires.
-   * The page is closed where practical.
-   * Authentication becomes invalid.
+   - The vault is manually locked.
+   - The user signs out.
+   - The auto-lock timer expires.
+   - The page is closed where practical.
+   - Authentication becomes invalid.
 
 Never store the vault passphrase.
 
 Never store an unwrapped vault key in:
 
-* Firestore.
-* Cookies.
-* localStorage.
-* sessionStorage.
-* IndexedDB.
-* Logs.
-* Analytics.
+- Firestore.
+- Cookies.
+- localStorage.
+- sessionStorage.
+- IndexedDB.
+- Logs.
+- Analytics.
 
 ---
 
@@ -678,17 +678,17 @@ Never store an unwrapped vault key in:
 
 During vault creation:
 
-* Generate a high-entropy recovery key.
-* Display it once.
-* Require the user to confirm it has been saved.
-* Use it to create a second wrapped copy of the vault key.
-* Do not store the raw recovery key.
+- Generate a high-entropy recovery key.
+- Display it once.
+- Require the user to confirm it has been saved.
+- Use it to create a second wrapped copy of the vault key.
+- Do not store the raw recovery key.
 
 Clearly explain:
 
-* Firebase password reset does not reset the vault passphrase.
-* Loss of both the passphrase and recovery key means encrypted data cannot be recovered.
-* Keep administrators cannot decrypt the vault.
+- Firebase password reset does not reset the vault passphrase.
+- Loss of both the passphrase and recovery key means encrypted data cannot be recovered.
+- Keep administrators cannot decrypt the vault.
 
 Do not create an administrative decryption backdoor.
 
@@ -700,36 +700,36 @@ Use Firebase Authentication.
 
 Implement:
 
-* Email and password registration.
-* Email verification.
-* Login.
-* Logout.
-* Password reset.
-* Authentication-state restoration.
-* Session revocation behavior.
-* Recent-login checks.
-* Reauthentication for sensitive operations.
-* TOTP MFA enrollment.
-* TOTP MFA challenge.
-* TOTP MFA removal.
-* Clear error handling.
+- Email and password registration.
+- Email verification.
+- Login.
+- Logout.
+- Password reset.
+- Authentication-state restoration.
+- Session revocation behavior.
+- Recent-login checks.
+- Reauthentication for sensitive operations.
+- TOTP MFA enrollment.
+- TOTP MFA challenge.
+- TOTP MFA removal.
+- Clear error handling.
 
 Users may register before verifying their email, but unverified users must not be able to:
 
-* Create a vault.
-* Read vault metadata.
-* Read projects.
-* Read environments.
-* Read ciphertext.
-* Create or update vault data.
+- Create a vault.
+- Read vault metadata.
+- Read projects.
+- Read environments.
+- Read ciphertext.
+- Create or update vault data.
 
 Create a dedicated verification page with:
 
-* Verification status.
-* Resend verification email.
-* Refresh verification state.
-* Change account action.
-* Logout action.
+- Verification status.
+- Resend verification email.
+- Refresh verification state.
+- Change account action.
+- Logout action.
 
 ---
 
@@ -739,10 +739,10 @@ Use Firebase Authentication with Identity Platform.
 
 Support authenticator applications including:
 
-* Microsoft Authenticator.
-* Google Authenticator.
-* Authy.
-* Compatible TOTP applications.
+- Microsoft Authenticator.
+- Google Authenticator.
+- Authy.
+- Compatible TOTP applications.
 
 The enrollment flow should include:
 
@@ -791,12 +791,12 @@ Server-side verification using Firebase Admin SDK
 
 Use:
 
-* HTTP-only cookies.
-* Secure cookies in production.
-* SameSite settings.
-* CSRF protection for state-changing browser requests.
-* Session expiration.
-* Session revocation checks where appropriate.
+- HTTP-only cookies.
+- Secure cookies in production.
+- SameSite settings.
+- CSRF protection for state-changing browser requests.
+- Session expiration.
+- Session revocation checks where appropriate.
 
 Do not rely only on client-side React authentication state.
 
@@ -822,10 +822,10 @@ The expected future flow is:
 
 The extension must never request or store:
 
-* Firebase password.
-* TOTP secret.
-* Raw recovery key.
-* Long-lived unprotected credentials.
+- Firebase password.
+- TOTP secret.
+- Raw recovery key.
+- Long-lived unprotected credentials.
 
 Reserve and document the required API endpoints:
 
@@ -841,12 +841,12 @@ DELETE /api/v1/device-sessions/:id
 
 Device authorization codes must be:
 
-* Short-lived.
-* Single-use.
-* Random.
-* Hashed before persistence.
-* Bound to the requesting client.
-* Invalidated after exchange.
+- Short-lived.
+- Single-use.
+- Random.
+- Hashed before persistence.
+- Bound to the requesting client.
+- Invalidated after exchange.
 
 ---
 
@@ -901,15 +901,15 @@ The extension should use the shared `packages/crypto` protocol.
 
 On first use, it may ask the user for:
 
-* Their vault passphrase.
-* Or their recovery key.
+- Their vault passphrase.
+- Or their recovery key.
 
 Optional future convenience:
 
-* Create a device-specific wrapped vault key.
-* Store only the device-wrapped material in VS Code SecretStorage.
-* Allow the user to revoke the device from Keep.
-* Invalidate the device-specific wrapping record when revoked.
+- Create a device-specific wrapped vault key.
+- Store only the device-wrapped material in VS Code SecretStorage.
+- Allow the user to revoke the device from Keep.
+- Invalidate the device-specific wrapping record when revoked.
 
 Do not store an unwrapped vault key in the extension’s normal settings or workspace files.
 
@@ -980,11 +980,11 @@ Use Firestore transactions for version checks and updates.
 
 Support idempotency for important mutation requests, especially:
 
-* Bulk updates.
-* Imports.
-* Synchronization.
-* Device authorization exchange.
-* Revision restore.
+- Bulk updates.
+- Imports.
+- Synchronization.
+- Device authorization exchange.
+- Revision restore.
 
 Allow clients to send:
 
@@ -1014,48 +1014,43 @@ Cosmos
 
 Project actions:
 
-* Create.
-* Update.
-* Rename.
-* Archive.
-* Restore.
-* Duplicate.
-* Delete.
+- Create.
+- Update.
+- Rename.
+- Archive.
+- Restore.
+- Duplicate.
+- Delete.
 
 Environment actions:
 
-* Create.
-* Update.
-* Rename.
-* Duplicate.
-* Archive.
-* Restore.
-* Delete.
-* Import.
-* Export.
-* Compare.
-* Synchronize.
-* Copy selected variables.
+- Create.
+- Update.
+- Rename.
+- Duplicate.
+- Archive.
+- Restore.
+- Delete.
+- Import.
+- Export.
+- Compare.
+- Synchronize.
+- Copy selected variables.
 
 Environment kinds:
 
 ```typescript
 type EnvironmentKind =
-  | "local"
-  | "development"
-  | "testing"
-  | "staging"
-  | "production"
-  | "custom";
+  "local" | "development" | "testing" | "staging" | "production" | "custom";
 ```
 
 Production environments should have a clear warning treatment.
 
 Sensitive production operations may require:
 
-* Recent authentication.
-* MFA.
-* Confirmation using the environment name.
+- Recent authentication.
+- MFA.
+- Confirmation using the environment name.
 
 ---
 
@@ -1100,45 +1095,45 @@ Build a high-quality environment editor using TanStack Table.
 
 Columns:
 
-* Selection.
-* Key.
-* Masked value.
-* Visibility.
-* Tags.
-* Updated time.
-* Actions.
+- Selection.
+- Key.
+- Masked value.
+- Visibility.
+- Tags.
+- Updated time.
+- Actions.
 
 Support:
 
-* Inline editing.
-* Keyboard navigation.
-* Add-variable dialog.
-* Search.
-* Sorting.
-* Filtering.
-* Tag filtering.
-* Visibility filtering.
-* Pagination or virtualization.
-* Optimistic UI.
-* Safe rollback.
-* Copy key.
-* Copy value.
-* Reveal temporarily.
-* Rename.
-* Duplicate.
-* Copy to another environment.
-* View revisions.
-* Delete.
+- Inline editing.
+- Keyboard navigation.
+- Add-variable dialog.
+- Search.
+- Sorting.
+- Filtering.
+- Tag filtering.
+- Visibility filtering.
+- Pagination or virtualization.
+- Optimistic UI.
+- Safe rollback.
+- Copy key.
+- Copy value.
+- Reveal temporarily.
+- Rename.
+- Duplicate.
+- Copy to another environment.
+- View revisions.
+- Delete.
 
 Secret values must be masked by default.
 
 Do not place plaintext values in:
 
-* HTML title attributes.
-* URL query parameters.
-* Analytics events.
-* Error reports.
-* Browser logs.
+- HTML title attributes.
+- URL query parameters.
+- Analytics events.
+- Error reports.
+- Browser logs.
 
 ---
 
@@ -1146,17 +1141,17 @@ Do not place plaintext values in:
 
 Users must be able to select variables and:
 
-* Delete them.
-* Copy them.
-* Move them.
-* Add tags.
-* Remove tags.
-* Change visibility.
-* Add a prefix.
-* Remove a prefix.
-* Convert keys to uppercase.
-* Find and replace key text.
-* Export selected variables.
+- Delete them.
+- Copy them.
+- Move them.
+- Add tags.
+- Remove tags.
+- Change visibility.
+- Add a prefix.
+- Remove a prefix.
+- Convert keys to uppercase.
+- Find and replace key text.
+- Export selected variables.
 
 Create a spreadsheet-style bulk editor.
 
@@ -1180,10 +1175,10 @@ Conflicts: 3
 
 Conflict policies:
 
-* Overwrite existing variables.
-* Skip existing variables.
-* Import only new variables.
-* Review conflicts individually.
+- Overwrite existing variables.
+- Skip existing variables.
+- Import only new variables.
+- Review conflicts individually.
 
 Chunk large operations safely.
 
@@ -1199,31 +1194,31 @@ Use expected environment versions.
 
 Support:
 
-* `.env`
-* `.env.local`
-* `.env.development`
-* `.env.production`
-* Pasted dotenv content.
-* JSON objects.
-* Shell-style `export KEY=value`.
+- `.env`
+- `.env.local`
+- `.env.development`
+- `.env.production`
+- Pasted dotenv content.
+- JSON objects.
+- Shell-style `export KEY=value`.
 
 Support:
 
-* Empty values.
-* Quoted values.
-* Escaped characters.
-* Comments.
-* Duplicate-key detection.
-* Variable-reference preservation.
-* Safely parseable multiline values.
+- Empty values.
+- Quoted values.
+- Escaped characters.
+- Comments.
+- Duplicate-key detection.
+- Variable-reference preservation.
+- Safely parseable multiline values.
 
 Do not execute:
 
-* Shell commands.
-* Command substitutions.
-* JavaScript.
-* Templates.
-* Arbitrary expressions.
+- Shell commands.
+- Command substitutions.
+- JavaScript.
+- Templates.
+- Arbitrary expressions.
 
 Treat suspicious content as literal text and show a warning.
 
@@ -1233,11 +1228,11 @@ Treat suspicious content as literal text and show a warning.
 
 Support:
 
-* `.env`
-* JSON.
-* Shell exports.
-* Docker Compose environment snippet.
-* Kubernetes Secret YAML.
+- `.env`
+- JSON.
+- Shell exports.
+- Docker Compose environment snippet.
+- Kubernetes Secret YAML.
 
 Export must occur locally after decryption.
 
@@ -1255,20 +1250,20 @@ Allow users to compare any two environments.
 
 Classify variables as:
 
-* Identical.
-* Different value.
-* Missing from source.
-* Missing from destination.
-* Different visibility.
-* Different tags or metadata.
+- Identical.
+- Different value.
+- Missing from source.
+- Missing from destination.
+- Different visibility.
+- Different tags or metadata.
 
 Support:
 
-* Copy source to destination.
-* Copy destination to source.
-* Synchronize selected.
-* Ignore selected differences.
-* Export a difference report.
+- Copy source to destination.
+- Copy destination to source.
+- Synchronize selected.
+- Ignore selected differences.
+- Export a difference report.
 
 Comparison should occur locally after decrypting ciphertext.
 
@@ -1280,13 +1275,13 @@ Do not persist plaintext comparison results.
 
 Create revisions for:
 
-* Variable creation.
-* Value update.
-* Key rename.
-* Visibility update.
-* Metadata update.
-* Deletion.
-* Restoration.
+- Variable creation.
+- Value update.
+- Key rename.
+- Visibility update.
+- Metadata update.
+- Deletion.
+- Restoration.
 
 Any revision snapshot containing a value must be encrypted.
 
@@ -1337,33 +1332,33 @@ Create strict Firestore Security Rules even though core application access uses 
 
 Rules must:
 
-* Deny unauthenticated access.
-* Deny access for unverified accounts.
-* Enforce ownership.
-* Prevent owner ID mutation.
-* Prevent vault ID mutation.
-* Validate document fields.
-* Validate field types.
-* Validate allowed enums.
-* Limit arrays.
-* Limit ciphertext sizes.
-* Prevent cross-user access.
-* Deny unknown document shapes where practical.
+- Deny unauthenticated access.
+- Deny access for unverified accounts.
+- Enforce ownership.
+- Prevent owner ID mutation.
+- Prevent vault ID mutation.
+- Validate document fields.
+- Validate field types.
+- Validate allowed enums.
+- Limit arrays.
+- Limit ciphertext sizes.
+- Prevent cross-user access.
+- Deny unknown document shapes where practical.
 
 Use reusable rules functions.
 
 Provide emulator tests for:
 
-* Unauthenticated access.
-* Unverified accounts.
-* Owner access.
-* Cross-user reads.
-* Cross-user writes.
-* Owner reassignment.
-* Invalid fields.
-* Invalid enums.
-* Oversized ciphertext.
-* Invalid batch writes.
+- Unauthenticated access.
+- Unverified accounts.
+- Owner access.
+- Cross-user reads.
+- Cross-user writes.
+- Owner reassignment.
+- Invalid fields.
+- Invalid enums.
+- Oversized ciphertext.
+- Invalid batch writes.
 
 Do not deploy permissive rules.
 
@@ -1373,34 +1368,34 @@ Do not deploy permissive rules.
 
 Record non-sensitive events:
 
-* Login.
-* Logout.
-* MFA enrollment.
-* MFA removal.
-* Vault creation.
-* Project creation.
-* Environment creation.
-* Variable creation.
-* Variable update.
-* Variable deletion.
-* Import.
-* Export request.
-* Bulk update.
-* Device authorization.
-* Device session creation.
-* Device session revocation.
-* Revision restoration.
+- Login.
+- Logout.
+- MFA enrollment.
+- MFA removal.
+- Vault creation.
+- Project creation.
+- Environment creation.
+- Variable creation.
+- Variable update.
+- Variable deletion.
+- Import.
+- Export request.
+- Bulk update.
+- Device authorization.
+- Device session creation.
+- Device session revocation.
+- Revision restoration.
 
 Never log:
 
-* Plaintext variable values.
-* Vault passphrases.
-* Recovery keys.
-* TOTP secrets.
-* Encryption keys.
-* Complete import content.
-* Complete export content.
-* Authentication tokens.
+- Plaintext variable values.
+- Vault passphrases.
+- Recovery keys.
+- TOTP secrets.
+- Encryption keys.
+- Complete import content.
+- Complete export content.
+- Authentication tokens.
 
 Use structured logging with request IDs.
 
@@ -1446,17 +1441,17 @@ Use route groups and layouts where appropriate.
 
 Display:
 
-* Number of projects.
-* Number of environments.
-* Number of variables.
-* Recently updated environments.
-* Recent non-sensitive activity.
-* Email verification status.
-* MFA status.
-* Vault lock status.
-* Active devices.
-* Quick project creation.
-* Quick import action.
+- Number of projects.
+- Number of environments.
+- Number of variables.
+- Recently updated environments.
+- Recent non-sensitive activity.
+- Email verification status.
+- MFA status.
+- Vault lock status.
+- Active devices.
+- Quick project creation.
+- Quick import action.
 
 Do not retrieve or decrypt every variable to render the dashboard.
 
@@ -1466,42 +1461,42 @@ Do not retrieve or decrypt every variable to render the dashboard.
 
 Create a modern and restrained interface inspired by:
 
-* Linear.
-* Vercel.
-* Raycast.
-* Modern password managers.
+- Linear.
+- Vercel.
+- Raycast.
+- Modern password managers.
 
 Do not copy their branding or exact layouts.
 
 Requirements:
 
-* Light and dark mode.
-* Neutral surfaces.
-* Restrained accent color.
-* Subtle borders.
-* Minimal shadows.
-* Monospace font for variable keys and values.
-* Strong accessibility.
-* Clear keyboard focus.
-* Responsive behavior.
-* Desktop-optimized variable editor.
-* Skeleton loading states.
-* Empty states.
-* Confirmation dialogs.
-* Command palette using `Cmd/Ctrl + K`.
-* Smooth but restrained transitions.
-* Production warning indicators.
-* Vault lock indicator.
-* Unsaved-change indicators.
-* Copy confirmations.
+- Light and dark mode.
+- Neutral surfaces.
+- Restrained accent color.
+- Subtle borders.
+- Minimal shadows.
+- Monospace font for variable keys and values.
+- Strong accessibility.
+- Clear keyboard focus.
+- Responsive behavior.
+- Desktop-optimized variable editor.
+- Skeleton loading states.
+- Empty states.
+- Confirmation dialogs.
+- Command palette using `Cmd/Ctrl + K`.
+- Smooth but restrained transitions.
+- Production warning indicators.
+- Vault lock indicator.
+- Unsaved-change indicators.
+- Copy confirmations.
 
 Avoid:
 
-* Excessive gradients.
-* Excessive glass effects.
-* Oversized cards.
-* Decorative motion.
-* Hidden security states.
+- Excessive gradients.
+- Excessive glass effects.
+- Oversized cards.
+- Decorative motion.
+- Hidden security states.
 
 ---
 
@@ -1552,37 +1547,37 @@ Ignore all credential-containing `.env` files in Git.
 
 Create typed errors for:
 
-* Unauthenticated.
-* Forbidden.
-* Email not verified.
-* MFA required.
-* Invalid MFA code.
-* Recent authentication required.
-* Vault locked.
-* Incorrect vault passphrase.
-* Invalid recovery key.
-* Corrupt ciphertext.
-* Unsupported encryption version.
-* Invalid request.
-* Duplicate variable.
-* Environment version conflict.
-* Idempotency conflict.
-* Import parse error.
-* Partial bulk-operation failure.
-* Device authorization expired.
-* Device authorization already used.
-* Device session revoked.
-* Firestore unavailable.
+- Unauthenticated.
+- Forbidden.
+- Email not verified.
+- MFA required.
+- Invalid MFA code.
+- Recent authentication required.
+- Vault locked.
+- Incorrect vault passphrase.
+- Invalid recovery key.
+- Corrupt ciphertext.
+- Unsupported encryption version.
+- Invalid request.
+- Duplicate variable.
+- Environment version conflict.
+- Idempotency conflict.
+- Import parse error.
+- Partial bulk-operation failure.
+- Device authorization expired.
+- Device authorization already used.
+- Device session revoked.
+- Firestore unavailable.
 
 Map domain and application errors consistently to HTTP status codes.
 
 Do not expose:
 
-* Stack traces.
-* Credentials.
-* Internal Firestore paths.
-* Ciphertext internals.
-* Account-existence information.
+- Stack traces.
+- Credentials.
+- Internal Firestore paths.
+- Ciphertext internals.
+- Account-existence information.
 
 ---
 
@@ -1592,39 +1587,39 @@ Do not expose:
 
 Test:
 
-* Dotenv parsing.
-* Dotenv serialization.
-* JSON import.
-* Shell export parsing.
-* Variable-key validation.
-* Conflict detection.
-* Bulk transformations.
-* Environment comparison.
-* Encryption and decryption.
-* Wrong-key failure.
-* IV uniqueness.
-* Vault-key wrapping.
-* Recovery-key wrapping.
-* Browser and Node crypto compatibility.
-* API schemas.
-* API client.
-* Environment version conflicts.
-* Idempotency behavior.
-* Device authorization expiry.
-* Device authorization single use.
+- Dotenv parsing.
+- Dotenv serialization.
+- JSON import.
+- Shell export parsing.
+- Variable-key validation.
+- Conflict detection.
+- Bulk transformations.
+- Environment comparison.
+- Encryption and decryption.
+- Wrong-key failure.
+- IV uniqueness.
+- Vault-key wrapping.
+- Recovery-key wrapping.
+- Browser and Node crypto compatibility.
+- API schemas.
+- API client.
+- Environment version conflicts.
+- Idempotency behavior.
+- Device authorization expiry.
+- Device authorization single use.
 
 ## Integration tests
 
 Test:
 
-* Route Handlers.
-* Application services.
-* Firestore repositories.
-* Authentication middleware.
-* Authorization.
-* Versioned updates.
-* Device authorization exchange.
-* Session revocation.
+- Route Handlers.
+- Application services.
+- Firestore repositories.
+- Authentication middleware.
+- Authorization.
+- Versioned updates.
+- Device authorization exchange.
+- Session revocation.
 
 ## Firestore Rules tests
 
@@ -1634,24 +1629,24 @@ Test all ownership, verification and validation rules with the Emulator Suite.
 
 Test:
 
-* Registration.
-* Email-verification gating.
-* Login.
-* MFA enrollment.
-* MFA challenge.
-* Vault creation.
-* Vault lock and unlock.
-* Project creation.
-* Environment creation.
-* Variable creation.
-* Bulk update.
-* Import preview.
-* Import commit.
-* Comparison.
-* Export.
-* Revision restoration.
-* Device approval page.
-* Device session revocation.
+- Registration.
+- Email-verification gating.
+- Login.
+- MFA enrollment.
+- MFA challenge.
+- Vault creation.
+- Vault lock and unlock.
+- Project creation.
+- Environment creation.
+- Variable creation.
+- Bulk update.
+- Import preview.
+- Import commit.
+- Comparison.
+- Export.
+- Revision restoration.
+- Device approval page.
+- Device session revocation.
 
 Never use production Firebase resources in automated tests.
 
@@ -1661,24 +1656,24 @@ Never use production Firebase resources in automated tests.
 
 Provide:
 
-* `README.md`.
-* Local setup instructions.
-* Firebase project setup.
-* Identity Platform setup.
-* TOTP MFA setup.
-* Firebase Emulator setup.
-* Firestore rules deployment.
-* Firestore indexes deployment.
-* Environment-variable reference.
-* Build and deployment instructions.
-* API documentation.
-* Typed client usage.
-* Device-authorization design.
-* Encryption protocol.
-* Threat model.
-* Data model.
-* Architecture decisions.
-* Future VS Code extension integration guide.
+- `README.md`.
+- Local setup instructions.
+- Firebase project setup.
+- Identity Platform setup.
+- TOTP MFA setup.
+- Firebase Emulator setup.
+- Firestore rules deployment.
+- Firestore indexes deployment.
+- Environment-variable reference.
+- Build and deployment instructions.
+- API documentation.
+- Typed client usage.
+- Device-authorization design.
+- Encryption protocol.
+- Threat model.
+- Data model.
+- Architecture decisions.
+- Future VS Code extension integration guide.
 
 Create at least these documents:
 
@@ -1721,67 +1716,67 @@ Keep the project runnable after every implementation phase.
 
 ## Phase 1 — Foundation
 
-* Create the monorepo.
-* Configure pnpm workspace.
-* Configure Turborepo.
-* Create the Next.js application.
-* Create shared packages.
-* Configure TypeScript.
-* Configure linting and formatting.
-* Configure UI foundation.
-* Configure typed environment variables.
-* Configure Firebase Emulator Suite.
-* Add initial CI checks.
+- Create the monorepo.
+- Configure pnpm workspace.
+- Configure Turborepo.
+- Create the Next.js application.
+- Create shared packages.
+- Configure TypeScript.
+- Configure linting and formatting.
+- Configure UI foundation.
+- Configure typed environment variables.
+- Configure Firebase Emulator Suite.
+- Add initial CI checks.
 
 ## Phase 2 — Domain and API foundation
 
-* Define domain entities.
-* Define application-service interfaces.
-* Define repository interfaces.
-* Define Zod API contracts.
-* Implement typed API response helpers.
-* Implement structured errors.
-* Create `/api/v1`.
-* Build the shared API client.
+- Define domain entities.
+- Define application-service interfaces.
+- Define repository interfaces.
+- Define Zod API contracts.
+- Implement typed API response helpers.
+- Implement structured errors.
+- Create `/api/v1`.
+- Build the shared API client.
 
 ## Phase 3 — Authentication
 
-* Registration.
-* Email verification.
-* Login.
-* Logout.
-* Password reset.
-* Secure server sessions.
-* Route protection.
-* Reauthentication.
-* TOTP enrollment.
-* MFA challenge.
-* Security settings.
+- Registration.
+- Email verification.
+- Login.
+- Logout.
+- Password reset.
+- Secure server sessions.
+- Route protection.
+- Reauthentication.
+- TOTP enrollment.
+- MFA challenge.
+- Security settings.
 
 ## Phase 4 — Encrypted vault
 
-* Vault creation.
-* Passphrase derivation.
-* Vault-key generation.
-* Key wrapping.
-* Recovery key.
-* Browser crypto adapter.
-* Node crypto adapter.
-* Compatibility tests.
-* Vault locking.
-* Automatic locking.
+- Vault creation.
+- Passphrase derivation.
+- Vault-key generation.
+- Key wrapping.
+- Recovery key.
+- Browser crypto adapter.
+- Node crypto adapter.
+- Compatibility tests.
+- Vault locking.
+- Automatic locking.
 
 ## Phase 5 — Core data management
 
-* Projects.
-* Environments.
-* Variables.
-* Server-side repositories.
-* Firestore rules.
-* Firestore indexes.
-* Variable editor.
-* CRUD operations.
-* Revision creation.
+- Projects.
+- Environments.
+- Variables.
+- Server-side repositories.
+- Firestore rules.
+- Firestore indexes.
+- Variable editor.
+- CRUD operations.
+- Revision creation.
 
 ## Phase 6 — Productivity
 
@@ -1832,9 +1827,9 @@ serve its first external client.
       or Firebase.
 - [x] Select projects and environments.
 - [x] Package and publish the initial Marketplace pre-release.
-- [x] Pull remote environments into local dotenv files. *(delivered in Phase 11, Stage C.)*
-- [x] Push updates with expected-version and idempotency protection. *(delivered in Phase 11, Stage D.)*
-- [x] Present refresh, overwrite and merge choices for HTTP 409 conflicts. *(delivered in Phase 11, Stage D.)*
+- [x] Pull remote environments into local dotenv files. _(delivered in Phase 11, Stage C.)_
+- [x] Push updates with expected-version and idempotency protection. _(delivered in Phase 11, Stage D.)_
+- [x] Present refresh, overwrite and merge choices for HTTP 409 conflicts. _(delivered in Phase 11, Stage D.)_
 - [x] Document extension security, session scopes and revocation.
 
 ### Dashboard reconciliation
@@ -1847,12 +1842,12 @@ serve its first external client.
 
 ## Phase 9 — Comparison and history
 
-* Environment comparison.
-* Difference actions.
-* Revision history.
-* Revision decryption.
-* Revision restoration.
-* Activity screen.
+- Environment comparison.
+- Difference actions.
+- Revision history.
+- Revision decryption.
+- Revision restoration.
+- Activity screen.
 
 ## Next milestone — Productivity, synchronization and usable history
 
@@ -1936,16 +1931,16 @@ after every stage.
 
 ## Phase 10 — Hardening
 
-* Rules tests.
-* Integration tests.
-* End-to-end tests.
-* Accessibility review.
-* Threat-model review.
-* Logging review.
-* Secret-leak review.
-* Performance review.
-* Production build verification.
-* Deployment documentation.
+- Rules tests.
+- Integration tests.
+- End-to-end tests.
+- Accessibility review.
+- Threat-model review.
+- Logging review.
+- Secret-leak review.
+- Performance review.
+- Production build verification.
+- Deployment documentation.
 
 Do not skip foundational phases to build polished UI first.
 
@@ -1955,36 +1950,36 @@ Do not skip foundational phases to build polished UI first.
 
 The project is complete only when:
 
-* It builds without TypeScript errors.
-* Linting passes.
-* Unit tests pass.
-* Integration tests pass.
-* Firestore rules tests pass.
-* Core Playwright tests pass.
-* The website uses the typed API client.
-* Core domain operations do not directly access Firestore from React components.
-* API contracts are shared.
-* APIs are versioned.
-* No plaintext secret is sent to the server.
-* No plaintext secret is stored in Firestore.
-* No plaintext secret is persisted in browser storage.
-* Browser and Node encryption implementations are compatible.
-* Email verification is enforced.
-* TOTP MFA works.
-* Secure web sessions are implemented.
-* Vault lock clears active in-memory key material.
-* Import and export work.
-* Bulk updates work.
-* Version conflicts return HTTP 409.
-* Idempotent retries do not duplicate changes.
-* Environment comparison works.
-* Revision restoration works.
-* Device authorization is designed and implemented securely.
-* Device sessions can be reviewed and revoked.
-* A future VS Code extension can consume the same API, API client, contracts and encryption protocol.
-* Light and dark themes work.
-* The interface is polished and accessible.
-* Setup and deployment documentation are complete.
+- It builds without TypeScript errors.
+- Linting passes.
+- Unit tests pass.
+- Integration tests pass.
+- Firestore rules tests pass.
+- Core Playwright tests pass.
+- The website uses the typed API client.
+- Core domain operations do not directly access Firestore from React components.
+- API contracts are shared.
+- APIs are versioned.
+- No plaintext secret is sent to the server.
+- No plaintext secret is stored in Firestore.
+- No plaintext secret is persisted in browser storage.
+- Browser and Node encryption implementations are compatible.
+- Email verification is enforced.
+- TOTP MFA works.
+- Secure web sessions are implemented.
+- Vault lock clears active in-memory key material.
+- Import and export work.
+- Bulk updates work.
+- Version conflicts return HTTP 409.
+- Idempotent retries do not duplicate changes.
+- Environment comparison works.
+- Revision restoration works.
+- Device authorization is designed and implemented securely.
+- Device sessions can be reviewed and revoked.
+- A future VS Code extension can consume the same API, API client, contracts and encryption protocol.
+- Light and dark themes work.
+- The interface is polished and accessible.
+- Setup and deployment documentation are complete.
 
 ---
 
@@ -2037,16 +2032,16 @@ UX, not new cryptography.
 
 ## Design decisions
 
-* **Unlock once per device.** The user is not asked for their passphrase on every
+- **Unlock once per device.** The user is not asked for their passphrase on every
   session. On first unlock (passphrase or recovery key) the extension creates a
   **device-wrapped copy** of the vault key. The random device secret is kept in
   VS Code `SecretStorage`; the device-wrapped key material is stored **server-side,
   bound to the current device session**, so revoking the device from the web
   invalidates the wrapping record and disables silent unlock. Neither the
   passphrase, the recovery key, nor the unwrapped vault key is ever persisted.
-* **Unwrapped vault key lives in memory only** and is cleared on lock, sign-out,
+- **Unwrapped vault key lives in memory only** and is cleared on lock, sign-out,
   auto-lock expiry and window close — matching Plan §17.
-* **Reuse shared packages.** `@keephq/crypto` and `@keephq/dotenv` only; the
+- **Reuse shared packages.** `@keephq/crypto` and `@keephq/dotenv` only; the
   extension continues to use `/api/v1` through `@keephq/api-client` and never
   connects directly to Redis or Firebase.
 
@@ -2096,17 +2091,17 @@ UX, not new cryptography.
 - [x] Status-bar item showing lock state and the selected `project / environment`,
       clickable to open Keep quick actions.
 - [x] Activity Bar tree view: projects → environments → variables (masked keys), with
-      pull and push from context menus. *(In-tree temporary reveal deferred — reveal
-      is available by pulling into `.env`.)*
+      pull and push from context menus. _(In-tree temporary reveal deferred — reveal
+      is available by pulling into `.env`.)_
 - [x] `.env` compare against remote (on-demand diff during pull and push conflicts).
-      *(A standing CodeLens drift indicator is deferred.)*
+      _(A standing CodeLens drift indicator is deferred.)_
 - [x] Per-workspace-folder environment binding for multi-root workspaces.
 
 ### Stage F — Hardening and Marketplace
 
 - [x] Unit tests for push preview/conflict classification and device-key wrapping.
-- [ ] Integration test driving pull/push against a mock `KeepClient`. *(Deferred —
-      requires a VS Code test host harness.)*
+- [ ] Integration test driving pull/push against a mock `KeepClient`. _(Deferred —
+      requires a VS Code test host harness.)_
 - [x] Secret-leak review: no plaintext values, passphrases, recovery keys, device
       secrets or vault keys in logs, notifications, telemetry or workspace state.
 - [x] First-run `walkthrough` contribution and updated `README`/`CHANGELOG`.
@@ -2130,12 +2125,12 @@ UX, not new cryptography.
 
 Cross-device clipboard sync built as a bounded module **inside Keep**, reusing
 the existing BFF, identity, Redis, crypto, device model, and design system. It
-is *not* a separate app, server, brand, or auth system.
+is _not_ a separate app, server, brand, or auth system.
 
 ## II-A. Repo reconciliation — overrides to the spec below
 
 The full feature spec (§§1–29 below) was written by inspecting the product
-*goals*, before the repository was examined. Now that the repo is known, the
+_goals_, before the repository was examined. Now that the repo is known, the
 following **overrides apply** — they take precedence wherever the spec below
 guesses at structure. They also substantially shrink the work.
 
@@ -2208,10 +2203,10 @@ Part I Phase 8 + Phase 11 already delivered auth, `KeepClient`, `SecretStorage`,
 status bar, tree view, and secure device-wrapped unlock. Add the clipboard
 commands (§12 below) into `apps/keep-vscode`; reuse everything. There is a real
 product synergy: Keep Secrets already "copies a variable value to the clipboard"
-(Part I §22) — with Keep Clipboard that becomes *"push this secret to another
-device's clipboard,"* end-to-end encrypted.
+(Part I §22) — with Keep Clipboard that becomes _"push this secret to another
+device's clipboard,"_ end-to-end encrypted.
 
-### 6. Feature flag & scope for *now*
+### 6. Feature flag & scope for _now_
 
 Everything ships behind `KEEP_CLIPBOARD_ENABLED`. **Do now: Phase 1 + Phase 2**
 of §25 below (core module + web dashboard + VS Code send/receive, request/
@@ -2243,12 +2238,12 @@ Extend the existing Keep application with a secure cross-device clipboard synchr
 
 Keep already has:
 
-* A mature Next.js application.
-* A Backend-for-Frontend architecture.
-* Redis as persistent application storage.
-* Firebase Authentication.
-* A mature VS Code extension.
-* Existing user, session, security, and application conventions.
+- A mature Next.js application.
+- A Backend-for-Frontend architecture.
+- Redis as persistent application storage.
+- Firebase Authentication.
+- A mature VS Code extension.
+- Existing user, session, security, and application conventions.
 
 Do not create a separate application or independent sync server.
 
@@ -2256,13 +2251,13 @@ The existing Keep BFF must become the authoritative clipboard synchronization se
 
 The feature should support:
 
-* Keep web application.
-* Existing Keep VS Code extension.
-* macOS desktop companion.
-* Windows desktop companion.
-* Samsung and general Android companion.
-* iPhone and iPad companion at a later stage.
-* Tablet-friendly Keep clipboard dashboard.
+- Keep web application.
+- Existing Keep VS Code extension.
+- macOS desktop companion.
+- Windows desktop companion.
+- Samsung and general Android companion.
+- iPhone and iPad companion at a later stage.
+- Tablet-friendly Keep clipboard dashboard.
 
 The first release should focus on reliable synchronization of text, URLs, JSON, commands, and code snippets.
 
@@ -2299,11 +2294,12 @@ A user should be able to:
 4. See it immediately in Keep Clipboard.
 5. Retrieve it through:
 
-   * Windows companion.
-   * VS Code extension.
-   * Samsung tablet.
-   * Android phone.
-   * Future iPhone or iPad app.
+   - Windows companion.
+   - VS Code extension.
+   - Samsung tablet.
+   - Android phone.
+   - Future iPhone or iPad app.
+
 6. Copy it into the destination device clipboard.
 7. Search, pin, expire, consume, or delete the item.
 
@@ -2337,15 +2333,15 @@ A desktop companion can monitor the macOS general pasteboard while it is running
 
 Support:
 
-* Automatic detection of clipboard changes.
-* Automatic sending, when enabled.
-* Manual or automatic receiving.
-* Menu bar history.
-* Global shortcut.
-* Start at login.
-* Pause synchronization.
-* Ignore-list and sensitivity rules.
-* Secure device credential storage.
+- Automatic detection of clipboard changes.
+- Automatic sending, when enabled.
+- Manual or automatic receiving.
+- Menu bar history.
+- Global shortcut.
+- Start at login.
+- Pause synchronization.
+- Ignore-list and sensitivity rules.
+- Secure device credential storage.
 
 The companion must avoid sending clipboard events back to the server after it applies a remote clipboard item locally.
 
@@ -2355,15 +2351,15 @@ A desktop companion can monitor the Windows clipboard while it is running.
 
 Support:
 
-* Automatic detection.
-* Automatic sending.
-* Manual or optional automatic receiving.
-* System tray interface.
-* Global shortcut.
-* Start at login.
-* Pause synchronization.
-* Secure device credential storage.
-* Clipboard loop prevention.
+- Automatic detection.
+- Automatic sending.
+- Manual or optional automatic receiving.
+- System tray interface.
+- Global shortcut.
+- Start at login.
+- Pause synchronization.
+- Secure device credential storage.
+- Clipboard loop prevention.
 
 ## 4.3 Android and Samsung tablets
 
@@ -2373,21 +2369,22 @@ Modern Android restricts clipboard reads when the application is not currently f
 
 The Android experience should initially use:
 
-* Keep Clipboard app screen.
-* Tap an Keep item to copy it to Android clipboard.
-* Paste current Android clipboard into Keep after opening the app.
-* Android Sharesheet integration:
+- Keep Clipboard app screen.
+- Tap an Keep item to copy it to Android clipboard.
+- Paste current Android clipboard into Keep after opening the app.
+- Android Sharesheet integration:
 
-  * Select text in another application.
-  * Tap Share.
-  * Select Keep.
-  * Send to one or more paired devices.
-* “Send to Keep” action.
-* Optional Quick Settings tile.
-* Optional home-screen widget showing recent items.
-* Foreground notification only when doing a visible transfer.
-* Deep links from the Keep website.
-* Biometric confirmation for sensitive items.
+  - Select text in another application.
+  - Tap Share.
+  - Select Keep.
+  - Send to one or more paired devices.
+
+- “Send to Keep” action.
+- Optional Quick Settings tile.
+- Optional home-screen widget showing recent items.
+- Foreground notification only when doing a visible transfer.
+- Deep links from the Keep website.
+- Biometric confirmation for sensitive items.
 
 Samsung-specific enhancements may be added where practical, but core behavior must use standard Android APIs and must not depend exclusively on Samsung services.
 
@@ -2401,19 +2398,20 @@ Do not design iOS around continuous clipboard monitoring.
 
 The future iOS/iPadOS companion should use:
 
-* Keep app clipboard history.
-* Tap to copy an item to the system pasteboard.
-* Explicit “Send Clipboard” action.
-* Share Extension:
+- Keep app clipboard history.
+- Tap to copy an item to the system pasteboard.
+- Explicit “Send Clipboard” action.
+- Share Extension:
 
-  * Select text, URL, or supported content.
-  * Tap Share.
-  * Select Keep.
-* Shortcuts/App Intents integration.
-* Optional widget for recent non-sensitive items.
-* Biometric confirmation.
-* Universal Links for pairing.
-* Explicit user interaction before reading clipboard content copied by another application.
+  - Select text, URL, or supported content.
+  - Tap Share.
+  - Select Keep.
+
+- Shortcuts/App Intents integration.
+- Optional widget for recent non-sensitive items.
+- Biometric confirmation.
+- Universal Links for pairing.
+- Explicit user interaction before reading clipboard content copied by another application.
 
 Do not promise automatic, always-running cross-app clipboard monitoring on iOS.
 
@@ -2458,14 +2456,14 @@ Firebase Authentication remains the user identity provider.
 
 The BFF must remain the only trusted authority that:
 
-* Resolves the authenticated user.
-* Authorizes device access.
-* Accepts clipboard content.
-* Reads clipboard history.
-* Issues device credentials.
-* Revokes devices.
-* Enforces quotas and retention.
-* Publishes synchronization events.
+- Resolves the authenticated user.
+- Authorizes device access.
+- Accepts clipboard content.
+- Reads clipboard history.
+- Issues device credentials.
+- Revokes devices.
+- Enforces quotas and retention.
+- Publishes synchronization events.
 
 Clients must never connect directly to Redis.
 
@@ -2520,39 +2518,22 @@ If Keep already has service, route, repository, or domain conventions, conform t
 
 Create a shared schema usable by:
 
-* BFF.
-* Web UI.
-* VS Code extension.
-* Desktop companion.
-* Future mobile clients.
+- BFF.
+- Web UI.
+- VS Code extension.
+- Desktop companion.
+- Future mobile clients.
 
 ```ts
 export type ClipboardContentType =
-  | "text"
-  | "url"
-  | "code"
-  | "json"
-  | "command"
-  | "image"
-  | "file";
+  "text" | "url" | "code" | "json" | "command" | "image" | "file";
 
 export type ClipboardOriginClient =
-  | "web"
-  | "vscode"
-  | "macos"
-  | "windows"
-  | "android"
-  | "ios";
+  "web" | "vscode" | "macos" | "windows" | "android" | "ios";
 
-export type ClipboardSensitivity =
-  | "normal"
-  | "sensitive"
-  | "secret";
+export type ClipboardSensitivity = "normal" | "sensitive" | "secret";
 
-export type ClipboardPersistenceMode =
-  | "once"
-  | "temporary"
-  | "pinned";
+export type ClipboardPersistenceMode = "once" | "temporary" | "pinned";
 
 export interface ClipboardItem {
   id: string;
@@ -2593,12 +2574,7 @@ Never accept an authoritative `userId` from request bodies.
 
 ```ts
 export type KeepDeviceType =
-  | "vscode"
-  | "macos"
-  | "windows"
-  | "android"
-  | "ios"
-  | "web";
+  "vscode" | "macos" | "windows" | "android" | "ios" | "web";
 
 export interface KeepDevice {
   id: string;
@@ -2859,14 +2835,14 @@ POST   /api/device-pairing/:pairingId/exchange
 
 Apply:
 
-* Authentication.
-* Authorization.
-* CSRF protection where relevant.
-* Schema validation.
-* Rate limiting.
-* Consistent error responses.
-* Request correlation IDs.
-* Safe structured logging.
+- Authentication.
+- Authorization.
+- CSRF protection where relevant.
+- Schema validation.
+- Rate limiting.
+- Consistent error responses.
+- Request correlation IDs.
+- Safe structured logging.
 
 ---
 
@@ -2881,29 +2857,33 @@ Use browser-based pairing.
 1. Client generates or requests a pairing session.
 2. BFF returns:
 
-   * Pairing ID.
-   * Short pairing code.
-   * Pairing URL.
-   * Expiration time.
+   - Pairing ID.
+   - Short pairing code.
+   - Pairing URL.
+   - Expiration time.
+
 3. Client displays:
 
-   * Code.
-   * QR code where applicable.
-   * “Open Keep” button.
+   - Code.
+   - QR code where applicable.
+   - “Open Keep” button.
+
 4. User signs into Keep through the existing Firebase and BFF flow.
 5. User sees:
 
-   * Device name.
-   * Device type.
-   * Requested permissions.
-   * Approximate platform information.
+   - Device name.
+   - Device type.
+   - Requested permissions.
+   - Approximate platform information.
+
 6. User approves or rejects.
 7. Client polls or listens for approval.
 8. Client exchanges the approved pairing session for:
 
-   * Device ID.
-   * One-time raw device token.
-   * Sync configuration.
+   - Device ID.
+   - One-time raw device token.
+   - Sync configuration.
+
 9. Server stores only the token hash.
 10. Client stores the raw token in secure local storage.
 11. Pairing session is invalidated immediately after successful exchange.
@@ -2928,16 +2908,16 @@ Extend the existing mature Keep VS Code extension rather than creating another e
 
 Reuse its:
 
-* Authentication.
-* API client.
-* Configuration.
-* Logging.
-* Commands.
-* Status bar.
-* Webviews.
-* Error handling.
-* Secure token storage.
-* Existing architecture.
+- Authentication.
+- API client.
+- Configuration.
+- Logging.
+- Commands.
+- Status bar.
+- Webviews.
+- Error handling.
+- Secure token storage.
+- Existing architecture.
 
 Add commands:
 
@@ -2959,14 +2939,14 @@ Keep: Manage Clipboard Devices
 
 When a user sends selected code:
 
-* Capture selected text.
-* Detect language from the active editor.
-* Mark content type as `code`.
-* Include language metadata.
-* Compute content hash.
-* Apply sensitivity detection.
-* Encrypt before submission when client encryption is enabled.
-* Show a non-sensitive confirmation.
+- Capture selected text.
+- Detect language from the active editor.
+- Mark content type as `code`.
+- Include language metadata.
+- Compute content hash.
+- Apply sensitivity detection.
+- Encrypt before submission when client encryption is enabled.
+- Show a non-sensitive confirmation.
 
 ## Remote history picker
 
@@ -2991,15 +2971,15 @@ Do not reveal secret previews.
 
 On selection:
 
-* Fetch and decrypt full content.
-* Copy to VS Code clipboard or insert into the active editor.
-* Support explicit actions:
+- Fetch and decrypt full content.
+- Copy to VS Code clipboard or insert into the active editor.
+- Support explicit actions:
 
-  * Copy.
-  * Insert.
-  * Pin.
-  * Delete.
-  * Mark consumed.
+  - Copy.
+  - Insert.
+  - Pin.
+  - Delete.
+  - Mark consumed.
 
 ## Secure storage
 
@@ -3007,21 +2987,21 @@ Store device tokens through the existing VS Code `ExtensionContext.secrets` mech
 
 Do not store device credentials in:
 
-* Settings JSON.
-* Workspace configuration.
-* Extension globalState.
-* Plain environment files.
-* Logs.
+- Settings JSON.
+- Workspace configuration.
+- Extension globalState.
+- Plain environment files.
+- Logs.
 
 ## Remote extension behavior
 
 Account for:
 
-* Local VS Code.
-* Remote SSH.
-* Dev Containers.
-* WSL.
-* Codespaces.
+- Local VS Code.
+- Remote SSH.
+- Dev Containers.
+- WSL.
+- Codespaces.
 
 The clipboard action should run in the UI extension host where required, not accidentally bind synchronization to the remote workspace host.
 
@@ -3033,30 +3013,30 @@ The desktop companion should be a separate Keep client but remain in the same re
 
 Choose either:
 
-* Tauri, preferred for a small native desktop footprint.
-* Electron, acceptable if it better matches the existing JavaScript expertise and delivery constraints.
+- Tauri, preferred for a small native desktop footprint.
+- Electron, acceptable if it better matches the existing JavaScript expertise and delivery constraints.
 
 Do not build separate macOS and Windows applications unless platform differences require isolated native modules.
 
 ## Features
 
-* Tray or menu-bar interface.
-* Clipboard change detection.
-* Send changes to Keep.
-* Receive remote notifications.
-* Manual receive.
-* Optional automatic receive.
-* Global keyboard shortcut.
-* Recent clipboard picker.
-* Pause synchronization.
-* Ignore current item.
-* Start at login.
-* Device rename.
-* Device revoke.
-* Sensitive-item warning.
-* Connection status.
-* Retry with exponential backoff.
-* Offline queue with strict size and TTL limits.
+- Tray or menu-bar interface.
+- Clipboard change detection.
+- Send changes to Keep.
+- Receive remote notifications.
+- Manual receive.
+- Optional automatic receive.
+- Global keyboard shortcut.
+- Recent clipboard picker.
+- Pause synchronization.
+- Ignore current item.
+- Start at login.
+- Device rename.
+- Device revoke.
+- Sensitive-item warning.
+- Connection status.
+- Retry with exponential backoff.
+- Offline queue with strict size and TTL limits.
 
 ## Default behavior
 
@@ -3099,34 +3079,34 @@ Implement Android only after the core web, BFF, Redis, VS Code, and desktop flow
 
 Recommended technology:
 
-* Native Kotlin with Jetpack Compose, or
-* React Native if it aligns better with the existing team.
+- Native Kotlin with Jetpack Compose, or
+- React Native if it aligns better with the existing team.
 
 Prefer native Kotlin when implementing:
 
-* Sharesheet.
-* Quick Settings tile.
-* Foreground services.
-* Widgets.
-* Clipboard APIs.
-* Biometric authentication.
-* Android Keystore.
+- Sharesheet.
+- Quick Settings tile.
+- Foreground services.
+- Widgets.
+- Clipboard APIs.
+- Biometric authentication.
+- Android Keystore.
 
 ## MVP Android features
 
-* Firebase or Keep browser-based sign-in.
-* Device registration.
-* Clipboard history.
-* Search.
-* Tap to copy to Android clipboard.
-* Paste and send current clipboard while the app is active.
-* Share text and URLs into Keep.
-* Send to all devices or selected device.
-* Receive notifications.
-* Pin and delete.
-* Biometric confirmation for sensitive items.
-* Device management.
-* Tablet-optimized layout.
+- Firebase or Keep browser-based sign-in.
+- Device registration.
+- Clipboard history.
+- Search.
+- Tap to copy to Android clipboard.
+- Paste and send current clipboard while the app is active.
+- Share text and URLs into Keep.
+- Send to all devices or selected device.
+- Receive notifications.
+- Pin and delete.
+- Biometric confirmation for sensitive items.
+- Device management.
+- Tablet-optimized layout.
 
 ## Sharesheet
 
@@ -3176,13 +3156,13 @@ Do not attempt to bypass Android clipboard privacy controls.
 
 Test on the target Samsung tablet for:
 
-* Battery optimization.
-* Background network restrictions.
-* One UI notification behavior.
-* Split-screen mode.
-* DeX mode.
-* Large-screen responsive layout.
-* Samsung Internet and Chrome PWA behavior.
+- Battery optimization.
+- Background network restrictions.
+- One UI notification behavior.
+- Split-screen mode.
+- DeX mode.
+- Large-screen responsive layout.
+- Samsung Internet and Chrome PWA behavior.
 
 Provide clear setup guidance if the user chooses to exempt Keep from battery optimization for reliable notifications.
 
@@ -3196,26 +3176,26 @@ Treat this as a later milestone.
 
 Recommended implementation:
 
-* SwiftUI.
-* Share Extension.
-* App Intents and Shortcuts.
-* Keychain.
-* CryptoKit.
-* LocalAuthentication for Face ID and Touch ID.
-* Push notifications where appropriate.
+- SwiftUI.
+- Share Extension.
+- App Intents and Shortcuts.
+- Keychain.
+- CryptoKit.
+- LocalAuthentication for Face ID and Touch ID.
+- Push notifications where appropriate.
 
 ## MVP iOS features
 
-* Sign in and device registration.
-* Clipboard history.
-* Search.
-* Tap to copy into the system pasteboard.
-* Explicit paste-and-send action.
-* Share Extension.
-* Pin and delete.
-* Biometric confirmation.
-* Device management.
-* iPad layout.
+- Sign in and device registration.
+- Clipboard history.
+- Search.
+- Tap to copy into the system pasteboard.
+- Explicit paste-and-send action.
+- Share Extension.
+- Pin and delete.
+- Biometric confirmation.
+- Device management.
+- iPad layout.
 
 ## Share Extension flow
 
@@ -3258,48 +3238,48 @@ Suggested route:
 
 The interface should be browser-first and fully usable on:
 
-* Desktop browsers.
-* Samsung tablets.
-* Android phones.
-* iPads.
-* iPhones.
+- Desktop browsers.
+- Samsung tablets.
+- Android phones.
+- iPads.
+- iPhones.
 
 It should not be mobile-first at the expense of desktop use.
 
 ## Main features
 
-* Recent items.
-* Search.
-* Filters.
-* Pinned items.
-* Connected devices.
-* Online presence.
-* One-tap copy.
-* Send to selected device.
-* Delete.
-* Clear history.
-* Expiration indicator.
-* Sensitivity label.
-* Content-type label.
-* Source device.
-* Timestamp.
-* Language metadata.
-* Pause clipboard synchronization.
-* Security settings.
-* Retention settings.
+- Recent items.
+- Search.
+- Filters.
+- Pinned items.
+- Connected devices.
+- Online presence.
+- One-tap copy.
+- Send to selected device.
+- Delete.
+- Clear history.
+- Expiration indicator.
+- Sensitivity label.
+- Content-type label.
+- Source device.
+- Timestamp.
+- Language metadata.
+- Pause clipboard synchronization.
+- Security settings.
+- Retention settings.
 
 ## Tablet layout
 
 Use touch-friendly controls with:
 
-* Minimum comfortable touch targets.
-* Two-column layout where space permits.
-* Sticky search and filters.
-* Optional details panel.
-* Full-screen item viewer.
-* PWA install support.
-* Landscape and portrait layouts.
-* DeX compatibility.
+- Minimum comfortable touch targets.
+- Two-column layout where space permits.
+- Sticky search and filters.
+- Optional details panel.
+- Full-screen item viewer.
+- PWA install support.
+- Landscape and portrait layouts.
+- DeX compatibility.
 
 Example:
 
@@ -3332,26 +3312,26 @@ Treat this feature as security-sensitive from the beginning.
 
 ## Mandatory rules
 
-* Never log clipboard payloads.
-* Never log decrypted payloads.
-* Never place plaintext secrets in analytics.
-* Never include secret previews.
-* Never expose Redis directly to clients.
-* Never trust client-provided user IDs.
-* Never persist raw device credentials.
-* Never return another user’s clipboard items.
-* Never allow a revoked device to reconnect.
-* Enforce payload limits.
-* Enforce rate limits.
-* Enforce retention.
-* Provide immediate device revocation.
-* Provide “clear all clipboard data.”
-* Support one-time items.
-* Require explicit approval for new devices.
-* Use secure transport.
-* Use constant-time token comparison where appropriate.
-* Protect pairing endpoints from brute force.
-* Invalidate pairing sessions after exchange.
+- Never log clipboard payloads.
+- Never log decrypted payloads.
+- Never place plaintext secrets in analytics.
+- Never include secret previews.
+- Never expose Redis directly to clients.
+- Never trust client-provided user IDs.
+- Never persist raw device credentials.
+- Never return another user’s clipboard items.
+- Never allow a revoked device to reconnect.
+- Enforce payload limits.
+- Enforce rate limits.
+- Enforce retention.
+- Provide immediate device revocation.
+- Provide “clear all clipboard data.”
+- Support one-time items.
+- Require explicit approval for new devices.
+- Use secure transport.
+- Use constant-time token comparison where appropriate.
+- Protect pairing endpoints from brute force.
+- Invalidate pairing sessions after exchange.
 
 ## Sensitive-content detection
 
@@ -3411,12 +3391,12 @@ Implement in two stages.
 
 ## Stage 1
 
-* TLS for transport.
-* Existing Keep server-side security.
-* Encrypted infrastructure storage where available.
-* No plaintext payloads in logs.
-* Strict access control.
-* Short retention.
+- TLS for transport.
+- Existing Keep server-side security.
+- Encrypted infrastructure storage where available.
+- No plaintext payloads in logs.
+- Strict access control.
+- Short retention.
 
 ## Stage 2
 
@@ -3484,11 +3464,11 @@ This is simpler but not end-to-end encrypted.
 
 Options:
 
-* Search only local cached content.
-* Store explicitly generated encrypted search tokens.
-* Limit server-side search to metadata.
-* Download recent encrypted records and search locally.
-* Avoid claiming full remote content search.
+- Search only local cached content.
+- Store explicitly generated encrypted search tokens.
+- Limit server-side search to metadata.
+- Download recent encrypted records and search locally.
+- Avoid claiming full remote content search.
 
 Do not silently weaken encryption merely to keep server-side search.
 
@@ -3641,22 +3621,22 @@ plaintext preview for sensitive items
 
 Handle:
 
-* Redis unavailable.
-* Firebase token expired.
-* Device token expired.
-* Device revoked.
-* Pairing expired.
-* Network disconnected.
-* Duplicate event.
-* Malformed encrypted envelope.
-* Payload too large.
-* History limit reached.
-* Stream cursor too old.
-* Client clock incorrect.
-* Client reconnect.
-* Partial object-storage upload.
-* Encryption-key mismatch.
-* Unsupported client version.
+- Redis unavailable.
+- Firebase token expired.
+- Device token expired.
+- Device revoked.
+- Pairing expired.
+- Network disconnected.
+- Duplicate event.
+- Malformed encrypted envelope.
+- Payload too large.
+- History limit reached.
+- Stream cursor too old.
+- Client clock incorrect.
+- Client reconnect.
+- Partial object-storage upload.
+- Encryption-key mismatch.
+- Unsupported client version.
 
 Use stable error codes such as:
 
@@ -3684,35 +3664,35 @@ Provide user-friendly client messages while preserving technical details in safe
 
 Cover:
 
-* Schema validation.
-* Retention calculation.
-* Sensitivity detection.
-* Preview generation.
-* Hash generation.
-* Deduplication.
-* Device authorization.
-* Pairing expiration.
-* Token hashing.
-* History trimming.
-* Loop-prevention state.
-* Encryption envelope parsing.
+- Schema validation.
+- Retention calculation.
+- Sensitivity detection.
+- Preview generation.
+- Hash generation.
+- Deduplication.
+- Device authorization.
+- Pairing expiration.
+- Token hashing.
+- History trimming.
+- Loop-prevention state.
+- Encryption envelope parsing.
 
 ## Integration tests
 
 Cover:
 
-* Authenticated web user creates item.
-* Paired device creates item.
-* Unauthorized device is rejected.
-* Revoked device is rejected.
-* Item appears in history.
-* Stream event is produced.
-* Item expires.
-* Pinned item survives ordinary cleanup.
-* One-time item is removed after consumption.
-* Duplicate item is suppressed.
-* Pairing code cannot be reused.
-* User cannot read another user’s items.
+- Authenticated web user creates item.
+- Paired device creates item.
+- Unauthorized device is rejected.
+- Revoked device is rejected.
+- Item appears in history.
+- Stream event is produced.
+- Item expires.
+- Pinned item survives ordinary cleanup.
+- One-time item is removed after consumption.
+- Duplicate item is suppressed.
+- Pairing code cannot be reused.
+- User cannot read another user’s items.
 
 ## End-to-end tests
 
@@ -3736,78 +3716,78 @@ Remote item → local clipboard → no echo loop
 
 Implement:
 
-* Clipboard domain module.
-* Redis repository.
-* Create/list/delete/pin/consume APIs.
-* Web dashboard.
-* Tablet-responsive UI.
-* Retention.
-* History trimming.
-* Sensitivity detection.
-* Safe logging.
-* Feature flag.
+- Clipboard domain module.
+- Redis repository.
+- Create/list/delete/pin/consume APIs.
+- Web dashboard.
+- Tablet-responsive UI.
+- Retention.
+- History trimming.
+- Sensitivity detection.
+- Safe logging.
+- Feature flag.
 
 Acceptance:
 
-* A signed-in user can manually add clipboard text.
-* The item appears in history.
-* The user can copy, pin, consume, and delete it.
-* History survives application restart through Redis.
-* Items expire correctly.
+- A signed-in user can manually add clipboard text.
+- The item appears in history.
+- The user can copy, pin, consume, and delete it.
+- History survives application restart through Redis.
+- Items expire correctly.
 
 ## Phase 2 — VS Code Extension
 
 Implement:
 
-* Pair extension as device.
-* Send selection.
-* Send clipboard.
-* Remote history Quick Pick.
-* Copy or insert remote item.
-* Secure credential storage.
-* Sync event notifications.
-* Loop and duplicate prevention.
+- Pair extension as device.
+- Send selection.
+- Send clipboard.
+- Remote history Quick Pick.
+- Copy or insert remote item.
+- Secure credential storage.
+- Sync event notifications.
+- Loop and duplicate prevention.
 
 Acceptance:
 
-* A VS Code selection appears in Keep Clipboard.
-* A web-created item can be inserted into the active editor.
-* Credentials are not stored in plaintext.
-* Sensitive previews are hidden.
+- A VS Code selection appears in Keep Clipboard.
+- A web-created item can be inserted into the active editor.
+- Credentials are not stored in plaintext.
+- Sensitive previews are hidden.
 
 ## Phase 3 — Real-Time Sync and Device Management
 
 Implement:
 
-* Redis Stream event flow.
-* SSE or WebSocket transport.
-* Cursor resume.
-* Presence.
-* Device dashboard.
-* Rename and revoke.
-* Token rotation.
-* Delivery acknowledgement.
+- Redis Stream event flow.
+- SSE or WebSocket transport.
+- Cursor resume.
+- Presence.
+- Device dashboard.
+- Rename and revoke.
+- Token rotation.
+- Delivery acknowledgement.
 
 Acceptance:
 
-* Connected clients receive events promptly.
-* Reconnecting clients resume correctly.
-* Revoked devices lose access immediately.
-* No event is silently lost because of a brief disconnect.
+- Connected clients receive events promptly.
+- Reconnecting clients resume correctly.
+- Revoked devices lose access immediately.
+- No event is silently lost because of a brief disconnect.
 
 ## Phase 4 — macOS and Windows Companion
 
 Implement:
 
-* Clipboard watcher.
-* Tray/menu-bar UI.
-* Manual receive.
-* Optional automatic send.
-* Optional automatic receive.
-* Global shortcut.
-* Start at login.
-* Secure credential storage.
-* Loop prevention.
+- Clipboard watcher.
+- Tray/menu-bar UI.
+- Manual receive.
+- Optional automatic send.
+- Optional automatic receive.
+- Global shortcut.
+- Start at login.
+- Secure credential storage.
+- Loop prevention.
 
 Acceptance:
 
@@ -3824,14 +3804,14 @@ Copy on Mac
 
 Implement:
 
-* Android app.
-* Tablet UI.
-* Sharesheet.
-* Tap-to-copy.
-* Explicit clipboard-send action.
-* Notifications.
-* Biometric protection.
-* Optional Quick Settings tile.
+- Android app.
+- Tablet UI.
+- Sharesheet.
+- Tap-to-copy.
+- Explicit clipboard-send action.
+- Notifications.
+- Biometric protection.
+- Optional Quick Settings tile.
 
 Acceptance:
 
@@ -3854,12 +3834,12 @@ Select Keep item
 
 Implement:
 
-* SwiftUI app.
-* Share Extension.
-* Tap-to-copy.
-* Explicit paste-and-send.
-* Shortcuts/App Intents.
-* Biometric protection.
+- SwiftUI app.
+- Share Extension.
+- Tap-to-copy.
+- Explicit paste-and-send.
+- Shortcuts/App Intents.
+- Biometric protection.
 
 ## Phase 7 — Client-Side Encryption
 
@@ -3867,13 +3847,13 @@ Only after a threat model and key lifecycle design are approved.
 
 Implement:
 
-* Device key provisioning.
-* Envelope encryption.
-* Key versioning.
-* Rotation.
-* Device revocation semantics.
-* Recovery strategy.
-* Local decryption.
+- Device key provisioning.
+- Envelope encryption.
+- Key versioning.
+- Rotation.
+- Device revocation semantics.
+- Recovery strategy.
+- Local decryption.
 
 ---
 
@@ -3881,19 +3861,19 @@ Implement:
 
 Do not implement initially:
 
-* Large file synchronization.
-* Video synchronization.
-* Unlimited history.
-* Team-shared clipboards.
-* Public clipboard links.
-* Internet-wide anonymous access.
-* Custom Android keyboard.
-* Accessibility-service clipboard scraping.
-* Silent continuous iOS clipboard monitoring.
-* Complex server-side encrypted-content search.
-* Unreviewed custom cryptography.
-* Automatic synchronization of likely secrets.
-* Automatic replacement of every device clipboard by default.
+- Large file synchronization.
+- Video synchronization.
+- Unlimited history.
+- Team-shared clipboards.
+- Public clipboard links.
+- Internet-wide anonymous access.
+- Custom Android keyboard.
+- Accessibility-service clipboard scraping.
+- Silent continuous iOS clipboard monitoring.
+- Complex server-side encrypted-content search.
+- Unreviewed custom cryptography.
+- Automatic synchronization of likely secrets.
+- Automatic replacement of every device clipboard by default.
 
 ---
 
@@ -3941,12 +3921,12 @@ docs/clipboard/operations.md
 
 The platform-limitations document must explain:
 
-* Why Android background clipboard reads are restricted.
-* Why the Android Sharesheet is preferred.
-* Why iOS requires explicit user actions.
-* Why desktop clients can provide deeper automation.
-* Why automatic receiving is opt-in.
-* Why clipboard content requires short retention and strict security.
+- Why Android background clipboard reads are restricted.
+- Why the Android Sharesheet is preferred.
+- Why iOS requires explicit user actions.
+- Why desktop clients can provide deeper automation.
+- Why automatic receiving is opt-in.
+- Why clipboard content requires short retention and strict security.
 
 ---
 

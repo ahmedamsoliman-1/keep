@@ -1,5 +1,5 @@
-import { bulkEnvironmentRequestSchema } from "@envault/api-contract";
-import { FirestoreEnvironmentRepository } from "@envault/firebase/repositories/environment";
+import { bulkEnvironmentRequestSchema } from "@keephq/api-contract";
+import { FirestoreEnvironmentRepository } from "@keephq/firebase/repositories/environment";
 import type { NextRequest } from "next/server";
 
 import {

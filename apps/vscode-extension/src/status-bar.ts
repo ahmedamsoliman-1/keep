@@ -7,7 +7,7 @@ import type { VaultSession } from "./vault-session";
 
 /**
  * A single status-bar entry reflecting connection, lock state and the active
- * folder's bound environment. Clicking it opens the Envault quick-actions menu.
+ * folder's bound environment. Clicking it opens the Keep quick-actions menu.
  */
 export function createStatusBar(
   context: vscode.ExtensionContext,
@@ -21,9 +21,9 @@ export function createStatusBar(
   async function refresh(): Promise<void> {
     const token = await getAccessToken(context);
     if (!token) {
-      item.text = "$(key) Envault";
-      item.tooltip = "Sign in to Envault";
-      item.command = "envault.signIn";
+      item.text = "$(key) Keep";
+      item.tooltip = "Sign in to Keep";
+      item.command = "keep.signIn";
       item.show();
       return;
     }
@@ -33,11 +33,11 @@ export function createStatusBar(
       ? `${binding.projectName}/${binding.environmentName}`
       : "no environment";
     const icon = session.isUnlocked ? "$(unlock)" : "$(lock)";
-    item.text = `${icon} Envault: ${environment}`;
+    item.text = `${icon} Keep: ${environment}`;
     item.tooltip = session.isUnlocked
-      ? "Envault vault unlocked — click for actions"
-      : "Envault vault locked — click for actions";
-    item.command = "envault.quickActions";
+      ? "Keep vault unlocked — click for actions"
+      : "Keep vault locked — click for actions";
+    item.command = "keep.quickActions";
     item.show();
   }
 

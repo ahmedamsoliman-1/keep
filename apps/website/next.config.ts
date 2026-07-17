@@ -29,10 +29,10 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: workspaceRoot,
   reactStrictMode: true,
   transpilePackages: [
-    "@envault/api-client",
-    "@envault/api-contract",
-    "@envault/config",
-    "@envault/firebase",
+    "@keephq/api-client",
+    "@keephq/api-contract",
+    "@keephq/config",
+    "@keephq/firebase",
   ],
 };
 

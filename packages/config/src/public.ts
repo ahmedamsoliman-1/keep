@@ -7,7 +7,7 @@ const publicEnvironmentSchema = z.object({
   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: z.string().min(1),
   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: z.string().min(1),
   NEXT_PUBLIC_FIREBASE_APP_ID: z.string().min(1),
-  NEXT_PUBLIC_APP_NAME: z.string().min(1).default("Envault"),
+  NEXT_PUBLIC_APP_NAME: z.string().min(1).default("Keep"),
   NEXT_PUBLIC_APP_URL: z.url().default("http://localhost:3000"),
   NEXT_PUBLIC_ENABLE_APP_CHECK: z
     .enum(["true", "false"])

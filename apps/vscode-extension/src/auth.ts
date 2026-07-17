@@ -1,4 +1,4 @@
-import { EnvaultApiError, EnvaultClient } from "@envault/api-client";
+import { KeepApiError, KeepClient } from "@keephq/api-client";
 import { createHash, randomBytes } from "node:crypto";
 import { hostname } from "node:os";
 import * as vscode from "vscode";
@@ -14,11 +14,11 @@ const sleep = (milliseconds: number) =>
 export async function signIn(context: vscode.ExtensionContext): Promise<void> {
   const verifier = randomBytes(48).toString("base64url");
   const challenge = createHash("sha256").update(verifier).digest("base64url");
-  const client = new EnvaultClient({ baseUrl: serverUrl() });
+  const client = new KeepClient({ baseUrl: serverUrl() });
   try {
     const authorization = await client.devices.createAuthorization({
       deviceName: hostname(),
-      clientName: "Envault for VS Code",
+      clientName: "Keep for VS Code",
       codeChallenge: challenge,
       scopes: [
         "projects:read",
@@ -33,7 +33,7 @@ export async function signIn(context: vscode.ExtensionContext): Promise<void> {
     await vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Notification,
-        title: `Approve Envault code ${authorization.userCode}`,
+        title: `Approve Keep code ${authorization.userCode}`,
         cancellable: true,
       },
       async (_progress, cancellation) => {
@@ -48,7 +48,7 @@ export async function signIn(context: vscode.ExtensionContext): Promise<void> {
           if (result.status === "authorized") {
             await context.secrets.store(TOKEN_KEY, result.accessToken);
             void vscode.window.showInformationMessage(
-              `Envault connected as ${result.session.deviceName}.`,
+              `Keep connected as ${result.session.deviceName}.`,
             );
             return;
           }
@@ -59,9 +59,9 @@ export async function signIn(context: vscode.ExtensionContext): Promise<void> {
     );
   } catch (error) {
     const message =
-      error instanceof EnvaultApiError || error instanceof Error
+      error instanceof KeepApiError || error instanceof Error
         ? error.message
-        : "Envault sign-in failed.";
+        : "Keep sign-in failed.";
     void vscode.window.showErrorMessage(message);
   }
 }
@@ -75,7 +75,7 @@ export async function signOut(
   await forgetDeviceKey(context, token ? createClient(token) : null);
   await context.secrets.delete(TOKEN_KEY);
   void vscode.window.showInformationMessage(
-    "Signed out of Envault. The local device credential was removed.",
+    "Signed out of Keep. The local device credential was removed.",
   );
 }
 
@@ -85,12 +85,12 @@ export async function showStatus(
 ): Promise<void> {
   const token = await getAccessToken(context);
   if (!token) {
-    void vscode.window.showInformationMessage("Envault is not connected.");
+    void vscode.window.showInformationMessage("Keep is not connected.");
     return;
   }
   void vscode.window.showInformationMessage(
     session.isUnlocked
-      ? `Envault is connected to ${serverUrl()} and unlocked.`
-      : `Envault is connected to ${serverUrl()} (vault locked).`,
+      ? `Keep is connected to ${serverUrl()} and unlocked.`
+      : `Keep is connected to ${serverUrl()} (vault locked).`,
   );
 }

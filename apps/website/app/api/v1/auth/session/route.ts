@@ -1,5 +1,5 @@
-import { sessionExchangeRequestSchema } from "@envault/api-contract";
-import { envaultRedisKey } from "@envault/redis";
+import { sessionExchangeRequestSchema } from "@keephq/api-contract";
+import { keepRedisKey } from "@keephq/redis";
 import type { NextRequest } from "next/server";
 
 import {
@@ -73,17 +73,14 @@ export async function POST(request: NextRequest) {
     );
     let passkeyAuthenticated = false;
     if (result.data.passkeyProof) {
-      const proofKey = envaultRedisKey(
-        "passkey-proof",
-        result.data.passkeyProof,
-      );
+      const proofKey = keepRedisKey("passkey-proof", result.data.passkeyProof);
       const proof = await getAdminFirestore().get<{ userId: string }>(proofKey);
       await getAdminFirestore().del(proofKey);
       passkeyAuthenticated = proof?.userId === decodedToken.uid;
     }
     let customMfaEnabled = false;
     let mfaTrustVersion: string | null = null;
-    let trustedDeviceCookieName = "envault_mfa_trust";
+    let trustedDeviceCookieName = "keep_mfa_trust";
     let trustedDeviceMaxAgeSeconds = 2_592_000;
     let shouldRememberDevice = false;
     try {
@@ -122,7 +119,7 @@ export async function POST(request: NextRequest) {
       )?.value;
       const trustedDevice = trustedDeviceId
         ? await redis.get<TrustedMfaDevice>(
-            envaultRedisKey("mfa-trusted-device", trustedDeviceId),
+            keepRedisKey("mfa-trusted-device", trustedDeviceId),
           )
         : null;
       const deviceIsTrusted =
@@ -179,7 +176,7 @@ export async function POST(request: NextRequest) {
       mfaEnabled: customMfaEnabled,
     };
     await getAdminFirestore().set(
-      envaultRedisKey("session", sessionCookie),
+      keepRedisKey("session", sessionCookie),
       sessionUser,
       { ex: sessionConfiguration.maxAgeSeconds },
     );
@@ -187,7 +184,7 @@ export async function POST(request: NextRequest) {
     if (shouldRememberDevice && mfaTrustVersion) {
       trustedDeviceId = crypto.randomUUID();
       await getAdminFirestore().set(
-        envaultRedisKey("mfa-trusted-device", trustedDeviceId),
+        keepRedisKey("mfa-trusted-device", trustedDeviceId),
         {
           userId: decodedToken.uid,
           trustVersion: mfaTrustVersion,
@@ -259,7 +256,7 @@ export async function DELETE(request: NextRequest) {
   const sessionConfiguration = getSessionConfiguration();
   const sessionId = request.cookies.get(sessionConfiguration.cookieName)?.value;
   if (sessionId)
-    await getAdminFirestore().del(envaultRedisKey("session", sessionId));
+    await getAdminFirestore().del(keepRedisKey("session", sessionId));
   const response = successResponse({ signedOut: true as const }, requestId);
   response.headers.append(
     "Set-Cookie",

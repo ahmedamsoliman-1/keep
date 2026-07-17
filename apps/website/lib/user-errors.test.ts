@@ -1,4 +1,4 @@
-import { EnvaultApiError } from "@envault/api-client";
+import { KeepApiError } from "@keephq/api-client";
 import { describe, expect, it } from "vitest";
 
 import { getEnvironmentConflict } from "./user-errors";
@@ -7,7 +7,7 @@ describe("getEnvironmentConflict", () => {
   it("extracts expected and current environment versions", () => {
     expect(
       getEnvironmentConflict(
-        new EnvaultApiError(
+        new KeepApiError(
           409,
           {
             code: "ENVIRONMENT_VERSION_CONFLICT",

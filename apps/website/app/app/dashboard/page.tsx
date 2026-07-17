@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { RedisProjectRepository } from "@envault/redis/repositories";
+import { RedisProjectRepository } from "@keephq/redis/repositories";
 
 import { WorkspaceNavigator } from "@/components/dashboard/workspace-navigator";
 import { AppShell } from "@/components/layout/app-shell";
@@ -38,7 +38,7 @@ export default async function DashboardPage() {
               Your environments, organized and protected.
             </h2>
             <p className="mt-4 max-w-2xl leading-7 text-[var(--muted)]">
-              Jump directly into any project environment while Envault keeps
+              Jump directly into any project environment while Keep keeps
               sensitive values encrypted on the client.
             </p>
             <VaultStatusCard />

@@ -1,4 +1,4 @@
-import { EnvaultApiError } from "@envault/api-client";
+import { KeepApiError } from "@keephq/api-client";
 import { FirebaseError } from "firebase/app";
 
 export type AuthOperation =
@@ -17,12 +17,12 @@ const commonFirebaseMessages: Record<string, string> = {
   "auth/weak-password":
     "Choose a stronger password with at least eight characters.",
   "auth/network-request-failed":
-    "Envault could not reach the authentication service. Check your connection and try again.",
+    "Keep could not reach the authentication service. Check your connection and try again.",
   "auth/too-many-requests":
     "Too many attempts were made. Wait a few minutes before trying again.",
   "auth/user-disabled": "This account is currently unavailable.",
   "auth/operation-not-allowed":
-    "This sign-in method is not enabled. Contact the Envault administrator.",
+    "This sign-in method is not enabled. Contact the Keep administrator.",
   "auth/requires-recent-login":
     "For your security, sign in again before continuing.",
   "auth/invalid-verification-code":
@@ -35,24 +35,23 @@ const commonFirebaseMessages: Record<string, string> = {
 
 const operationFallbacks: Record<AuthOperation, string> = {
   login: "The email or password is incorrect.",
-  register: "Envault could not create an account with those details.",
+  register: "Keep could not create an account with those details.",
   "password-reset":
     "If the account is eligible, password-reset instructions will be sent.",
   "email-verification":
     "The verification email could not be sent. Try again shortly.",
   mfa: "Authenticator-app verification could not be updated. Try again.",
   session: "Your secure session could not be established. Sign in again.",
-  logout:
-    "Envault could not finish signing out. Refresh the page and try again.",
+  logout: "Keep could not finish signing out. Refresh the page and try again.",
 };
 
 export function getAuthErrorMessage(
   error: unknown,
   operation: AuthOperation,
 ): string {
-  if (error instanceof EnvaultApiError) {
+  if (error instanceof KeepApiError) {
     if (error.status >= 500) {
-      return "Firebase authentication succeeded, but Envault could not create its secure application session. Check the Redis configuration and try again.";
+      return "Firebase authentication succeeded, but Keep could not create its secure application session. Check the Redis configuration and try again.";
     }
     if (error.error.code === "UNAUTHENTICATED") {
       return operationFallbacks.session;

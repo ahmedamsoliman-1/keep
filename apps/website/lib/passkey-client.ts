@@ -6,7 +6,7 @@ import type {
   PublicKeyCredentialRequestOptionsJSON,
   RegistrationResponseJSON,
 } from "@simplewebauthn/browser";
-import type { WrappedVaultKeyV1 } from "@envault/crypto";
+import type { WrappedVaultKeyV1 } from "@keephq/crypto";
 
 interface SuccessEnvelope<T> {
   data: T;

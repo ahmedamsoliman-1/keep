@@ -1,7 +1,7 @@
 import "server-only";
 
 import { cookies } from "next/headers";
-import { envaultRedisKey } from "@envault/redis";
+import { keepRedisKey } from "@keephq/redis";
 
 import { getAdminFirestore, getSessionConfiguration } from "./firebase-admin";
 
@@ -23,6 +23,6 @@ export async function getSessionUser(checkRevoked = true) {
 
   void checkRevoked;
   return getAdminFirestore().get<RedisSession>(
-    envaultRedisKey("session", sessionCookie),
+    keepRedisKey("session", sessionCookie),
   );
 }

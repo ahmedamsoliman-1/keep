@@ -8,7 +8,7 @@ import {
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { EnvaultLogo } from "@/components/brand/envault-logo";
+import { KeepLogo } from "@/components/brand/keep-logo";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { MobileNavigation } from "@/components/layout/mobile-navigation";
 import { GlobalCommandPalette } from "@/components/layout/global-command-palette";
@@ -38,7 +38,7 @@ export function AppShell({
     <div className="min-h-screen bg-[var(--app-background)]">
       <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col border-r bg-[var(--sidebar)] p-4 lg:flex">
         <Link className="px-2 py-2" href="/app/dashboard">
-          <EnvaultLogo />
+          <KeepLogo />
         </Link>
         <nav className="mt-8 space-y-1">
           {navigation.map((item) => (
@@ -78,7 +78,7 @@ export function AppShell({
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-xs font-semibold">
-                {userName ?? "Envault user"}
+                {userName ?? "Keep user"}
               </span>
               <span className="mt-0.5 block truncate text-[11px] text-[var(--muted)]">
                 {userEmail ?? "Individual workspace"}

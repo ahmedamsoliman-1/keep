@@ -2,7 +2,7 @@ import type {
   EnvironmentDto,
   ProjectDto,
   VariableDto,
-} from "@envault/api-contract";
+} from "@keephq/api-contract";
 import * as vscode from "vscode";
 
 import { createClient, getAccessToken } from "./client";
@@ -21,18 +21,16 @@ interface VariableNode {
   kind: "variable";
   variable: VariableDto;
 }
-type EnvaultNode = ProjectNode | EnvironmentNode | VariableNode;
+type KeepNode = ProjectNode | EnvironmentNode | VariableNode;
 
-export class EnvaultTreeProvider
-  implements vscode.TreeDataProvider<EnvaultNode>
-{
+export class KeepTreeProvider implements vscode.TreeDataProvider<KeepNode> {
   readonly #onDidChangeTreeData = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this.#onDidChangeTreeData.event;
 
   constructor(private readonly context: vscode.ExtensionContext) {
     stateChanged.event(() => this.#onDidChangeTreeData.fire());
     context.secrets.onDidChange((event) => {
-      if (event.key === "envault.deviceAccessToken")
+      if (event.key === "keep.deviceAccessToken")
         this.#onDidChangeTreeData.fire();
     });
   }
@@ -41,14 +39,14 @@ export class EnvaultTreeProvider
     this.#onDidChangeTreeData.fire();
   }
 
-  getTreeItem(node: EnvaultNode): vscode.TreeItem {
+  getTreeItem(node: KeepNode): vscode.TreeItem {
     if (node.kind === "project") {
       const item = new vscode.TreeItem(
         node.project.name,
         vscode.TreeItemCollapsibleState.Collapsed,
       );
       item.iconPath = new vscode.ThemeIcon("folder");
-      item.contextValue = "envaultProject";
+      item.contextValue = "keepProject";
       return item;
     }
     if (node.kind === "environment") {
@@ -58,9 +56,9 @@ export class EnvaultTreeProvider
       );
       item.description = `${node.environment.kind} · v${node.environment.version}`;
       item.iconPath = new vscode.ThemeIcon("server-environment");
-      item.contextValue = "envaultEnvironment";
+      item.contextValue = "keepEnvironment";
       item.command = {
-        command: "envault.bindEnvironment",
+        command: "keep.bindEnvironment",
         title: "Use this environment",
         arguments: [node.project, node.environment],
       };
@@ -72,11 +70,11 @@ export class EnvaultTreeProvider
     );
     item.description = "••••••";
     item.iconPath = new vscode.ThemeIcon("key");
-    item.contextValue = "envaultVariable";
+    item.contextValue = "keepVariable";
     return item;
   }
 
-  async getChildren(node?: EnvaultNode): Promise<EnvaultNode[]> {
+  async getChildren(node?: KeepNode): Promise<KeepNode[]> {
     const token = await getAccessToken(this.context);
     if (!token) return [];
     const client = createClient(token);
@@ -96,9 +94,7 @@ export class EnvaultTreeProvider
         }));
       }
       if (node.kind === "environment") {
-        const { variables } = await client.variables.list(
-          node.environment.id,
-        );
+        const { variables } = await client.variables.list(node.environment.id);
         return variables
           .slice()
           .sort((a, b) => a.key.localeCompare(b.key))

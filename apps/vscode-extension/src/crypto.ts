@@ -1,6 +1,6 @@
-import type { VariableDto } from "@envault/api-contract";
-import { decryptVariableValue, encryptVariableValue } from "@envault/crypto";
-import { getNodeCryptoProvider } from "@envault/crypto/node";
+import type { VariableDto } from "@keephq/api-contract";
+import { decryptVariableValue, encryptVariableValue } from "@keephq/crypto";
+import { getNodeCryptoProvider } from "@keephq/crypto/node";
 
 const provider = getNodeCryptoProvider();
 

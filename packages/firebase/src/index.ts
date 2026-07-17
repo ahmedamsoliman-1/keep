@@ -1,1 +1,1 @@
-export const FIREBASE_EMULATOR_PROJECT_ID = "envault-local";
+export const FIREBASE_EMULATOR_PROJECT_ID = "keep-local";

@@ -1,5 +1,5 @@
-import { createProjectRequestSchema } from "@envault/api-contract";
-import { FirestoreProjectRepository } from "@envault/firebase/repositories/project";
+import { createProjectRequestSchema } from "@keephq/api-contract";
+import { FirestoreProjectRepository } from "@keephq/firebase/repositories/project";
 import type { NextRequest } from "next/server";
 
 import {

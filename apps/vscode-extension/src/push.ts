@@ -1,6 +1,6 @@
-import { EnvaultApiError, type EnvaultClient } from "@envault/api-client";
-import type { ImportVariableItem, VariableDto } from "@envault/api-contract";
-import { parseDotenv, serializeDotenv } from "@envault/dotenv";
+import { KeepApiError, type KeepClient } from "@keephq/api-client";
+import type { ImportVariableItem, VariableDto } from "@keephq/api-contract";
+import { parseDotenv, serializeDotenv } from "@keephq/dotenv";
 import { randomUUID } from "node:crypto";
 import * as vscode from "vscode";
 
@@ -67,11 +67,11 @@ function summarize(plan: PushPlan, environmentName: string): string {
 }
 
 function isVersionConflict(error: unknown): boolean {
-  return error instanceof EnvaultApiError && error.status === 409;
+  return error instanceof KeepApiError && error.status === 409;
 }
 
 async function commitChunks(
-  client: EnvaultClient,
+  client: KeepClient,
   environmentId: string,
   items: ImportVariableItem[],
   startVersion: number,
@@ -222,7 +222,9 @@ export async function pushEnvironment(
     }
   } catch (error) {
     void vscode.window.showErrorMessage(
-      error instanceof Error ? error.message : "The push could not be completed.",
+      error instanceof Error
+        ? error.message
+        : "The push could not be completed.",
     );
   } finally {
     unlocked.key.fill(0);

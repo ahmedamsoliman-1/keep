@@ -1,6 +1,6 @@
 # Device authorization
 
-Envault external clients use a browser-approved authorization flow rather than
+Keep external clients use a browser-approved authorization flow rather than
 collecting Firebase passwords, MFA codes, vault passphrases, or browser
 cookies.
 
@@ -8,7 +8,7 @@ cookies.
 
 1. The client generates a high-entropy PKCE verifier and SHA-256 challenge.
 2. It creates a short-lived device authorization.
-3. Envault returns a verification URL and human-readable code.
+3. Keep returns a verification URL and human-readable code.
 4. The browser signs the user in and displays the requested scopes.
 5. The user explicitly approves the device.
 6. The client exchanges the verifier once for a random device access token.
@@ -21,11 +21,11 @@ from Settings.
 
 ## Redis keys
 
-- `envault:v1:device-authorization:{authorizationId}`
-- `envault:v1:device-user-code:{userCode}`
-- `envault:v1:device-session:{sessionId}`
-- `envault:v1:device-token:{tokenHash}`
-- `envault:v1:user:{userId}:device-sessions`
+- `keep:v1:device-authorization:{authorizationId}`
+- `keep:v1:device-user-code:{userCode}`
+- `keep:v1:device-session:{sessionId}`
+- `keep:v1:device-token:{tokenHash}`
+- `keep:v1:user:{userId}:device-sessions`
 
 ## Initial scopes
 

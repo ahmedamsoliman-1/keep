@@ -24,8 +24,8 @@ The extension unlocks the vault locally, exactly like the website:
    owner-scoped device session — it is encrypted and useless without the
    passphrase or recovery key).
 2. `unlockVaultWithPassphrase` / `unlockVaultWithRecoveryKey` derive and unwrap
-   the vault key using `@envault/crypto` with the Node crypto provider
-   (`@envault/crypto/node`).
+   the vault key using `@keephq/crypto` with the Node crypto provider
+   (`@keephq/crypto/node`).
 3. The unwrapped key is held in memory only and cleared on lock, sign-out,
    auto-lock and window close.
 
@@ -49,6 +49,7 @@ So the passphrase is entered at most once per device:
    ```
 
    Only ciphertext and IV are stored — never the device secret or any plaintext.
+
 3. Later sessions fetch the wrapped material and combine it with the local
    device secret to unwrap silently.
 4. Revoking the device session removes the wrapped-key record, so a revoked

@@ -1,5 +1,5 @@
 {
-  "name": "@envault/firebase",
+  "name": "@keephq/firebase",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -18,8 +18,8 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@envault/api-contract": "workspace:*",
-    "@envault/redis": "workspace:*",
+    "@keephq/api-contract": "workspace:*",
+    "@keephq/redis": "workspace:*",
     "firebase": "^12.0.0",
     "firebase-admin": "^13.4.0",
     "server-only": "^0.0.1"

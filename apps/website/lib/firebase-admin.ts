@@ -1,8 +1,8 @@
 import "server-only";
 
-import { parseServerEnvironment } from "@envault/config/server";
-import { getFirebaseAdminAuth } from "@envault/firebase/admin";
-import { getEnvaultRedis } from "@envault/redis";
+import { parseServerEnvironment } from "@keephq/config/server";
+import { getFirebaseAdminAuth } from "@keephq/firebase/admin";
+import { getKeepRedis } from "@keephq/redis";
 import { loadEnvConfig } from "@next/env";
 import path from "node:path";
 
@@ -39,7 +39,7 @@ export function getMfaConfiguration() {
   }
   return {
     encryptionKey: environment.MFA_ENCRYPTION_KEY,
-    trustedDeviceCookieName: "envault_mfa_trust",
+    trustedDeviceCookieName: "keep_mfa_trust",
     trustedDeviceMaxAgeSeconds: environment.DEVICE_SESSION_MAX_AGE_SECONDS,
   };
 }
@@ -66,5 +66,5 @@ export function getAdminAuth() {
 
 export function getAdminFirestore() {
   ensureLocalEnvironmentLoaded();
-  return getEnvaultRedis(process.env);
+  return getKeepRedis(process.env);
 }

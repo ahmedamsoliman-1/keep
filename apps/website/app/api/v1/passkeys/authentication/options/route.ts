@@ -1,5 +1,5 @@
 import { generateAuthenticationOptions } from "@simplewebauthn/server";
-import { envaultRedisKey } from "@envault/redis";
+import { keepRedisKey } from "@keephq/redis";
 import type { NextRequest } from "next/server";
 
 import { errorResponse, successResponse } from "@/lib/api-response";
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
   });
   const flowId = crypto.randomUUID();
   await getAdminFirestore().set(
-    envaultRedisKey("passkey-challenge", "authentication", flowId),
+    keepRedisKey("passkey-challenge", "authentication", flowId),
     {
       challenge: options.challenge,
       origin: configuration.origin,

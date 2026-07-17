@@ -1,4 +1,4 @@
-import type { EnvaultRedis } from "@envault/redis";
+import type { KeepRedis } from "@keephq/redis";
 import { createHash } from "node:crypto";
 import { describe, expect, it, vi } from "vitest";
 
@@ -6,7 +6,7 @@ import { DeviceRepository } from "./device-repository";
 
 vi.mock("server-only", () => ({}));
 
-class MemoryRedis implements EnvaultRedis {
+class MemoryRedis implements KeepRedis {
   private readonly values = new Map<string, unknown>();
 
   public get<T>(key: string) {
@@ -42,7 +42,7 @@ describe("DeviceRepository", () => {
       .digest("base64url");
     const authorization = await repository.createAuthorization({
       deviceName: "Developer Mac",
-      clientName: "Envault for VS Code",
+      clientName: "Keep for VS Code",
       scopes: ["projects:read", "variables:read"],
       codeChallenge,
       ttlSeconds: 600,
@@ -93,13 +93,17 @@ describe("DeviceRepository", () => {
       .digest("base64url");
     const authorization = await repository.createAuthorization({
       deviceName: "Developer Mac",
-      clientName: "Envault for VS Code",
+      clientName: "Keep for VS Code",
       scopes: ["variables:read", "variables:write"],
       codeChallenge,
       ttlSeconds: 600,
     });
     await repository.approve(authorization.id, "owner", authorization.userCode);
-    const exchanged = await repository.exchange(authorization.id, verifier, 3_600);
+    const exchanged = await repository.exchange(
+      authorization.id,
+      verifier,
+      3_600,
+    );
     if (!("session" in exchanged) || !exchanged.session)
       throw new Error("Expected a session.");
     const sessionId = exchanged.session.id;
@@ -128,6 +132,8 @@ describe("DeviceRepository", () => {
 
     // Revoking the session removes the wrapped key, disabling silent unlock.
     await repository.revoke("owner", sessionId);
-    await expect(repository.getVaultKey(sessionId, "owner")).resolves.toBeNull();
+    await expect(
+      repository.getVaultKey(sessionId, "owner"),
+    ).resolves.toBeNull();
   });
 });

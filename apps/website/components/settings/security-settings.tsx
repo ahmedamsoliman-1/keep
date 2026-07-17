@@ -1,6 +1,6 @@
 "use client";
 
-import { EnvaultClient } from "@envault/api-client";
+import { KeepClient } from "@keephq/api-client";
 import {
   EmailAuthProvider,
   onAuthStateChanged,
@@ -25,7 +25,7 @@ import { getUserFacingError } from "@/lib/user-errors";
 
 import { PasskeySettings } from "./passkey-settings";
 
-const client = new EnvaultClient({ baseUrl: "" });
+const client = new KeepClient({ baseUrl: "" });
 
 export function SecuritySettings() {
   const [user, setUser] = useState<User | null>(null);
@@ -161,9 +161,9 @@ export function SecuritySettings() {
           <div>
             <h3 className="font-semibold">Authenticator app</h3>
             <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
-              Envault verifies standard TOTP codes independently of Firebase
-              MFA. Microsoft Authenticator, Google Authenticator and compatible
-              apps are supported.
+              Keep verifies standard TOTP codes independently of Firebase MFA.
+              Microsoft Authenticator, Google Authenticator and compatible apps
+              are supported.
             </p>
           </div>
         </div>

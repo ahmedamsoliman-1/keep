@@ -1,4 +1,4 @@
-import { mfaCodeRequestSchema } from "@envault/api-contract";
+import { mfaCodeRequestSchema } from "@keephq/api-contract";
 import type { NextRequest } from "next/server";
 
 import {
@@ -49,8 +49,8 @@ export async function POST(request: NextRequest) {
   try {
     const secret = createTotpSecret();
     await repository().begin(user.id, secret);
-    const label = encodeURIComponent(`Envault:${user.email}`);
-    const uri = `otpauth://totp/${label}?secret=${secret}&issuer=Envault&algorithm=SHA1&digits=6&period=30`;
+    const label = encodeURIComponent(`Keep:${user.email}`);
+    const uri = `otpauth://totp/${label}?secret=${secret}&issuer=Keep&algorithm=SHA1&digits=6&period=30`;
     return successResponse({ secret, uri }, requestId, 201);
   } catch {
     return errorResponse(

@@ -1,4 +1,4 @@
-import { deviceWrappedVaultKeySchema } from "@envault/api-contract";
+import { deviceWrappedVaultKeySchema } from "@keephq/api-contract";
 import type { NextRequest } from "next/server";
 
 import {

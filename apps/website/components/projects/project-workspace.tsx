@@ -1,7 +1,7 @@
 "use client";
 
-import { EnvaultClient } from "@envault/api-client";
-import type { ProjectDto } from "@envault/api-contract";
+import { KeepClient } from "@keephq/api-client";
+import type { ProjectDto } from "@keephq/api-contract";
 import { Folder, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -21,7 +21,7 @@ import {
 } from "@/lib/vault-key-store";
 import { getUserFacingError } from "@/lib/user-errors";
 
-const client = new EnvaultClient({ baseUrl: "" });
+const client = new KeepClient({ baseUrl: "" });
 
 export function ProjectWorkspace() {
   const [projects, setProjects] = useState<ProjectDto[]>([]);

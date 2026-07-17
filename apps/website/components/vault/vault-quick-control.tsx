@@ -1,13 +1,13 @@
 "use client";
 
-import type { VaultDto } from "@envault/api-contract";
+import type { VaultDto } from "@keephq/api-contract";
 import {
   unlockVaultWithBiometricSecret,
   unlockVaultWithPassphrase,
   unlockVaultWithRecoveryKey,
   type VaultKeyMaterialV1,
-} from "@envault/crypto";
-import { getBrowserCryptoProvider } from "@envault/crypto/browser";
+} from "@keephq/crypto";
+import { getBrowserCryptoProvider } from "@keephq/crypto/browser";
 import { startAuthentication } from "@simplewebauthn/browser";
 import { Fingerprint, LockKeyhole, LockOpen } from "lucide-react";
 import Link from "next/link";

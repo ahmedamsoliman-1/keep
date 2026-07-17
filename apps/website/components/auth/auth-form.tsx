@@ -1,6 +1,6 @@
 "use client";
 
-import { EnvaultApiError, EnvaultClient } from "@envault/api-client";
+import { KeepApiError, KeepClient } from "@keephq/api-client";
 import { startAuthentication } from "@simplewebauthn/browser";
 import {
   createUserWithEmailAndPassword,
@@ -21,7 +21,7 @@ import { passkeyClient } from "@/lib/passkey-client";
 
 type AuthMode = "login" | "register" | "forgot-password";
 
-const apiClient = new EnvaultClient({ baseUrl: "" });
+const apiClient = new KeepClient({ baseUrl: "" });
 
 export function AuthForm({
   mode,
@@ -88,7 +88,7 @@ export function AuthForm({
     } catch (caughtError) {
       if (
         mode === "login" &&
-        caughtError instanceof EnvaultApiError &&
+        caughtError instanceof KeepApiError &&
         caughtError.error.code === "MFA_REQUIRED"
       ) {
         const currentUser = getClientAuth().currentUser;

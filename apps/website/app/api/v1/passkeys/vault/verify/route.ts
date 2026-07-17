@@ -1,7 +1,7 @@
-import type { WrappedVaultKeyV1 } from "@envault/crypto";
+import type { WrappedVaultKeyV1 } from "@keephq/crypto";
 import type { AuthenticationResponseJSON } from "@simplewebauthn/server";
 import { verifyAuthenticationResponse } from "@simplewebauthn/server";
-import { envaultRedisKey } from "@envault/redis";
+import { keepRedisKey } from "@keephq/redis";
 import type { NextRequest } from "next/server";
 
 import {
@@ -49,11 +49,7 @@ export async function POST(request: NextRequest) {
   if (!body?.flowId || !body.response) return invalidRequestResponse(requestId);
 
   const redis = getAdminFirestore();
-  const challengeKey = envaultRedisKey(
-    "passkey-challenge",
-    "vault",
-    body.flowId,
-  );
+  const challengeKey = keepRedisKey("passkey-challenge", "vault", body.flowId);
   const challenge = await redis.get<VaultChallenge>(challengeKey);
   await redis.del(challengeKey);
   const repository = new PasskeyRepository(redis);

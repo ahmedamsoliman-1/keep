@@ -10,6 +10,6 @@ export function getPasskeyConfiguration(request: NextRequest) {
   return {
     origin,
     rpId: new URL(origin).hostname,
-    rpName: process.env.NEXT_PUBLIC_APP_NAME ?? "Envault",
+    rpName: process.env.NEXT_PUBLIC_APP_NAME ?? "Keep",
   };
 }

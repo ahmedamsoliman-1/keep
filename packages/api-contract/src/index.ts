@@ -63,7 +63,7 @@ export const deviceScopeSchema = z.enum([
 ]);
 export const createDeviceAuthorizationRequestSchema = z.object({
   deviceName: z.string().trim().min(1).max(80),
-  clientName: z.string().trim().min(1).max(80).default("Envault VS Code"),
+  clientName: z.string().trim().min(1).max(80).default("Keep VS Code"),
   codeChallenge: z.string().min(43).max(128),
   scopes: z.array(deviceScopeSchema).min(1).max(8),
 });
@@ -352,9 +352,7 @@ export type DeviceAuthorizationResponse = z.infer<
   typeof deviceAuthorizationResponseSchema
 >;
 export type DeviceSession = z.infer<typeof deviceSessionSchema>;
-export type DeviceWrappedVaultKey = z.infer<
-  typeof deviceWrappedVaultKeySchema
->;
+export type DeviceWrappedVaultKey = z.infer<typeof deviceWrappedVaultKeySchema>;
 export type DeviceVaultKeyStatus = z.infer<typeof deviceVaultKeyStatusSchema>;
 export type UpdateProfileRequest = z.infer<typeof updateProfileRequestSchema>;
 export type CreateVaultRequest = z.infer<typeof createVaultRequestSchema>;

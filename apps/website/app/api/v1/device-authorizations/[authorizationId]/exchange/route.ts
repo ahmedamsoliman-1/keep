@@ -1,4 +1,4 @@
-import { exchangeDeviceAuthorizationRequestSchema } from "@envault/api-contract";
+import { exchangeDeviceAuthorizationRequestSchema } from "@keephq/api-contract";
 import type { NextRequest } from "next/server";
 
 import {
