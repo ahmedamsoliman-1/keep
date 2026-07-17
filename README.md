@@ -4,6 +4,7 @@ Envault is an API-first, client-side encrypted environment variable management p
 
 ## Documentation
 
+- [Master plan (Keep Secrets + Keep Clipboard)](docs/master-plan.md)
 - [Firebase free-tier constraints](docs/firebase-free-tier.md)
 - [Envault-managed authenticator MFA](docs/custom-totp-mfa.md)
 - [Redis primary storage](docs/redis-storage.md)
@@ -36,5 +37,5 @@ that has been exposed.
 pnpm check
 ```
 
-See `Plan.md` for the product specification and `docs/architecture.md` for the evolving
-technical architecture.
+See `docs/master-plan.md` for the master product specification and `docs/architecture.md`
+for the evolving technical architecture.
