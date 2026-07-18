@@ -4,6 +4,7 @@ import {
   ClipboardCheck,
   Cpu,
   Download,
+  MonitorSmartphone,
   Puzzle,
   ShieldCheck,
   Sparkles,
@@ -20,6 +21,9 @@ export const metadata: Metadata = {
 };
 
 const MAC_DMG = "/downloads/Keep-Clipboard-0.1.0-arm64.dmg";
+const RELEASES_URL = "https://github.com/ahmedamsoliman-1/envault/releases";
+const RELEASE_API =
+  "https://api.github.com/repos/ahmedamsoliman-1/envault/releases/latest";
 const VSCODE_URL =
   "https://marketplace.visualstudio.com/items?itemName=keep.keep-vscode";
 
@@ -33,6 +37,18 @@ const VSCODE_FEATURES = [
   "Send the current selection to Keep Clipboard",
   "Browse and insert clipboard history without leaving the editor",
   "Pull and push encrypted environment secrets",
+];
+
+const WINDOWS_FEATURES = [
+  "Automatic clipboard sending with likely-secret filtering",
+  "Remote history with click-to-copy and one-time items",
+  "Native system tray and start-at-login support",
+];
+
+const ANDROID_FEATURES = [
+  "Share text explicitly through Keep",
+  "Browse history and tap an item to copy",
+  "Samsung tablet and DeX-friendly interface",
 ];
 
 const STEPS = [
@@ -50,7 +66,31 @@ const STEPS = [
   },
 ];
 
-export default function DownloadPage() {
+type ReleaseAsset = { name: string; browser_download_url: string };
+
+async function getReleaseAssets(): Promise<ReleaseAsset[]> {
+  try {
+    const response = await fetch(RELEASE_API, {
+      headers: { Accept: "application/vnd.github+json" },
+      next: { revalidate: 3600 },
+    });
+    if (!response.ok) return [];
+    const release = (await response.json()) as { assets?: ReleaseAsset[] };
+    return release.assets ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export default async function DownloadPage() {
+  const assets = await getReleaseAssets();
+  const windowsDownload = assets.find(
+    (asset) => asset.name === "Keep-Clipboard-Windows-x64-Setup.exe",
+  )?.browser_download_url;
+  const androidDownload = assets.find(
+    (asset) => asset.name === "Keep-Clipboard-Android-universal.apk",
+  )?.browser_download_url;
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#111318] text-white">
       <div className="auth-grid pointer-events-none absolute inset-0 opacity-20" />
@@ -79,8 +119,9 @@ export default function DownloadPage() {
             Your clipboard, everywhere you work.
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-base leading-7 text-white/55">
-            Install the desktop app and the editor extension. Copy on one device,
-            paste on another — with likely secrets filtered out automatically.
+            Install the desktop app and the editor extension. Copy on one
+            device, paste on another — with likely secrets filtered out
+            automatically.
           </p>
         </section>
 
@@ -132,14 +173,103 @@ export default function DownloadPage() {
                 </summary>
                 <p className="mt-2 leading-5">
                   It isn’t — this early build isn’t notarized by Apple yet, so
-                  macOS blocks it after download. Open Terminal and run this once,
-                  then open the app normally:
+                  macOS blocks it after download. Open Terminal and run this
+                  once, then open the app normally:
                 </p>
                 <code className="mt-2 block overflow-x-auto rounded bg-black/40 px-2 py-1.5 font-mono text-[11px] text-white/80">
                   xattr -dr com.apple.quarantine &quot;/Applications/Keep
                   Clipboard.app&quot;
                 </code>
               </details>
+            </div>
+          </article>
+
+          {/* Windows app */}
+          <article className="flex flex-col rounded-2xl border border-white/10 bg-white/5 p-8">
+            <div className="flex items-center gap-3">
+              <span className="flex size-11 items-center justify-center rounded-xl bg-white/10">
+                <MonitorSmartphone className="size-6 text-indigo-300" />
+              </span>
+              <div>
+                <h2 className="text-lg font-semibold tracking-[-0.02em]">
+                  Keep Clipboard for Windows
+                </h2>
+                <p className="text-xs text-white/50">Desktop companion</p>
+              </div>
+            </div>
+            <ul className="mt-6 space-y-2.5">
+              {WINDOWS_FEATURES.map((feature) => (
+                <li
+                  key={feature}
+                  className="flex gap-2.5 text-sm text-white/70"
+                >
+                  <Check className="mt-0.5 size-4 shrink-0 text-indigo-300" />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8 flex flex-col gap-3">
+              {windowsDownload ? (
+                <a
+                  href={windowsDownload}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400"
+                >
+                  <Download className="size-4" /> Download for Windows
+                </a>
+              ) : (
+                <span className="inline-flex cursor-not-allowed items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/45">
+                  Windows release in progress
+                </span>
+              )}
+              <p className="text-xs text-white/45">
+                Windows 10/11 · x64 · versioned GitHub release
+              </p>
+            </div>
+          </article>
+
+          {/* Android app */}
+          <article className="flex flex-col rounded-2xl border border-white/10 bg-white/5 p-8">
+            <div className="flex items-center gap-3">
+              <span className="flex size-11 items-center justify-center rounded-xl bg-white/10">
+                <MonitorSmartphone className="size-6 text-indigo-300" />
+              </span>
+              <div>
+                <h2 className="text-lg font-semibold tracking-[-0.02em]">
+                  Keep Clipboard for Android &amp; Samsung
+                </h2>
+                <p className="text-xs text-white/50">Mobile companion</p>
+              </div>
+            </div>
+            <ul className="mt-6 space-y-2.5">
+              {ANDROID_FEATURES.map((feature) => (
+                <li
+                  key={feature}
+                  className="flex gap-2.5 text-sm text-white/70"
+                >
+                  <Check className="mt-0.5 size-4 shrink-0 text-indigo-300" />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8 flex flex-col gap-3">
+              {androidDownload ? (
+                <a
+                  href={androidDownload}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400"
+                >
+                  <Download className="size-4" /> Download Android APK
+                </a>
+              ) : (
+                <span className="inline-flex cursor-not-allowed items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/45">
+                  Native build in progress
+                </span>
+              )}
+              <a
+                href={RELEASES_URL}
+                className="text-center text-xs text-indigo-300 transition hover:text-indigo-200"
+              >
+                Follow signed releases on GitHub
+              </a>
             </div>
           </article>
 

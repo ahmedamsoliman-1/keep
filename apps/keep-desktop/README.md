@@ -1,9 +1,10 @@
-# Keep Clipboard (macOS/Windows desktop agent)
+# Keep Clipboard native clients
 
 A menu-bar app that watches this machine's clipboard and **automatically** sends
 whatever you copy to Keep, where it appears live in the web UI and on your other
 paired devices. Built with [Tauri](https://tauri.app) (thin Rust shell + a small
-webview that reuses `@keephq/api-client` and `@keephq/domain`).
+webview that reuses `@keephq/api-client` and `@keephq/domain`). The same client
+UI is also the foundation for the Android/Samsung companion.
 
 > It is a **client**, not a server. There is no "desktop server" — the app talks
 > to the already-deployed Keep backend (`keep.aamsdn.space`). See
@@ -11,16 +12,29 @@ webview that reuses `@keephq/api-client` and `@keephq/domain`).
 
 ## What it does
 
-- Polls the OS clipboard ~1×/second; on a new copy it sends the text to
-  `POST /api/v1/clipboard/items` (origin `macos`), exactly like the web and VS
-  Code clients.
+- On macOS and Windows, polls the OS clipboard ~1×/second and sends new text to
+  `POST /api/v1/clipboard/items` with the correct platform origin.
+- Lists remote history and copies a selected item to the local clipboard;
+  one-time items are consumed atomically.
+- On Android, provides explicit paste-and-send plus tap-to-copy history. It does
+  not attempt restricted background clipboard reads.
 - **Secret-guard:** content that `detectSensitivity()` classifies as a secret
   (private keys, tokens, `AWS_SECRET_ACCESS_KEY`, …) is skipped, silently. No
   prompts.
 - **Pause** toggle for when you're about to copy sensitive junk.
-- **Start at login** toggle (registers a macOS LaunchAgent) so it's always on.
+- **Start at login** toggle on desktop.
 - Pairs as a device via the same browser-approval flow the VS Code extension
-  uses; the token is stored via the Tauri store.
+  uses; the token is currently stored via the Tauri store.
+
+## Platform release gates
+
+- Windows builds use `src-tauri/tauri.windows.conf.json` and must be produced on
+  a Windows runner. Before distribution, replace the Tauri token store with
+  Windows Credential Manager and verify MSI/NSIS signing behavior.
+- Android builds require Rust/Cargo, Android Studio/SDK/NDK, Android signing,
+  Keystore-backed credential storage, biometric gating, Sharesheet intent
+  handling, content-free notifications, and Samsung tablet/DeX device testing.
+- Neither native phase includes Keep Secrets functionality.
 
 ## Prerequisites
 
@@ -30,7 +44,7 @@ webview that reuses `@keephq/api-client` and `@keephq/domain`).
 | **Run** the built app | **Nothing.** The `.app` is a native binary — no Rust, no Node.             |
 
 The second point matters: to run it on another Mac you copy over the built
-`.app`/`.dmg` and open it. Rust is a *build-time* dependency only.
+`.app`/`.dmg` and open it. Rust is a _build-time_ dependency only.
 
 ## Develop
 
@@ -90,7 +104,7 @@ automatically. No terminal, no `pnpm`.
 ```
 
 - **Server** — one always-on instance in the cloud (already deployed). This is
-  the piece that *could* run in Docker/containers long-term.
+  the piece that _could_ run in Docker/containers long-term.
 - **Clients** — one per device (web tab, VS Code, this Mac app, future mobile).
   Native, per-machine.
 
@@ -99,7 +113,7 @@ automatically. No terminal, no `pnpm`.
 A Docker container is a headless Linux sandbox with no GUI and **no access to
 the host's clipboard**. This app's whole job is reading the macOS pasteboard and
 living in the menu bar — both are host-OS/GUI features a container cannot reach.
-The *server* is the containerizable half; the desktop agent must run natively on
+The _server_ is the containerizable half; the desktop agent must run natively on
 each machine whose clipboard you want to sync.
 
 ## Status / not yet done

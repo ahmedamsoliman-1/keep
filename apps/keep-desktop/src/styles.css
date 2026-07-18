@@ -99,6 +99,10 @@ button.primary {
   font-weight: 600;
   cursor: pointer;
 }
+button.primary:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
 button.link {
   background: none;
   border: none;
@@ -136,6 +140,30 @@ button.link {
   color: var(--muted);
   margin: 4px 0 0;
 }
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.compose {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.compose.hidden {
+  display: none;
+}
+.compose textarea {
+  resize: vertical;
+  min-height: 72px;
+  max-height: 180px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px;
+  background: var(--card);
+  color: var(--fg);
+  font: inherit;
+}
 
 .recent {
   list-style: none;
@@ -161,6 +189,18 @@ button.link {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.history-item {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
 .recent .meta {
   color: var(--muted);
   font-size: 11px;
@@ -172,4 +212,12 @@ button.link {
   color: var(--muted);
   text-align: center;
   padding: 20px 0;
+}
+
+@media (min-width: 700px) {
+  .app {
+    width: min(680px, 100%);
+    margin: 0 auto;
+    padding: 20px;
+  }
 }

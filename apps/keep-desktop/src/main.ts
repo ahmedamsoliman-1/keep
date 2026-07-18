@@ -1,6 +1,6 @@
 import { KeepClient } from "@keephq/api-client";
 import { detectSensitivity } from "@keephq/domain";
-import { readText } from "@tauri-apps/plugin-clipboard-manager";
+import { readText, writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
@@ -16,6 +16,27 @@ let paused = false;
 let lastText = "";
 let watching = false;
 
+type Platform = "macos" | "windows" | "android";
+
+const platform: Platform = /Android/iu.test(navigator.userAgent)
+  ? "android"
+  : /Windows/iu.test(navigator.userAgent)
+    ? "windows"
+    : "macos";
+const isMobile = platform === "android";
+const platformLabel =
+  platform === "macos"
+    ? "Mac"
+    : platform === "windows"
+      ? "Windows PC"
+      : "Android device";
+const clientLabel =
+  platform === "macos"
+    ? "macOS"
+    : platform === "windows"
+      ? "Windows"
+      : "Android";
+
 // All API traffic goes through the Tauri HTTP plugin (Rust side) so requests
 // are not subject to the webview's cross-origin restrictions.
 const client = new KeepClient({
@@ -24,7 +45,8 @@ const client = new KeepClient({
   fetch: tauriFetch as unknown as typeof globalThis.fetch,
 });
 
-const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+const $ = <T extends HTMLElement>(id: string) =>
+  document.getElementById(id) as T;
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const msg = (e: unknown) => (e instanceof Error ? e.message : String(e));
 const firstLine = (t: string) => t.replace(/\s+/gu, " ").trim().slice(0, 60);
@@ -32,7 +54,10 @@ const firstLine = (t: string) => t.replace(/\s+/gu, " ").trim().slice(0, 60);
 function base64url(bytes: Uint8Array): string {
   let binary = "";
   for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary).replace(/\+/gu, "-").replace(/\//gu, "_").replace(/=+$/u, "");
+  return btoa(binary)
+    .replace(/\+/gu, "-")
+    .replace(/\//gu, "_")
+    .replace(/=+$/u, "");
 }
 
 async function pkce(): Promise<{ verifier: string; challenge: string }> {
@@ -49,7 +74,8 @@ async function pkce(): Promise<{ verifier: string; challenge: string }> {
 function setStatus(state: "off" | "on" | "paused") {
   const dot = $("status-dot");
   dot.className = `dot dot--${state}`;
-  dot.title = state === "on" ? "syncing" : state === "paused" ? "paused" : "disconnected";
+  dot.title =
+    state === "on" ? "syncing" : state === "paused" ? "paused" : "disconnected";
 }
 
 function showConnect(hint = "") {
@@ -68,11 +94,14 @@ async function showMain(deviceName: string) {
   $("view-main").classList.remove("hidden");
   $("device-name").textContent = deviceName;
   setStatus(paused ? "paused" : "on");
-  try {
-    ($("autostart-toggle") as HTMLInputElement).checked = await isEnabled();
-  } catch {
-    /* autostart may be unavailable in dev */
+  if (!isMobile) {
+    try {
+      ($("autostart-toggle") as HTMLInputElement).checked = await isEnabled();
+    } catch {
+      /* autostart may be unavailable in dev */
+    }
   }
+  await refreshHistory();
 }
 
 function addRecent(entry: { preview: string; meta: string; skipped: boolean }) {
@@ -90,6 +119,75 @@ function addRecent(entry: { preview: string; meta: string; skipped: boolean }) {
   while (list.children.length > MAX_RECENT) list.lastElementChild?.remove();
 }
 
+async function refreshHistory() {
+  const list = $("history");
+  list.replaceChildren();
+  try {
+    const { items } = await client.clipboard.list();
+    if (items.length === 0) {
+      const empty = document.createElement("li");
+      empty.className = "empty";
+      empty.textContent = "No remote items yet.";
+      list.append(empty);
+      return;
+    }
+    for (const item of items) {
+      const li = document.createElement("li");
+      const preview = document.createElement("button");
+      preview.className = "history-item";
+      preview.type = "button";
+      preview.textContent = item.safePreview ?? `${item.sensitivity} item`;
+      preview.title = "Copy this item";
+      preview.addEventListener("click", async () => {
+        try {
+          const detail =
+            item.persistenceMode === "once"
+              ? await client.clipboard.consume(item.id)
+              : await client.clipboard.get(item.id);
+          await writeText(detail.content);
+          preview.textContent = "Copied to this device";
+          if (item.persistenceMode === "once") await refreshHistory();
+          window.setTimeout(() => void refreshHistory(), 1200);
+        } catch (error) {
+          preview.textContent = `Could not copy: ${msg(error)}`;
+        }
+      });
+      const meta = document.createElement("span");
+      meta.className = "meta";
+      meta.textContent = `${item.originClient} · ${item.persistenceMode}`;
+      li.append(preview, meta);
+      list.append(li);
+    }
+  } catch (error) {
+    const failed = document.createElement("li");
+    failed.className = "empty";
+    failed.textContent = `Could not load history: ${msg(error)}`;
+    list.append(failed);
+  }
+}
+
+async function sendManualText() {
+  const input = $("manual-text") as HTMLTextAreaElement;
+  const content = input.value.trim();
+  if (!content) return;
+  const button = $("manual-send") as HTMLButtonElement;
+  button.disabled = true;
+  try {
+    await client.clipboard.create({
+      content,
+      originClient: platform,
+      persistenceMode: "temporary",
+    });
+    input.value = "";
+    await refreshHistory();
+  } catch (error) {
+    input.setCustomValidity(msg(error));
+    input.reportValidity();
+  } finally {
+    button.disabled = false;
+  }
+}
+
 // --- Pairing (device authorization, PKCE) ---
 
 async function connect() {
@@ -99,10 +197,10 @@ async function connect() {
   try {
     const { verifier, challenge } = await pkce();
     const auth = await client.devices.createAuthorization({
-      deviceName: "Keep Clipboard (macOS)",
-      clientName: "Keep Clipboard for macOS",
+      deviceName: `Keep Clipboard (${clientLabel})`,
+      clientName: `Keep Clipboard for ${clientLabel}`,
       codeChallenge: challenge,
-      scopes: ["clipboard:read", "clipboard:write"],
+      scopes: ["clipboard:read", "clipboard:write", "clipboard:receive"],
     });
     // The server derives verificationUri from the request Origin, which for
     // this app is `tauri://localhost`. Rebuild it against the real server so
@@ -124,14 +222,17 @@ async function connect() {
     const expires = new Date(auth.expiresAt).getTime();
     while (Date.now() < expires) {
       await sleep(auth.intervalSeconds * 1000);
-      const result = await client.devices.exchange(auth.authorizationId, verifier);
+      const result = await client.devices.exchange(
+        auth.authorizationId,
+        verifier,
+      );
       if (result.status === "authorized") {
         token = result.accessToken;
         await store.set("token", token);
         await store.set("deviceName", result.session.deviceName);
         await store.save();
         await showMain(result.session.deviceName);
-        void startWatching();
+        if (!isMobile) void startWatching();
         return;
       }
     }
@@ -177,22 +278,34 @@ async function tick() {
   if (!text.trim()) return;
 
   if (detectSensitivity(text) === "secret") {
-    addRecent({ preview: firstLine(text), meta: "skipped · looks like a secret", skipped: true });
+    addRecent({
+      preview: firstLine(text),
+      meta: "skipped · looks like a secret",
+      skipped: true,
+    });
     return;
   }
   try {
     const item = await client.clipboard.create({
       content: text,
-      originClient: "macos",
+      originClient: platform,
       persistenceMode: "temporary",
     });
     const tag =
       item.sensitivity === "normal"
         ? item.contentType
         : `${item.contentType} · ${item.sensitivity}`;
-    addRecent({ preview: item.safePreview ?? firstLine(text), meta: `sent · ${tag}`, skipped: false });
+    addRecent({
+      preview: item.safePreview ?? firstLine(text),
+      meta: `sent · ${tag}`,
+      skipped: false,
+    });
   } catch (error) {
-    addRecent({ preview: firstLine(text), meta: `error · ${msg(error)}`, skipped: true });
+    addRecent({
+      preview: firstLine(text),
+      meta: `error · ${msg(error)}`,
+      skipped: true,
+    });
   }
 }
 
@@ -204,24 +317,41 @@ async function init() {
 
   $("connect-btn").addEventListener("click", () => void connect());
   $("signout-btn").addEventListener("click", () => void signOut());
+  $("refresh-btn").addEventListener("click", () => void refreshHistory());
+  $("manual-send").addEventListener("click", () => void sendManualText());
 
-  ($("pause-toggle") as HTMLInputElement).addEventListener("change", (event) => {
-    paused = (event.target as HTMLInputElement).checked;
-    setStatus(paused ? "paused" : "on");
-  });
+  $("platform-copy").textContent = platformLabel;
+  $("connect-copy").textContent = isMobile
+    ? "Connect this Android device to share text with Keep and copy items from your history."
+    : `Connect this ${platformLabel} to Keep. New clipboard text can be sent automatically; likely secrets are skipped.`;
+  $("desktop-controls").classList.toggle("hidden", isMobile);
+  $("mobile-compose").classList.toggle("hidden", !isMobile);
 
-  ($("autostart-toggle") as HTMLInputElement).addEventListener("change", async (event) => {
-    const on = (event.target as HTMLInputElement).checked;
-    try {
-      await (on ? enable() : disable());
-    } catch {
-      /* ignore in dev */
-    }
-  });
+  ($("pause-toggle") as HTMLInputElement).addEventListener(
+    "change",
+    (event) => {
+      paused = (event.target as HTMLInputElement).checked;
+      setStatus(paused ? "paused" : "on");
+    },
+  );
+
+  ($("autostart-toggle") as HTMLInputElement).addEventListener(
+    "change",
+    async (event) => {
+      const on = (event.target as HTMLInputElement).checked;
+      try {
+        await (on ? enable() : disable());
+      } catch {
+        /* ignore in dev */
+      }
+    },
+  );
 
   if (token) {
-    await showMain((await store.get<string>("deviceName")) ?? "This Mac");
-    void startWatching();
+    await showMain(
+      (await store.get<string>("deviceName")) ?? `This ${platformLabel}`,
+    );
+    if (!isMobile) void startWatching();
   } else {
     showConnect();
   }

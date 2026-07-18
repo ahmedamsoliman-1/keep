@@ -17,10 +17,11 @@
       <!-- Disconnected view -->
       <section id="view-connect" class="view">
         <p class="muted">
-          Connect this Mac to Keep. Everything you copy is sent automatically —
-          except items macOS flags as passwords, which are skipped.
+          <span id="connect-copy">Connect this device to Keep Clipboard.</span>
         </p>
-        <button id="connect-btn" class="primary">Connect this Mac</button>
+        <button id="connect-btn" class="primary">
+          Connect this <span id="platform-copy">device</span>
+        </button>
         <p id="connect-hint" class="hint"></p>
       </section>
 
@@ -33,14 +34,28 @@
             <span>Pause</span>
           </label>
         </div>
-        <div class="statusline statusline--sub">
+        <div id="desktop-controls" class="statusline statusline--sub">
           <label class="toggle">
             <input type="checkbox" id="autostart-toggle" />
             <span>Start at login</span>
           </label>
           <button id="signout-btn" class="link">Sign out</button>
         </div>
-        <h2 class="section-title">Recently sent</h2>
+        <section id="mobile-compose" class="compose hidden">
+          <label for="manual-text" class="section-title">Share to Keep</label>
+          <textarea
+            id="manual-text"
+            rows="3"
+            placeholder="Paste or share text here"
+          ></textarea>
+          <button id="manual-send" class="primary">Send to Keep</button>
+        </section>
+        <div class="section-heading">
+          <h2 class="section-title">Clipboard history</h2>
+          <button id="refresh-btn" class="link">Refresh</button>
+        </div>
+        <ul id="history" class="recent"></ul>
+        <h2 class="section-title">Recently sent by this device</h2>
         <ul id="recent" class="recent"></ul>
       </section>
     </main>

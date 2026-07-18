@@ -4070,8 +4070,7 @@ Then **return to Keep Secrets** (Stage E → F → Phase 9 → Phase 10).
   per-user Redis Stream (`envault:v1:clipboard:user:*:stream`, `MAXLEN`-trimmed)
   appended on every mutation via a best-effort `emitClipboardEvent`;
   `ClipboardEventLog` in `@keephq/redis` (append / `latestCursor` / exclusive
-  `readSince`); `GET /api/v1/clipboard/events` bounded SSE (~25s, `maxDuration`
-  30) tailing the stream; the web workspace subscribes with `EventSource` and
+  `readSince`); `GET /api/v1/clipboard/events` bounded SSE (~25s, `maxDuration` 30) tailing the stream; the web workspace subscribes with `EventSource` and
   applies idempotent deltas (upsert-by-id, once-consume removal) — cursor resume
   is automatic via `Last-Event-ID`. `KEEP_CLIPBOARD_STREAM_MAXLEN` config; event
   payloads carry sanitized metadata only. Unit-tested; `pnpm check` green.
@@ -4085,7 +4084,7 @@ Then **return to Keep Secrets** (Stage E → F → Phase 9 → Phase 10).
 - **[x] Phase 15a — macOS desktop agent** (Tauri) — Part II §25 Ph 4, macOS
   half. `apps/keep-desktop` is a Tauri menu-bar app: polls the clipboard (~1s),
   auto-sends new copies as `origin: macos` via device-auth + `POST
-  /clipboard/items`, with a local secret-guard (`@keephq/domain`
+/clipboard/items`, with a local secret-guard (`@keephq/domain`
   `detectSensitivity`), Pause toggle, start-at-login (autostart LaunchAgent),
   single-instance guard, first-run window, and Keep-branded icons (generated
   from `apps/website/app/icon.svg`). API via `tauri-plugin-http` (bypasses
@@ -4099,7 +4098,12 @@ Then **return to Keep Secrets** (Stage E → F → Phase 9 → Phase 10).
   has no macOS-style concealed-clipboard marker, so it relies on the regex
   secret-guard. Needs a Windows build host (or a CI Windows runner —
   cross-compiling from macOS is impractical) and an Authenticode cert to avoid
-  SmartScreen warnings.
+  SmartScreen warnings. **Scope decision (2026-07-18): this phase is Clipboard
+  only.** Ship the planned native companion capabilities: clipboard watching,
+  send and manual receive/history, optional loop-guarded auto-receive, system
+  tray, start-at-login, secure Windows Credential Manager storage, pairing and
+  revocation. Do not add Keep Secrets project/environment browsing, secret
+  editing, vault unlock, or dotenv pull/push to the Windows app in this phase.
 - **Phase 16 — Android / Samsung companion** — Part II §25 Ph 5. Android
   restricts background clipboard reads (10+), so unlike desktop this is
   **share-to-Keep first** (a Share-sheet target → create item) plus tap-to-copy
@@ -4108,7 +4112,12 @@ Then **return to Keep Secrets** (Stage E → F → Phase 9 → Phase 10).
   browsers; a native app adds share/receive + a Quick Settings tile). Likely
   Tauri v2 mobile (reuse the webview UI + `@keephq/api-client` + `@keephq/domain`)
   or native Kotlin. Needs the mobile build toolchain, Play Store, biometric lock,
-  and server FCM integration for background receive.
+  and server FCM integration for background receive. **Scope decision
+  (2026-07-18): this phase is Clipboard-first and does not include Keep Secrets.**
+  Its product scope is: share text through the Android Sharesheet, browse
+  clipboard history, tap to copy, receive notifications, provide a Samsung
+  tablet/DeX-friendly interface, optionally add a Quick Settings tile, and
+  protect access with biometrics.
 - **Phase 17 — iPhone / iPad companion** (Share Extension, App Intents) — Ph 6.
   iOS blocks background clipboard access and shows a paste banner, so it is
   share-driven like Android. Reuses the same server + contracts.
@@ -4170,17 +4179,20 @@ Then **return to Keep Secrets** (Stage E → F → Phase 9 → Phase 10).
 
 ## Recommended sequencing (from here)
 
-1. **Desktop Keychain storage** — small; closes the security gap in the live app.
-2. **Phase 14b device management** — now that web, VS Code, and macOS all emit, a
+1. **Windows + Android/Samsung Clipboard milestone** — develop both together
+   against the shared contracts and client UI, while shipping separate native
+   packages. Windows includes watcher/history/tray/autostart; Android includes
+   Sharesheet/history/tap-to-copy/notifications/DeX/biometrics and never relies
+   on background clipboard reads. Keep Secrets remains out of scope for both.
+2. **Native secure credential storage** — Windows Credential Manager and
+   Android Keystore-backed storage are release gates, not follow-ups.
+3. **Phase 14b device management** — now that web, VS Code, and macOS all emit, a
    device dashboard + revoke is both useful and a security necessity.
-3. **Return to Keep Secrets** — Stage E (revision history) → F (activity) →
+4. **Return to Keep Secrets** — Stage E (revision history) → F (activity) →
    Phase 9 (comparison/history UI) → Phase 10 (hardening). The platform still
    owes these before it is "done".
-4. **Phase 15b — Windows** — extends reach on the shared codebase.
 5. **Signing + notarization** — when distributing beyond your own devices.
-6. **Phase 16 — Android / Samsung** — bigger lift (mobile toolchain, Play Store,
-   FCM push; share-to-Keep first given Android's background-clipboard limits).
-7. **Phase 18 — client-side clipboard encryption** — after a threat model.
+6. **Phase 18 — client-side clipboard encryption** — after a threat model.
 
 ## Suggested commit boundaries (historical — Step 0 + Phases 12–13, shipped)
 
