@@ -220,23 +220,38 @@ async function connect() {
     }
 
     const expires = new Date(auth.expiresAt).getTime();
+    let lastExchangeError: string | null = null;
     while (Date.now() < expires) {
       await sleep(auth.intervalSeconds * 1000);
-      const result = await client.devices.exchange(
-        auth.authorizationId,
-        verifier,
-      );
-      if (result.status === "authorized") {
-        token = result.accessToken;
-        await store.set("token", token);
-        await store.set("deviceName", result.session.deviceName);
-        await store.save();
-        await showMain(result.session.deviceName);
-        if (!isMobile) void startWatching();
-        return;
+      try {
+        const result = await client.devices.exchange(
+          auth.authorizationId,
+          verifier,
+        );
+        lastExchangeError = null;
+        if (result.status === "authorized") {
+          token = result.accessToken;
+          await store.set("token", token);
+          await store.set("deviceName", result.session.deviceName);
+          await store.save();
+          await showMain(result.session.deviceName);
+          if (!isMobile) void startWatching();
+          return;
+        }
+      } catch (error) {
+        // Android can briefly invalidate an in-flight HTTP connection while
+        // this activity returns from the external approval browser. Keep the
+        // PKCE authorization alive and retry instead of making the user start
+        // the entire pairing flow again.
+        lastExchangeError = msg(error);
+        connectHint("Returning from the browser — reconnecting to Keep…");
       }
     }
-    connectHint("Pairing expired — try again.");
+    connectHint(
+      lastExchangeError
+        ? `Pairing expired after a connection problem: ${lastExchangeError}`
+        : "Pairing expired — try again.",
+    );
   } catch (error) {
     connectHint(`Pairing failed: ${msg(error)}`);
   } finally {
