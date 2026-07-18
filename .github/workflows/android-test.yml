@@ -39,6 +39,9 @@ jobs:
           java-version: 21
           cache: gradle
 
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
         with:
