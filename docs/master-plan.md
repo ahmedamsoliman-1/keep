@@ -4011,6 +4011,12 @@ Keep's roadmap is the Part I platform phases, with the Keep Clipboard phases
 inserted as an intentional divergence and numbered to continue the platform
 sequence.
 
+_Reconciled 2026-07-18: Keep Clipboard has shipped through **Phase 15a** — the
+macOS desktop agent is live and distributed from the website `/download` page,
+alongside the VS Code extension. The sections below track what's shipped, what
+Keep Secrets still owes, the remaining/planned clipboard + platform phases,
+cross-cutting desktop/extension/server work, and a candidate feature backlog._
+
 ## Done (Keep Secrets)
 
 - Foundation, domain/API, auth + TOTP MFA, encrypted vault, core data
@@ -4073,26 +4079,110 @@ Then **return to Keep Secrets** (Stage E → F → Phase 9 → Phase 10).
   blocking `XREAD` — a later optimization if sub-second latency is needed.
 - **Phase 14b — Device management** (rest of Part II §25 Phase 3): presence,
   device dashboard (rename/revoke), delivery acknowledgement, `device.revoked`
-  events. Deferred until a second device type emits (Phases 15–17).
-- **[~] Phase 15 — macOS & Windows companion** (Tauri) — Part II §25 Ph 4.
-  v1 (macOS, send-only) done: `apps/keep-desktop` is a Tauri menu-bar app that
-  polls the clipboard (~1s), auto-sends new copies as `origin: macos` via the
-  existing device-auth + `POST /clipboard/items`, with a local secret-guard
-  (reuses `@keephq/domain` `detectSensitivity`), Pause toggle, and start-at-login
-  (autostart LaunchAgent). API traffic routed through `tauri-plugin-http` to
-  bypass webview CORS; token in the Tauri store. Builds to `.app`/`.dmg`.
-  Remaining: Keychain token storage; native `changeCount`/concealed-type
-  detection (skip password-manager copies at the OS level); receive/auto-place;
-  Windows; code signing + notarization. Server follow-up: the device-approval
-  `verificationUri` is built from the request `Origin` (wrong for non-browser
-  clients like Tauri, which send `tauri://localhost`) — currently corrected
-  client-side; should use a configured public base URL server-side.
-- **Phase 16 — Android / Samsung companion** (Sharesheet-first) — Ph 5.
+  events. **Now unblocked** — web, VS Code, and macOS (15a) all emit, so a device
+  dashboard + revoke is both useful and security-relevant (revoke a lost Mac).
+  High priority in the sequencing below.
+- **[x] Phase 15a — macOS desktop agent** (Tauri) — Part II §25 Ph 4, macOS
+  half. `apps/keep-desktop` is a Tauri menu-bar app: polls the clipboard (~1s),
+  auto-sends new copies as `origin: macos` via device-auth + `POST
+  /clipboard/items`, with a local secret-guard (`@keephq/domain`
+  `detectSensitivity`), Pause toggle, start-at-login (autostart LaunchAgent),
+  single-instance guard, first-run window, and Keep-branded icons (generated
+  from `apps/website/app/icon.svg`). API via `tauri-plugin-http` (bypasses
+  webview CORS); token in the Tauri store; builds to `.app`/`.dmg`. **Distributed
+  live** from the website `/download` page (linked from login + app sidebar);
+  unsigned, so users clear quarantine with `xattr` (documented in-page).
+  Send-only. Cross-cutting remainders tracked under "Desktop hardening" below.
+- **Phase 15b — Windows desktop companion** — same `apps/keep-desktop` codebase.
+  `tauri-plugin-clipboard-manager` + system-tray + `tauri-plugin-autostart` all
+  support Windows; the watch loop, pairing, and secret-guard are shared. Windows
+  has no macOS-style concealed-clipboard marker, so it relies on the regex
+  secret-guard. Needs a Windows build host (or a CI Windows runner —
+  cross-compiling from macOS is impractical) and an Authenticode cert to avoid
+  SmartScreen warnings.
+- **Phase 16 — Android / Samsung companion** — Part II §25 Ph 5. Android
+  restricts background clipboard reads (10+), so unlike desktop this is
+  **share-to-Keep first** (a Share-sheet target → create item) plus tap-to-copy
+  history — not silent auto-capture. Receive via foreground SSE / FCM push.
+  Samsung: DeX + large-screen tablet UI (the web tablet layout already covers
+  browsers; a native app adds share/receive + a Quick Settings tile). Likely
+  Tauri v2 mobile (reuse the webview UI + `@keephq/api-client` + `@keephq/domain`)
+  or native Kotlin. Needs the mobile build toolchain, Play Store, biometric lock,
+  and server FCM integration for background receive.
 - **Phase 17 — iPhone / iPad companion** (Share Extension, App Intents) — Ph 6.
+  iOS blocks background clipboard access and shows a paste banner, so it is
+  share-driven like Android. Reuses the same server + contracts.
 - **Phase 18 — Client-side clipboard encryption** (threat model first;
   reuse `@keephq/crypto` key-wrapping) — Ph 7.
 
-## Suggested commit boundaries (Step 0 + Phases 12–13)
+## Desktop hardening & distribution (cross-cuts 15a/15b)
+
+- **Keychain / Credential-Manager token storage** — replace the Tauri store
+  (plaintext-ish on disk) with the OS secret store. The one real security gap in
+  the otherwise-shippable v1.
+- **Native clipboard signals** — read `changeCount` + concealed/sensitive
+  pasteboard types (macOS) so password-manager copies are skipped at the OS level
+  rather than only by regex; Windows format/exclusion equivalents.
+- **Receive / auto-place** — hold the SSE connection open (desktop is long-lived,
+  no serverless bound) to show items from other devices live; click-to-copy, with
+  opt-in, loop-guarded auto-place into the local clipboard.
+- **Signing + notarization** — macOS Developer ID + notarization and Windows
+  Authenticode so downloads open with a normal double-click (removes the `xattr`
+  step). **Deferred by decision (2026-07-18)**; the `xattr` note ships meanwhile.
+  Requires an Apple Developer account ($99/yr) / Authenticode cert.
+- **Release hosting + auto-update** — move binaries out of git into GitHub
+  Releases; wire `tauri-plugin-updater` for in-app updates.
+
+## VS Code extension — planned improvements
+
+**Environments (secrets):**
+
+- Pre-push diff / compare view; conflict resolution surfaced in-editor.
+- Status-bar indicator of the bound project/environment; auto-pull on folder open.
+- Quick add/edit variable; secret masking in the `.env` editor; multi-root support.
+
+**Clipboard:**
+
+- In-extension live updates (hold SSE) so history refreshes without re-running.
+- Receive notifications ("new item from macOS"); a "paste last item" command.
+- Keybindings for send/history; language-aware insert (wrap code, keep indent).
+
+## Server follow-ups
+
+- **Device-approval URL** — build `verificationUri` from a configured public base
+  URL, not the request `Origin` (which is `tauri://localhost` for Tauri, and
+  wrong for any non-browser client). Currently corrected client-side in the
+  desktop app; the server-side fix benefits every future client.
+- **Phase 14b device endpoints** — presence, list/rename/revoke, delivery ack.
+
+## Candidate new Keep features (backlog, unprioritized)
+
+- **`keep` CLI** — terminal client: pull/push env to `.env`, and `keep copy` /
+  `keep paste` for the clipboard from the shell (reuses device-auth +
+  `@keephq/api-client`).
+- **Team / shared** environments and clipboards (currently an MVP non-goal) — the
+  main multi-user growth path; needs an authorization model.
+- **Browser extension** clipboard client (Chrome/Firefox).
+- **Clipboard organization** — search, tags/folders, filters beyond preview.
+- **Web push / bell** for clipboard + secret events.
+- **Secret lifecycle** — rotation reminders, per-variable expiry, cross-env
+  references, templates.
+
+## Recommended sequencing (from here)
+
+1. **Desktop Keychain storage** — small; closes the security gap in the live app.
+2. **Phase 14b device management** — now that web, VS Code, and macOS all emit, a
+   device dashboard + revoke is both useful and a security necessity.
+3. **Return to Keep Secrets** — Stage E (revision history) → F (activity) →
+   Phase 9 (comparison/history UI) → Phase 10 (hardening). The platform still
+   owes these before it is "done".
+4. **Phase 15b — Windows** — extends reach on the shared codebase.
+5. **Signing + notarization** — when distributing beyond your own devices.
+6. **Phase 16 — Android / Samsung** — bigger lift (mobile toolchain, Play Store,
+   FCM push; share-to-Keep first given Android's background-clipboard limits).
+7. **Phase 18 — client-side clipboard encryption** — after a threat model.
+
+## Suggested commit boundaries (historical — Step 0 + Phases 12–13, shipped)
 
 ```text
 chore(brand): rename Envault -> Keep across packages, env, redis prefix
