@@ -26,21 +26,26 @@ fn toggle_window(app: &tauri::AppHandle) {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let mut builder = tauri::Builder::default()
-        .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_http::init())
-        .plugin(tauri_plugin_clipboard_manager::init())
-        .plugin(tauri_plugin_store::Builder::new().build());
+    let mut builder = tauri::Builder::default();
 
+    // Single-instance must be registered first: a second launch (e.g. from
+    // Spotlight) just reveals the running window instead of spawning a copy.
     #[cfg(desktop)]
     {
+        builder = builder.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            show_window(app);
+        }));
         builder = builder.plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             None,
         ));
     }
 
-    builder
+    let app = builder
+        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_http::init())
+        .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_store::Builder::new().build())
         .setup(|app| {
             // Menu-bar app: no Dock icon on macOS.
             #[cfg(target_os = "macos")]
@@ -52,7 +57,7 @@ pub fn run() {
 
             let _tray = TrayIconBuilder::with_id("keep-tray")
                 .icon(app.default_window_icon().unwrap().clone())
-                .icon_as_template(true)
+                .icon_as_template(false)
                 .tooltip("Keep Clipboard")
                 .menu(&menu)
                 .show_menu_on_left_click(false)
@@ -73,6 +78,8 @@ pub fn run() {
                 })
                 .build(app)?;
 
+            // Show the window on launch so first-run pairing is visible.
+            show_window(app.handle());
             Ok(())
         })
         .on_window_event(|window, event| {
@@ -82,6 +89,14 @@ pub fn run() {
                 api.prevent_close();
             }
         })
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application");
+
+    app.run(|_app_handle, _event| {
+        // Clicking the app again (Dock/Finder/Spotlight) reveals the window.
+        #[cfg(target_os = "macos")]
+        if let tauri::RunEvent::Reopen { .. } = &_event {
+            show_window(_app_handle);
+        }
+    });
 }

@@ -104,11 +104,21 @@ async function connect() {
       codeChallenge: challenge,
       scopes: ["clipboard:read", "clipboard:write"],
     });
+    // The server derives verificationUri from the request Origin, which for
+    // this app is `tauri://localhost`. Rebuild it against the real server so
+    // the approval page opens on the web, keeping the server-generated path.
+    let approveUrl: string;
+    try {
+      const parsed = new URL(auth.verificationUri);
+      approveUrl = `${SERVER}${parsed.pathname}${parsed.search}`;
+    } catch {
+      approveUrl = `${SERVER}/device?authorizationId=${auth.authorizationId}&code=${auth.userCode}`;
+    }
     connectHint(`Approve code ${auth.userCode} in your browser…`);
     try {
-      await openUrl(auth.verificationUri);
+      await openUrl(approveUrl);
     } catch {
-      connectHint(`Open ${auth.verificationUri} and approve code ${auth.userCode}.`);
+      connectHint(`Open ${approveUrl} and approve code ${auth.userCode}.`);
     }
 
     const expires = new Date(auth.expiresAt).getTime();

@@ -4083,7 +4083,10 @@ Then **return to Keep Secrets** (Stage E → F → Phase 9 → Phase 10).
   bypass webview CORS; token in the Tauri store. Builds to `.app`/`.dmg`.
   Remaining: Keychain token storage; native `changeCount`/concealed-type
   detection (skip password-manager copies at the OS level); receive/auto-place;
-  Windows; code signing + notarization.
+  Windows; code signing + notarization. Server follow-up: the device-approval
+  `verificationUri` is built from the request `Origin` (wrong for non-browser
+  clients like Tauri, which send `tauri://localhost`) — currently corrected
+  client-side; should use a configured public base URL server-side.
 - **Phase 16 — Android / Samsung companion** (Sharesheet-first) — Ph 5.
 - **Phase 17 — iPhone / iPad companion** (Share Extension, App Intents) — Ph 6.
 - **Phase 18 — Client-side clipboard encryption** (threat model first;
