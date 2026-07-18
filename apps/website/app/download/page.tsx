@@ -38,7 +38,7 @@ const VSCODE_FEATURES = [
 const STEPS = [
   {
     title: "Download & open",
-    body: "Grab the .dmg, drag Keep Clipboard to Applications, and open it (right-click → Open the first time).",
+    body: "Grab the .dmg and drag Keep Clipboard to Applications. On first launch, clear the quarantine flag (see the note under the button).",
   },
   {
     title: "Connect this Mac",
@@ -123,8 +123,23 @@ export default function DownloadPage() {
                 <span>·</span>
                 <span>v0.1.0</span>
                 <span>·</span>
-                <span>Unsigned — right-click → Open</span>
+                <span>macOS 12+</span>
               </p>
+
+              <details className="mt-2 rounded-lg border border-amber-400/20 bg-amber-400/[0.06] p-3 text-xs text-white/60">
+                <summary className="cursor-pointer font-medium text-amber-200/90">
+                  macOS says it’s “damaged”? Read this first.
+                </summary>
+                <p className="mt-2 leading-5">
+                  It isn’t — this early build isn’t notarized by Apple yet, so
+                  macOS blocks it after download. Open Terminal and run this once,
+                  then open the app normally:
+                </p>
+                <code className="mt-2 block overflow-x-auto rounded bg-black/40 px-2 py-1.5 font-mono text-[11px] text-white/80">
+                  xattr -dr com.apple.quarantine &quot;/Applications/Keep
+                  Clipboard.app&quot;
+                </code>
+              </details>
             </div>
           </article>
 
