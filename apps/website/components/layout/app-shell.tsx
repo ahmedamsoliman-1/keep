@@ -1,6 +1,7 @@
 import {
   ChevronRight,
   ClipboardList,
+  Download,
   FolderKanban,
   LayoutDashboard,
   Settings,
@@ -71,6 +72,13 @@ export function AppShell({
           >
             <Settings className="size-4" />
             Settings
+          </Link>
+          <Link
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[var(--muted)] transition hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)]"
+            href="/download"
+          >
+            <Download className="size-4" />
+            Download apps
           </Link>
         </div>
         <div className="mt-auto rounded-xl border bg-[var(--surface)] p-2">

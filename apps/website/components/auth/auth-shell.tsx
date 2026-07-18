@@ -1,4 +1,10 @@
-import { CheckCircle2, KeyRound, ShieldCheck, Sparkles } from "lucide-react";
+import {
+  CheckCircle2,
+  Download,
+  KeyRound,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -84,6 +90,15 @@ export function AuthShell({
           <div className="mt-8">{children}</div>
           <div className="mt-8 text-center text-sm text-[var(--muted)]">
             {footer}
+          </div>
+          <div className="mt-6 border-t pt-5 text-center">
+            <Link
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--muted)] transition hover:text-indigo-500"
+              href="/download"
+            >
+              <Download className="size-3.5" />
+              Get the desktop app &amp; VS Code extension
+            </Link>
           </div>
         </div>
       </section>
