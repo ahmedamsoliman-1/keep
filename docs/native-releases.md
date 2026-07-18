@@ -16,6 +16,11 @@ Android APK/AAB assets will join this list only after the native Android shell,
 secure storage, biometrics, Sharesheet and notification work passes its release
 gate. The download page intentionally labels Android as in progress until then.
 
+Before that public gate, `.github/workflows/android-test.yml` can be run
+manually from `main`. It creates a signed universal APK as a private GitHub
+Actions artifact with a 14-day retention period. It does not create a GitHub
+Release and does not expose the APK on `/download`.
+
 ## GitHub environment
 
 Create a protected GitHub environment named `native-release`. Require reviewer
@@ -45,10 +50,23 @@ certificate.
 The workflow can also be started manually for an existing `keep-v*` tag. It
 never creates a release from an arbitrary branch or untagged commit.
 
-## Android signing inputs (planned)
+## Android private testing
 
-The Android job will use a Play App Signing upload keystore exposed only through
-the protected environment. The first AAB must be registered manually in Play
-Console; subsequent internal-track uploads can be automated through the Google
-Play Developer API. Direct APK downloads and Play-distributed AABs must be built
-from the same tag and signing identity.
+The protected `native-release` environment must contain these secrets:
+
+| Name                        | Purpose                                  |
+| --------------------------- | ---------------------------------------- |
+| `ANDROID_KEYSTORE_BASE64`   | Base64-encoded Android release keystore  |
+| `ANDROID_KEYSTORE_PASSWORD` | Keystore password                        |
+| `ANDROID_KEY_ALIAS`         | Release key alias                        |
+| `ANDROID_KEY_PASSWORD`      | Private-key password                     |
+
+Run **Android signed test APK** from the repository's Actions page, approve the
+`native-release` environment if prompted, then download the artifact from the
+completed workflow run. The workflow verifies the APK signature and includes a
+SHA-256 checksum. Keep the same keystore permanently: Android only accepts an
+update when it is signed with the same key as the installed app.
+
+The current distribution plan is direct APK download, not Google Play. After
+the Android release gate passes, the same signing identity will be used for a
+tagged public APK named `Keep-Clipboard-Android-universal.apk`.

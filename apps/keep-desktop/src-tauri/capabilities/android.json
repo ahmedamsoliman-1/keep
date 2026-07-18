@@ -1,0 +1,22 @@
+{
+  "$schema": "../gen/schemas/android-schema.json",
+  "identifier": "android",
+  "description": "Capabilities for the Keep Clipboard Android app",
+  "platforms": ["android"],
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "opener:default",
+    "clipboard-manager:allow-read-text",
+    "clipboard-manager:allow-write-text",
+    "store:default",
+    {
+      "identifier": "http:default",
+      "allow": [
+        { "url": "https://keep.aamsdn.space/*" },
+        { "url": "https://env.aamsdn.space/*" },
+        { "url": "http://localhost:3000/*" }
+      ]
+    }
+  ]
+}
