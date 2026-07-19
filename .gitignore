@@ -21,3 +21,6 @@ firebase-debug.log
 firestore-debug.log
 ui-debug.log
 *.local
+
+git.sh
+start.sh

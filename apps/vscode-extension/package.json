@@ -2,7 +2,7 @@
   "name": "keep-vscode",
   "displayName": "Keep",
   "description": "Secure environment management from VS Code.",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "publisher": "keep",
   "license": "UNLICENSED",
   "repository": {
@@ -92,6 +92,60 @@
         "icon": "$(history)"
       },
       {
+        "command": "keep.clipboard.copyItem",
+        "title": "Copy clipboard item",
+        "category": "Keep",
+        "icon": "$(copy)"
+      },
+      {
+        "command": "keep.clipboard.insertItem",
+        "title": "Insert clipboard item into editor",
+        "category": "Keep",
+        "icon": "$(insert)"
+      },
+      {
+        "command": "keep.clipboard.pinItem",
+        "title": "Pin clipboard item",
+        "category": "Keep",
+        "icon": "$(pin)"
+      },
+      {
+        "command": "keep.clipboard.unpinItem",
+        "title": "Unpin clipboard item",
+        "category": "Keep",
+        "icon": "$(pinned)"
+      },
+      {
+        "command": "keep.clipboard.deleteItem",
+        "title": "Delete clipboard item",
+        "category": "Keep",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "keep.passwords.unlock",
+        "title": "Unlock vault to view passwords",
+        "category": "Keep",
+        "icon": "$(unlock)"
+      },
+      {
+        "command": "keep.passwords.reveal",
+        "title": "Reveal / hide password",
+        "category": "Keep",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "keep.passwords.copyPassword",
+        "title": "Copy password",
+        "category": "Keep",
+        "icon": "$(copy)"
+      },
+      {
+        "command": "keep.passwords.copyUsername",
+        "title": "Copy username",
+        "category": "Keep",
+        "icon": "$(account)"
+      },
+      {
         "command": "keep.quickActions",
         "title": "Quick actions",
         "category": "Keep"
@@ -117,6 +171,14 @@
         {
           "id": "keep.explorer",
           "name": "Environments"
+        },
+        {
+          "id": "keep.clipboard",
+          "name": "Clipboard"
+        },
+        {
+          "id": "keep.passwords",
+          "name": "Passwords"
         }
       ]
     },
@@ -124,18 +186,46 @@
       {
         "view": "keep.explorer",
         "contents": "Connect this device to Keep to browse your projects and environments.\n[Sign in to Keep](command:keep.signIn)"
+      },
+      {
+        "view": "keep.clipboard",
+        "contents": "Sign in to Keep to see your cross-device clipboard stream.\n[Sign in to Keep](command:keep.signIn)"
+      },
+      {
+        "view": "keep.passwords",
+        "contents": "Sign in to Keep to view your managed passwords.\n[Sign in to Keep](command:keep.signIn)"
       }
     ],
     "menus": {
       "view/title": [
         {
-          "command": "keep.clipboard.history",
+          "command": "keep.refresh",
           "when": "view == keep.explorer",
+          "group": "navigation@2"
+        },
+        {
+          "command": "keep.clipboard.send",
+          "when": "view == keep.clipboard",
+          "group": "navigation@1"
+        },
+        {
+          "command": "keep.clipboard.history",
+          "when": "view == keep.clipboard",
+          "group": "navigation@2"
+        },
+        {
+          "command": "keep.refresh",
+          "when": "view == keep.clipboard",
+          "group": "navigation@3"
+        },
+        {
+          "command": "keep.passwords.unlock",
+          "when": "view == keep.passwords",
           "group": "navigation@1"
         },
         {
           "command": "keep.refresh",
-          "when": "view == keep.explorer",
+          "when": "view == keep.passwords",
           "group": "navigation@2"
         }
       ],
@@ -156,6 +246,46 @@
           "command": "keep.push",
           "when": "view == keep.explorer && viewItem == keepEnvironment",
           "group": "inline@2"
+        },
+        {
+          "command": "keep.clipboard.insertItem",
+          "when": "view == keep.clipboard && viewItem =~ /^keepClipboardItem/",
+          "group": "inline@1"
+        },
+        {
+          "command": "keep.clipboard.pinItem",
+          "when": "view == keep.clipboard && viewItem == keepClipboardItem",
+          "group": "inline@2"
+        },
+        {
+          "command": "keep.clipboard.unpinItem",
+          "when": "view == keep.clipboard && viewItem == keepClipboardItemPinned",
+          "group": "inline@2"
+        },
+        {
+          "command": "keep.clipboard.deleteItem",
+          "when": "view == keep.clipboard && viewItem =~ /^keepClipboardItem/",
+          "group": "inline@3"
+        },
+        {
+          "command": "keep.clipboard.copyItem",
+          "when": "view == keep.clipboard && viewItem =~ /^keepClipboardItem/",
+          "group": "context@1"
+        },
+        {
+          "command": "keep.passwords.reveal",
+          "when": "view == keep.passwords && viewItem =~ /^keepPassword/",
+          "group": "inline@1"
+        },
+        {
+          "command": "keep.passwords.copyPassword",
+          "when": "view == keep.passwords && viewItem =~ /^keepPassword/",
+          "group": "inline@2"
+        },
+        {
+          "command": "keep.passwords.copyUsername",
+          "when": "view == keep.passwords && viewItem =~ /^keepPassword/",
+          "group": "inline@3"
         }
       ]
     },

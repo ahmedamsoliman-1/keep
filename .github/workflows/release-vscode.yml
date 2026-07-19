@@ -1,0 +1,139 @@
+name: Release VS Code extension
+
+# Publishes apps/vscode-extension to the VS Code Marketplace (and Open VSX, if
+# configured). Two ways to trigger:
+#
+#   1. Push a tag `vscode-v<version>` that matches package.json (e.g. vscode-v0.4.0).
+#   2. Run this workflow manually (Actions → Release VS Code extension → Run).
+#
+# Channel follows the repo convention in apps/vscode-extension/scripts/release.sh:
+# an ODD minor (0.5.x) publishes to the pre-release channel, an EVEN minor (0.4.x)
+# to stable. `workflow_dispatch` can override this with the `channel` input.
+#
+# Required secret (scoped to the `vscode-release` environment or the repo):
+#   VSCE_PAT  — Azure DevOps PAT for the "keep" publisher, Marketplace: Manage.
+# Optional:
+#   OVSX_PAT  — Open VSX token; when set, the build is mirrored there too.
+
+on:
+  push:
+    tags:
+      - "vscode-v*"
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Marketplace channel
+        required: true
+        type: choice
+        options:
+          - auto
+          - pre-release
+          - stable
+        default: auto
+      ref:
+        description: Tag or ref to publish (defaults to the triggering ref)
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vscode-release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PUBLISH_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.ref != '' && inputs.ref || github.ref_name }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: vscode-release
+    defaults:
+      run:
+        working-directory: apps/vscode-extension
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.PUBLISH_REF }}
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.9.0
+      - name: Install dependencies
+        working-directory: .
+        run: pnpm install --frozen-lockfile
+
+      - name: Resolve version and channel
+        id: meta
+        shell: bash
+        env:
+          CHANNEL_INPUT: ${{ inputs.channel }}
+        run: |
+          version="$(node -p "require('./package.json').version")"
+
+          # On a tag push, the tag must match the package version exactly so a
+          # release can never publish a stale or mismatched build.
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            expected="vscode-v${version}"
+            if [ "${GITHUB_REF_NAME}" != "$expected" ]; then
+              echo "Tag ${GITHUB_REF_NAME} does not match package version (expected $expected)." >&2
+              exit 1
+            fi
+          fi
+
+          channel="${CHANNEL_INPUT:-auto}"
+          if [ "$channel" = "auto" ]; then
+            minor="$(echo "$version" | cut -d. -f2)"
+            if [ $((minor % 2)) -eq 1 ]; then channel="pre-release"; else channel="stable"; fi
+          fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "channel=$channel" >> "$GITHUB_OUTPUT"
+          echo "vsix=keep-vscode-${version}.vsix" >> "$GITHUB_OUTPUT"
+          echo "Publishing v${version} to the ${channel} channel."
+
+      - name: Verify (lint, typecheck, test, build)
+        run: |
+          pnpm run lint
+          pnpm run typecheck
+          pnpm run test
+          pnpm run build
+
+      - name: Package .vsix
+        run: |
+          flag=""
+          [ "${{ steps.meta.outputs.channel }}" = "pre-release" ] && flag="--pre-release"
+          pnpm exec vsce package $flag --no-dependencies -o "${{ steps.meta.outputs.vsix }}"
+
+      - name: Publish to the VS Code Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          if [ -z "${VSCE_PAT:-}" ]; then
+            echo "VSCE_PAT is not set. Add it to the 'vscode-release' environment (Marketplace: Manage PAT for the 'keep' publisher)." >&2
+            exit 1
+          fi
+          # The pre-release/stable channel is already baked into the packaged
+          # .vsix (see the "Package .vsix" step), so publishing by --packagePath
+          # must not repeat --pre-release.
+          pnpm exec vsce publish --no-dependencies --packagePath "${{ steps.meta.outputs.vsix }}"
+
+      - name: Mirror to Open VSX (optional)
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          if [ -z "${OVSX_PAT:-}" ]; then
+            echo "OVSX_PAT not set — skipping Open VSX mirror."
+            exit 0
+          fi
+          pnpm dlx ovsx publish "${{ steps.meta.outputs.vsix }}" -p "$OVSX_PAT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: keep-vscode-${{ steps.meta.outputs.version }}
+          path: apps/vscode-extension/${{ steps.meta.outputs.vsix }}
+          if-no-files-found: error

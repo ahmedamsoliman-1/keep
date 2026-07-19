@@ -19,6 +19,13 @@ machine in plaintext, and without overwriting a teammate's changes.
   protection. On a conflict you can overwrite or compare & merge.
 - **Environments view** — browse projects, environments and variable keys from
   the Activity Bar; pull or push an environment from its context menu.
+- **Clipboard view** — a scrollable stream of your cross-device Keep Clipboard.
+  Copy an item into VS Code, insert it at the cursor, pin/unpin or delete it, and
+  send the current selection with **Keep: Send selection to Clipboard**. Sensitive
+  previews stay masked.
+- **Passwords view** — browse your zero-knowledge password vault. Entries are
+  decrypted locally only while the vault is unlocked and masked by default;
+  reveal, copy the password or copy the username per row.
 
 ## Getting started
 
@@ -37,6 +44,7 @@ Open the Command Palette with `Cmd+Shift+P` (macOS) or `Ctrl+Shift+P`
 - `Keep: Select environment`
 - `Keep: Pull environment → .env`
 - `Keep: Push .env → environment`
+- `Keep: Send selection to Clipboard` / `Keep: Open Clipboard history`
 - `Keep: Show connection status`
 
 ## Settings
@@ -77,3 +85,36 @@ Package a locally installable VSIX:
 ```bash
 pnpm --filter keep-vscode package:vsix
 ```
+
+## Releasing
+
+Publishing to the Marketplace is automated by the
+[`Release VS Code extension`](../../.github/workflows/release-vscode.yml) GitHub
+Actions workflow — no local `vsce` login or manual publish is needed.
+
+**Channel convention:** an ODD minor (`0.5.x`) publishes to the pre-release
+channel; an EVEN minor (`0.4.x`) to stable.
+
+**One-time setup:** in the repository, create a `vscode-release`
+[environment](https://docs.github.com/actions/deployment/targeting-different-environments)
+and add:
+
+- `VSCE_PAT` (required) — an Azure DevOps Personal Access Token for the `keep`
+  publisher with **Marketplace: Manage** scope.
+- `OVSX_PAT` (optional) — an Open VSX token; when present the build is mirrored
+  there too.
+
+**To cut a release** — bump the version in `package.json`, commit, then either:
+
+```bash
+# Option A — push a matching tag (the workflow verifies tag == package version)
+git tag vscode-v$(node -p "require('./apps/vscode-extension/package.json').version")
+git push origin --tags
+```
+
+or **Option B** — run the workflow manually from the Actions tab (optionally
+overriding the channel). The workflow verifies, packages, publishes, and uploads
+the `.vsix` as a build artifact.
+
+For a fully local publish instead, `scripts/release.sh` still works (see its
+header for usage) and requires `VSCE_PAT` in your shell.

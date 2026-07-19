@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.4.0
+
+- Clipboard view in the Activity Bar: a scrollable stream of synced items with
+  copy, insert-into-editor, pin/unpin and delete per row, plus send-selection and
+  history from the view title. Sensitive previews stay masked; content is fetched
+  on demand and never held in the tree.
+- Passwords view in the Activity Bar: browse the zero-knowledge password vault.
+  Entries are decrypted locally only while the vault is unlocked, masked by
+  default, with per-row reveal/hide, copy-password and copy-username. Shows an
+  "Unlock vault" row while locked.
+
 ## 0.3.1
 
 - Unlock the vault locally with a passphrase or recovery key; the unwrapped key

@@ -4018,6 +4018,15 @@ signing, and device-validation release gate. The sections below track what's
 shipped, what Keep Secrets still owes, the remaining clipboard/platform phases,
 cross-cutting work, and the candidate feature backlog._
 
+_Reconciled again 2026-07-19: the VS Code extension now hosts all three product
+areas as Activity Bar views — Environments (existing), a scrollable **Clipboard**
+stream (Phase 13b), and a read-and-reveal **Passwords** view (Phase P2a). Both
+reuse the one device session and vault session; passwords decrypt locally only
+while unlocked. Marketplace publishing is now automated by
+`.github/workflows/release-vscode.yml` (tag `vscode-v*` or manual dispatch;
+`VSCE_PAT`/optional `OVSX_PAT` in a `vscode-release` environment), replacing the
+manual local `scripts/release.sh` step — see `docs/native-releases.md`._
+
 ## Done (Keep Secrets)
 
 - Foundation, domain/API, auth + TOTP MFA, encrypted vault, core data
@@ -4062,6 +4071,16 @@ cross-cutting work, and the candidate feature backlog._
   device token; `KeepApiError` 404/401/403 mapped to actionable messages.
   Manual receive, request/response only (no in-extension SSE yet). Typecheck +
   lint + esbuild + `pnpm check` green.
+- **[x] Phase 13b — Clipboard stream as an Activity Bar view.** The Quick Pick
+  history is promoted to a first-class, scrollable **Clipboard** view
+  (`keep.clipboard`) in the Keep container, alongside Environments — so a synced
+  item is visible and grabbable without opening a palette. `ClipboardTreeProvider`
+  lists `client.clipboard.list()` (metadata + `safePreview` only); rows offer
+  copy (default click), insert-into-editor, pin/unpin and delete, and the view
+  title carries send-selection + history. Content is fetched on demand
+  (`get`/`consume`) and never held in the tree; sensitive/secret items stay
+  masked. Still request/response only (no in-extension SSE). Reuses the shared
+  `receiveItem`/`reportError` helpers; typecheck + lint + esbuild + tests green.
 
 Then **return to Keep Secrets** (Stage E → F → Phase 9 → Phase 10).
 
@@ -4098,6 +4117,17 @@ the server only stores ciphertext. The detailed spec and phasing live in
   optional "re-authenticate to reveal" as a hardening gate over the shared unlock.
 - **P2 — Richer items & reach.** Secure notes, cards, identities; TOTP; folder/tag
   maturity; surfacing in VS Code / desktop / mobile via device-auth + api-client.
+  - **[x] P2a (partial) — VS Code Passwords view (read + reveal).** A
+    **Passwords** view (`keep.passwords`) in the Keep container browses the vault
+    read-only. While locked it shows an "Unlock vault" row (reusing the shared
+    silent/passphrase unlock); once unlocked, `client.passwords.list()` ciphertext
+    is decrypted locally with the in-memory vault key (`decryptPasswordItem`, Node
+    provider — mirrors `lib/password-entry.ts`) and the key copy is zeroed
+    immediately. Entries are masked by default with per-row reveal/hide,
+    copy-password and copy-username; decrypted values live only in memory and drop
+    on lock/sign-out/auto-lock. Unit test covers the decrypt round-trip + AAD/GCM
+    rejection. Create/edit/import stay web-only; desktop/mobile reach still to
+    come.
 - **P3 — Sharing.** Secure sharing and browser-extension autofill (aligns with
   the team/shared backlog below).
 

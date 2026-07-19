@@ -6,8 +6,9 @@ import type {
 import * as vscode from "vscode";
 
 import { requireClient } from "./client";
+import { stateChanged } from "./events";
 
-const CONTENT_ICON: Record<ClipboardItemDto["contentType"], string> = {
+export const CONTENT_ICON: Record<ClipboardItemDto["contentType"], string> = {
   text: "note",
   url: "link",
   code: "code",
@@ -72,7 +73,7 @@ function toQuickItem(item: ClipboardItemDto): ClipboardQuickItem {
   };
 }
 
-function reportError(error: unknown): void {
+export function reportError(error: unknown): void {
   if (error instanceof KeepApiError) {
     if (error.status === 404) {
       void vscode.window.showWarningMessage(
@@ -93,7 +94,7 @@ function reportError(error: unknown): void {
 }
 
 /** Reads the item's content and either copies it or inserts it into the editor. */
-async function receiveItem(
+export async function receiveItem(
   client: KeepClient,
   item: ClipboardItemDto,
   insert: boolean,
@@ -155,6 +156,7 @@ export async function sendToClipboard(
       language,
       persistenceMode: choice.mode,
     });
+    stateChanged.fire();
     void vscode.window.showInformationMessage(
       item.sensitivity === "normal"
         ? "Sent to Keep Clipboard."

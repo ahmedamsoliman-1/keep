@@ -4,7 +4,19 @@ import * as vscode from "vscode";
 import { showStatus, signIn, signOut } from "./auth";
 import { getAccessToken } from "./client";
 import { sendToClipboard, showClipboardHistory } from "./clipboard";
+import {
+  ClipboardTreeProvider,
+  copyClipboardNode,
+  insertClipboardNode,
+  mutateClipboardNode,
+} from "./clipboard-tree";
 import { stateChanged } from "./events";
+import {
+  copyPassword,
+  copyUsername,
+  PasswordsTreeProvider,
+  revealPassword,
+} from "./passwords-tree";
 import { pullEnvironment } from "./pull";
 import { pushEnvironment } from "./push";
 import {
@@ -87,6 +99,14 @@ async function bindEnvironment(
 export function activate(context: vscode.ExtensionContext) {
   const session = new VaultSession();
   const tree = new KeepTreeProvider(context);
+  const clipboardTree = new ClipboardTreeProvider(context);
+  const passwordsTree = new PasswordsTreeProvider(context, session);
+
+  const refreshAll = () => {
+    tree.refresh();
+    clipboardTree.refresh();
+    passwordsTree.refresh();
+  };
 
   context.subscriptions.push(
     vscode.commands.registerCommand("keep.signIn", () => signIn(context)),
@@ -122,10 +142,38 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("keep.clipboard.history", () =>
       showClipboardHistory(context),
     ),
+    vscode.commands.registerCommand("keep.clipboard.copyItem", (node) =>
+      copyClipboardNode(context, node),
+    ),
+    vscode.commands.registerCommand("keep.clipboard.insertItem", (node) =>
+      insertClipboardNode(context, node),
+    ),
+    vscode.commands.registerCommand("keep.clipboard.pinItem", (node) =>
+      mutateClipboardNode(context, node, "pin"),
+    ),
+    vscode.commands.registerCommand("keep.clipboard.unpinItem", (node) =>
+      mutateClipboardNode(context, node, "unpin"),
+    ),
+    vscode.commands.registerCommand("keep.clipboard.deleteItem", (node) =>
+      mutateClipboardNode(context, node, "delete"),
+    ),
+    vscode.commands.registerCommand("keep.passwords.unlock", async () => {
+      const unlocked = await ensureUnlocked(context, session);
+      if (unlocked) unlocked.key.fill(0);
+    }),
+    vscode.commands.registerCommand("keep.passwords.reveal", (node) =>
+      revealPassword(passwordsTree, node),
+    ),
+    vscode.commands.registerCommand("keep.passwords.copyPassword", (node) =>
+      copyPassword(node),
+    ),
+    vscode.commands.registerCommand("keep.passwords.copyUsername", (node) =>
+      copyUsername(node),
+    ),
     vscode.commands.registerCommand("keep.quickActions", () =>
       quickActions(context, session),
     ),
-    vscode.commands.registerCommand("keep.refresh", () => tree.refresh()),
+    vscode.commands.registerCommand("keep.refresh", () => refreshAll()),
     vscode.commands.registerCommand(
       "keep.bindEnvironment",
       (project: ProjectDto, environment: EnvironmentDto) =>
@@ -134,7 +182,9 @@ export function activate(context: vscode.ExtensionContext) {
     session,
     createStatusBar(context, session),
     vscode.window.registerTreeDataProvider("keep.explorer", tree),
-    stateChanged.event(() => tree.refresh()),
+    vscode.window.registerTreeDataProvider("keep.clipboard", clipboardTree),
+    vscode.window.registerTreeDataProvider("keep.passwords", passwordsTree),
+    stateChanged.event(() => refreshAll()),
     stateChanged,
   );
 }

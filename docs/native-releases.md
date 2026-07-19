@@ -78,6 +78,28 @@ deployment. The tagged workflow publishes
 `Keep-Clipboard-Android-universal.apk`, and the website discovers that exact
 asset from the latest GitHub Release automatically.
 
+## VS Code extension releases
+
+The VS Code extension has a **separate** track from the native installers, since
+it publishes to the VS Code Marketplace rather than GitHub Releases and keeps its
+own version in `apps/vscode-extension/package.json`.
+
+`.github/workflows/release-vscode.yml` verifies (lint/typecheck/test/build),
+packages, and publishes the extension. It triggers on a `vscode-v<version>` tag
+(the tag must match `package.json`) or a manual `workflow_dispatch`. Channel
+follows the odd/even-minor convention in `apps/vscode-extension/scripts/release.sh`
+(odd minor → pre-release, even → stable); `workflow_dispatch` can override it.
+
+Create a `vscode-release` GitHub environment with:
+
+| Kind             | Name       | Purpose                                                          |
+| ---------------- | ---------- | ---------------------------------------------------------------- |
+| Environment secret | `VSCE_PAT` | Azure DevOps PAT for the `keep` publisher, **Marketplace: Manage** |
+| Environment secret | `OVSX_PAT` | _(optional)_ Open VSX token to mirror the same build             |
+
+Because `vscode-v*` and `keep-v*` use different tag prefixes, the extension and
+native release workflows never trigger each other.
+
 ## Android beta scope and follow-ups
 
 The direct-download beta intentionally supports manual text sending, clipboard

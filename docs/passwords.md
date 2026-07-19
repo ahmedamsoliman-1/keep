@@ -80,6 +80,13 @@ HaveIBeenPwned k-anonymity (range API, never sends a full hash); trash & restore
 Secure notes, cards, identities; TOTP codes; folder/tag maturity; surfacing in
 VS Code, desktop, and mobile via the existing device-auth + api-client.
 
+- **P2a (shipped, partial):** VS Code **Passwords** view — read-only browse of the
+  vault. Locked until the shared vault unlock; then `client.passwords.list()`
+  ciphertext is decrypted locally with the in-memory vault key and shown masked,
+  with per-row reveal/hide, copy-password and copy-username. Plaintext lives only
+  in memory while unlocked. See `docs/vscode-integration.md`. Create/edit/import
+  and desktop/mobile reach are still to come.
+
 ### Phase P3 — Sharing
 
 Secure sharing and browser-extension autofill (aligns with the Part III
