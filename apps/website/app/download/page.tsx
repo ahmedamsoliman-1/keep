@@ -46,7 +46,7 @@ const WINDOWS_FEATURES = [
 ];
 
 const ANDROID_FEATURES = [
-  "Share text explicitly through Keep",
+  "Send text explicitly through Keep",
   "Browse history and tap an item to copy",
   "Samsung tablet and DeX-friendly interface",
 ];
@@ -263,7 +263,7 @@ export default async function DownloadPage() {
                 </a>
               ) : (
                 <span className="inline-flex cursor-not-allowed items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/45">
-                  Native build in progress
+                  Android release in progress
                 </span>
               )}
               <a
@@ -274,8 +274,8 @@ export default async function DownloadPage() {
               </a>
               <p className="text-xs leading-5 text-white/45">
                 Android limits background clipboard access. This beta uses
-                explicit sharing and manual sending; Share Sheet, biometrics,
-                and notifications will arrive in later updates.
+                manual sending; Share Sheet, biometrics, notifications, and
+                deeper Samsung integration are planned for later updates.
               </p>
             </div>
           </article>

@@ -35,24 +35,9 @@ jobs:
             *) echo "Release tag must start with keep-v" >&2; exit 1 ;;
           esac
 
-  desktop:
+  macos:
     needs: validate
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - runner: macos-14
-            artifact: keep-clipboard-macos-arm64
-            args: --target aarch64-apple-darwin
-            paths: |
-              apps/keep-desktop/src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
-          - runner: windows-latest
-            artifact: keep-clipboard-windows-x64
-            args: ""
-            paths: |
-              apps/keep-desktop/src-tauri/target/release/bundle/nsis/*.exe
-              apps/keep-desktop/src-tauri/target/release/bundle/msi/*.msi
-    runs-on: ${{ matrix.runner }}
+    runs-on: macos-14
     environment: native-release
     steps:
       - uses: actions/checkout@v5
@@ -67,11 +52,29 @@ jobs:
           version: 11.9.0
       - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.runner == 'macos-14' && 'aarch64-apple-darwin' || '' }}
+          targets: aarch64-apple-darwin
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter keep-desktop typecheck
-      - name: Enforce Windows release security gate
-        if: runner.os == 'Windows'
+      - uses: tauri-apps/tauri-action@v1
+        with:
+          projectPath: apps/keep-desktop
+          args: --target aarch64-apple-darwin
+      - uses: actions/upload-artifact@v4
+        with:
+          name: keep-clipboard-macos-arm64
+          path: apps/keep-desktop/src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
+          if-no-files-found: error
+
+  windows:
+    needs: validate
+    runs-on: windows-latest
+    environment: native-release
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+      - name: Check Windows release gate
+        id: gate
         shell: pwsh
         env:
           RELEASE_APPROVED: ${{ vars.KEEP_WINDOWS_RELEASE_APPROVED }}
@@ -79,10 +82,12 @@ jobs:
           WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
         run: |
           if ($env:RELEASE_APPROVED -ne "true") {
-            throw "Set native-release variable KEEP_WINDOWS_RELEASE_APPROVED=true only after Credential Manager integration and device testing pass."
+            "enabled=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            Write-Host "Windows release gate is closed; macOS and Android can still publish."
+            exit 0
           }
           if (-not $env:WINDOWS_CERTIFICATE_BASE64 -or -not $env:WINDOWS_CERTIFICATE_PASSWORD) {
-            throw "Windows signing certificate secrets are required."
+            throw "Windows signing certificate secrets are required when the release gate is open."
           }
           $pfxPath = Join-Path $env:RUNNER_TEMP "keep-windows-signing.pfx"
           [IO.File]::WriteAllBytes($pfxPath, [Convert]::FromBase64String($env:WINDOWS_CERTIFICATE_BASE64))
@@ -99,14 +104,34 @@ jobs:
             }
           } | ConvertTo-Json -Depth 4
           $config | Set-Content "apps/keep-desktop/src-tauri/tauri.windows-signing.conf.json"
+          "enabled=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+      - uses: actions/setup-node@v5
+        if: steps.gate.outputs.enabled == 'true'
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - uses: pnpm/action-setup@v4
+        if: steps.gate.outputs.enabled == 'true'
+        with:
+          version: 11.9.0
+      - uses: dtolnay/rust-toolchain@stable
+        if: steps.gate.outputs.enabled == 'true'
+      - run: pnpm install --frozen-lockfile
+        if: steps.gate.outputs.enabled == 'true'
+      - run: pnpm --filter keep-desktop typecheck
+        if: steps.gate.outputs.enabled == 'true'
       - uses: tauri-apps/tauri-action@v1
+        if: steps.gate.outputs.enabled == 'true'
         with:
           projectPath: apps/keep-desktop
-          args: ${{ matrix.args }} ${{ runner.os == 'Windows' && '--config src-tauri/tauri.windows-signing.conf.json' || '' }}
+          args: --config src-tauri/tauri.windows-signing.conf.json
       - uses: actions/upload-artifact@v4
+        if: steps.gate.outputs.enabled == 'true'
         with:
-          name: ${{ matrix.artifact }}
-          path: ${{ matrix.paths }}
+          name: keep-clipboard-windows-x64
+          path: |
+            apps/keep-desktop/src-tauri/target/release/bundle/nsis/*.exe
+            apps/keep-desktop/src-tauri/target/release/bundle/msi/*.msi
           if-no-files-found: error
 
   android:
@@ -195,7 +220,7 @@ jobs:
           if-no-files-found: error
 
   publish:
-    needs: [desktop, android]
+    needs: [macos, windows, android]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -211,13 +236,13 @@ jobs:
         run: |
           mkdir release
           mac_dmg=$(find artifacts/keep-clipboard-macos-arm64 -type f -name '*.dmg' -print -quit)
-          win_exe=$(find artifacts/keep-clipboard-windows-x64 -type f -name '*.exe' -print -quit)
-          win_msi=$(find artifacts/keep-clipboard-windows-x64 -type f -name '*.msi' -print -quit)
+          win_exe=$(find artifacts/keep-clipboard-windows-x64 -type f -name '*.exe' -print -quit 2>/dev/null || true)
+          win_msi=$(find artifacts/keep-clipboard-windows-x64 -type f -name '*.msi' -print -quit 2>/dev/null || true)
           android_apk=$(find artifacts/keep-clipboard-android -type f -name '*.apk' -print -quit)
-          test -n "$mac_dmg" && test -n "$win_exe" && test -n "$win_msi" && test -n "$android_apk"
+          test -n "$mac_dmg" && test -n "$android_apk"
           cp "$mac_dmg" release/Keep-Clipboard-macOS-arm64.dmg
-          cp "$win_exe" release/Keep-Clipboard-Windows-x64-Setup.exe
-          cp "$win_msi" release/Keep-Clipboard-Windows-x64.msi
+          if [ -n "$win_exe" ]; then cp "$win_exe" release/Keep-Clipboard-Windows-x64-Setup.exe; fi
+          if [ -n "$win_msi" ]; then cp "$win_msi" release/Keep-Clipboard-Windows-x64.msi; fi
           cp "$android_apk" release/Keep-Clipboard-Android-universal.apk
           cd release
           sha256sum * > SHA256SUMS.txt

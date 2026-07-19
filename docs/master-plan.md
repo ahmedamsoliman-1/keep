@@ -4104,7 +4104,7 @@ Then **return to Keep Secrets** (Stage E → F → Phase 9 → Phase 10).
   tray, start-at-login, secure Windows Credential Manager storage, pairing and
   revocation. Do not add Keep Secrets project/environment browsing, secret
   editing, vault unlock, or dotenv pull/push to the Windows app in this phase.
-- **Phase 16 — Android / Samsung companion** — Part II §25 Ph 5. Android
+- **Phase 16 — Android / Samsung companion (public beta shipped 2026-07-19)** — Part II §25 Ph 5. Android
   restricts background clipboard reads (10+), so unlike desktop this is
   **share-to-Keep first** (a Share-sheet target → create item) plus tap-to-copy
   history — not silent auto-capture. Receive via foreground SSE / FCM push.
@@ -4114,10 +4114,12 @@ Then **return to Keep Secrets** (Stage E → F → Phase 9 → Phase 10).
   or native Kotlin. Needs the mobile build toolchain, Play Store, biometric lock,
   and server FCM integration for background receive. **Scope decision
   (2026-07-18): this phase is Clipboard-first and does not include Keep Secrets.**
-  Its product scope is: share text through the Android Sharesheet, browse
-  clipboard history, tap to copy, receive notifications, provide a Samsung
-  tablet/DeX-friendly interface, optionally add a Quick Settings tile, and
-  protect access with biometrics.
+  The shipped beta pairs through the browser, manually sends text, browses
+  clipboard history, and taps to copy, with signed direct-APK distribution.
+  Follow-ups are an Android Sharesheet target, notifications, biometric lock,
+  Samsung tablet/DeX validation, an optional Quick Settings tile, and research
+  into supported Samsung clipboard APIs. Keep will not bypass Android privacy
+  controls or depend on Samsung-only behavior.
 - **Phase 17 — iPhone / iPad companion** (Share Extension, App Intents) — Ph 6.
   iOS blocks background clipboard access and shows a paste banner, so it is
   share-driven like Android. Reuses the same server + contracts.
@@ -4179,13 +4181,13 @@ Then **return to Keep Secrets** (Stage E → F → Phase 9 → Phase 10).
 
 ## Recommended sequencing (from here)
 
-1. **Windows + Android/Samsung Clipboard milestone** — develop both together
-   against the shared contracts and client UI, while shipping separate native
-   packages. Windows includes watcher/history/tray/autostart; Android includes
-   Sharesheet/history/tap-to-copy/notifications/DeX/biometrics and never relies
-   on background clipboard reads. Keep Secrets remains out of scope for both.
-2. **Native secure credential storage** — Windows Credential Manager and
-   Android Keystore-backed storage are release gates, not follow-ups.
+1. **Finish Windows Clipboard distribution** — Android/Samsung has shipped as a
+   direct-download public beta. Windows still needs Credential Manager, signed
+   installers, and clean-device testing before its independent release gate.
+2. **Android/Samsung beta enhancements** — Sharesheet, notifications,
+   biometrics, DeX/tablet validation, optional Quick Settings, and supported
+   Samsung clipboard integration research. Silent background capture remains
+   explicitly out of scope.
 3. **Phase 14b device management** — now that web, VS Code, and macOS all emit, a
    device dashboard + revoke is both useful and a security necessity.
 4. **Return to Keep Secrets** — Stage E (revision history) → F (activity) →

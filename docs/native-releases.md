@@ -13,10 +13,11 @@ publish from an existing `keep-v*` Git tag.
 - `Keep-Clipboard-Android-universal.apk`
 - `SHA256SUMS.txt`
 
-The Android public-beta release gate requires Android Keystore-backed session
-storage, signed upgrade testing, reliable pairing/sign-out, and honest product
-limitations on the download page. Sharesheet, biometrics, notifications, and
-additional DeX polish may ship in later beta updates.
+The Android public-beta release gate requires signed upgrade testing, reliable
+pairing/sign-out, app-private session storage with Android Keystore preferred,
+and honest product limitations on the download page. Sharesheet, biometrics,
+notifications, Quick Settings, Samsung clipboard research, and additional DeX
+polish may ship in later beta updates.
 
 Before that public gate, `.github/workflows/android-test.yml` can be run
 manually from `main`. It creates a signed universal APK as a private GitHub
@@ -44,7 +45,9 @@ gates and refuses to publish the associated installer before its release gate.
    `apps/keep-desktop/src-tauri/Cargo.toml`, and
    `apps/keep-desktop/src-tauri/tauri.conf.json`.
 2. Merge a green CI build.
-3. Create and push a protected tag such as `keep-v0.2.0`.
+3. Create and push a protected tag such as `keep-v0.2.0`. macOS and Android
+   publish together; Windows remains independently gated until its signing and
+   device-testing requirements pass.
 4. Approve the `native-release` environment deployment.
 5. Verify the release checksums, provenance and installers on clean devices.
 6. Confirm `/download` resolves the latest Windows and Android installers.
@@ -73,3 +76,18 @@ The current distribution plan is direct APK download, not Google Play. After
 the Android release gate passes, set `KEEP_ANDROID_RELEASE_APPROVED=true`. The
 tagged workflow publishes `Keep-Clipboard-Android-universal.apk`, and the
 website discovers that exact asset from the latest GitHub Release automatically.
+
+## Android beta scope and follow-ups
+
+The direct-download beta intentionally supports manual text sending, clipboard
+history, and tap-to-copy. Android restricts background clipboard reads, so the
+app does not claim macOS-style automatic capture.
+
+Future Android/Samsung work is tracked in this order:
+
+1. Android Sharesheet target for sending selected text directly to Keep.
+2. Notifications and foreground/background receive behavior.
+3. Biometric app lock and stronger Keystore compatibility diagnostics.
+4. Samsung tablet/DeX layout testing and an optional Quick Settings tile.
+5. Investigate Samsung clipboard integration using supported public APIs only;
+   Keep will not use Accessibility scraping or depend exclusively on Samsung.
