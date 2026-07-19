@@ -34,10 +34,10 @@ approval and restrict deployment to protected `keep-v*` tags. Configure:
 | Environment variable | `KEEP_WINDOWS_RELEASE_APPROVED` | Must equal `true` after Credential Manager integration and Windows device testing pass |
 | Environment secret   | `WINDOWS_CERTIFICATE_BASE64`    | Base64-encoded Authenticode PFX                                                        |
 | Environment secret   | `WINDOWS_CERTIFICATE_PASSWORD`  | PFX password                                                                           |
-| Environment variable | `KEEP_ANDROID_RELEASE_APPROVED` | Must equal `true` only after Android feature and device testing pass                   |
 
-Do not set either approval variable early. The workflow treats them as security
-gates and refuses to publish the associated installer before its release gate.
+Do not set the Windows approval variable early. Android is gated by the
+protected tag, the `native-release` environment approval, and the required
+signing secrets rather than a duplicate boolean flag.
 
 ## Publishing
 
@@ -73,9 +73,10 @@ SHA-256 checksum. Keep the same keystore permanently: Android only accepts an
 update when it is signed with the same key as the installed app.
 
 The current distribution plan is direct APK download, not Google Play. After
-the Android release gate passes, set `KEEP_ANDROID_RELEASE_APPROVED=true`. The
-tagged workflow publishes `Keep-Clipboard-Android-universal.apk`, and the
-website discovers that exact asset from the latest GitHub Release automatically.
+the Android release gate passes, approve the protected `native-release`
+deployment. The tagged workflow publishes
+`Keep-Clipboard-Android-universal.apk`, and the website discovers that exact
+asset from the latest GitHub Release automatically.
 
 ## Android beta scope and follow-ups
 

@@ -160,19 +160,14 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
-      - name: Enforce Android release gate
+      - name: Restore Android signing key
         shell: bash
         env:
-          RELEASE_APPROVED: ${{ vars.KEEP_ANDROID_RELEASE_APPROVED || secrets.KEEP_ANDROID_RELEASE_APPROVED }}
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          if [ "$RELEASE_APPROVED" != "true" ]; then
-            echo "Set KEEP_ANDROID_RELEASE_APPROVED=true only after the Android release gate passes." >&2
-            exit 1
-          fi
           for value in \
             "$ANDROID_KEYSTORE_BASE64" \
             "$ANDROID_KEYSTORE_PASSWORD" \
