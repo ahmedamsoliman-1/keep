@@ -85,10 +85,15 @@ it publishes to the VS Code Marketplace rather than GitHub Releases and keeps it
 own version in `apps/vscode-extension/package.json`.
 
 `.github/workflows/release-vscode.yml` verifies (lint/typecheck/test/build),
-packages, and publishes the extension. It triggers on a `vscode-v<version>` tag
-(the tag must match `package.json`) or a manual `workflow_dispatch`. Channel
-follows the odd/even-minor convention in `apps/vscode-extension/scripts/release.sh`
-(odd minor → pre-release, even → stable); `workflow_dispatch` can override it.
+packages, and publishes the extension. It triggers on a manual `workflow_dispatch`
+(recommended) or a `vscode-v*` tag. Because Marketplace versions are immutable,
+the workflow auto-increments the patch version until it finds a free one,
+publishes it, then commits the `package.json` bump back to the default branch —
+so each run just publishes the next patch. Channel follows the odd/even-minor
+convention in `apps/vscode-extension/scripts/release.sh` (odd minor → pre-release,
+even → stable); CI only moves the patch, and `workflow_dispatch` can override the
+channel. It needs `contents: write` for the commit-back; if the default branch is
+protected the publish still succeeds and the bump is left to a manual edit.
 
 Create a `vscode-release` GitHub environment with:
 

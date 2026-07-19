@@ -92,9 +92,6 @@ Publishing to the Marketplace is automated by the
 [`Release VS Code extension`](../../.github/workflows/release-vscode.yml) GitHub
 Actions workflow — no local `vsce` login or manual publish is needed.
 
-**Channel convention:** an ODD minor (`0.5.x`) publishes to the pre-release
-channel; an EVEN minor (`0.4.x`) to stable.
-
 **One-time setup:** in the repository, create a `vscode-release`
 [environment](https://docs.github.com/actions/deployment/targeting-different-environments)
 and add:
@@ -104,17 +101,21 @@ and add:
 - `OVSX_PAT` (optional) — an Open VSX token; when present the build is mirrored
   there too.
 
-**To cut a release** — bump the version in `package.json`, commit, then either:
+**To cut a release** — just run the workflow from the **Actions** tab (or push a
+`vscode-v*` tag). Marketplace versions are immutable, so the workflow
+**auto-increments the patch** until it finds a free version, publishes it, then
+commits the resulting `package.json` bump back to the default branch. Each run
+therefore publishes the next patch (`0.4.0` taken → `0.4.1`) — no manual bump
+needed.
 
-```bash
-# Option A — push a matching tag (the workflow verifies tag == package version)
-git tag vscode-v$(node -p "require('./apps/vscode-extension/package.json').version")
-git push origin --tags
-```
+**Channel convention:** an ODD minor (`0.5.x`) publishes to the pre-release
+channel; an EVEN minor (`0.4.x`) to stable. CI only moves the patch, so to switch
+channel or bump the minor/major, edit `package.json` first (or pass the `channel`
+input on a manual run).
 
-or **Option B** — run the workflow manually from the Actions tab (optionally
-overriding the channel). The workflow verifies, packages, publishes, and uploads
-the `.vsix` as a build artifact.
+> If the default branch is protected against direct pushes, the publish still
+> succeeds but the commit-back step logs a warning — bump `package.json` to the
+> published version yourself in that case.
 
 For a fully local publish instead, `scripts/release.sh` still works (see its
 header for usage) and requires `VSCE_PAT` in your shell.
